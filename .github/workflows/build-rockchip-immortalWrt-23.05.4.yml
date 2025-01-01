@@ -1,0 +1,67 @@
+name: build-rockchip-immortalWrt-23.05.4
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: |
+          输入 软路由型号（用逗号分隔的多个值），可选值如下：
+          ariaboard_photonicat,armsom_sige3,ezpro_mrkaio-m68s,firefly_roc-rk3328-cc,firefly_roc-rk3568-pc,friendlyarm_nanopc-t4,friendlyarm_nanopi-r2c,friendlyarm_nanopi-r2c-plus,friendlyarm_nanopi-r2s,friendlyarm_nanopi-r4s,friendlyarm_nanopi-r4s-enterprise,friendlyarm_nanopi-r4se,friendlyarm_nanopi-r5c,friendlyarm_nanopi-r5s,huake_guangmiao-g4c,lunzn_fastrhino-r66s,lunzn_fastrhino-r68s,lyt_t68m,pine64_rockpro64,radxa_rock-pi-4a,radxa_rock-pi-e,xunlong_orangepi-r1-plus,xunlong_orangepi-r1-plus-lts
+        required: true
+        default: 'friendlyarm_nanopi-r4s'
+      rootfs_partsize:
+        description: '设置软件包大小 单位(MB)'
+        required: true
+        default: '1024'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set executable permissions
+        run: chmod +x ${{ github.workspace }}/rockchip/23.05.4/build.sh
+
+      - name: Building Rockchip ImmortalWrt
+        run: |
+          profiles="${{ github.event.inputs.profile }}"
+          rootfs_partsize="${{ github.event.inputs.rootfs_partsize }}"
+          
+          IFS=',' read -r -a profile_array <<< "$profiles"
+          
+          for profile in "${profile_array[@]}"; do
+            echo "Building for profile: $profile"
+            
+            docker run --rm -i \
+              --user root \
+              -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
+              -v "${{ github.workspace }}/files:/home/build/immortalwrt/files" \
+              -v "${{ github.workspace }}/rockchip/imm.config:/home/build/immortalwrt/.config" \
+              -v "${{ github.workspace }}/rockchip/23.05.4/build.sh:/home/build/immortalwrt/build.sh" \
+              -e PROFILE=$profile \
+              -e ROOTFS_PARTSIZE=$rootfs_partsize \
+              immortalwrt/imagebuilder:rockchip-armv8-openwrt-23.05.4 /bin/bash /home/build/immortalwrt/build.sh
+          done
+
+      - name: Create GitHub Release Info
+        uses: softprops/action-gh-release@v2.1.0
+        with:
+          tag_name: Autobuild-23.05.4
+          name: ImmortWrt-Rockchip
+          body_path: ${{ github.workspace }}/info.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload ImmortWrt as release assets
+        uses: softprops/action-gh-release@v2.1.0
+        with:
+          tag_name: Autobuild-23.05.4
+          files: ${{ github.workspace }}/bin/targets/rockchip/armv8/*.img.gz
+          token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

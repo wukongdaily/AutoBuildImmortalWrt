@@ -1,0 +1,61 @@
+name: build-x86-64-immortalwrt-24.10
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: '请输入要编译固件大小 单位(MB)'
+        required: true
+        default: '1024'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set executable permissions
+        run: chmod +x ${{ github.workspace }}/x86-64/build.sh
+
+      - name: Build ImmortalWrt-x86-64-eif
+        run: |
+          profiles="${{ github.event.inputs.profile }}"
+          
+          IFS=',' read -r -a profile_array <<< "$profiles"
+          
+          for profile in "${profile_array[@]}"; do
+            echo "Building for profile: $profile"
+            
+            docker run --rm -i \
+              --user root \
+              -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
+              -v "${{ github.workspace }}/files:/home/build/immortalwrt/files" \
+              -v "${{ github.workspace }}/x86-64/imm.config:/home/build/immortalwrt/.config" \
+              -v "${{ github.workspace }}/x86-64/24.10/build.sh:/home/build/immortalwrt/build.sh" \
+              -e PROFILE=$profile \
+              immortalwrt/imagebuilder:x86-64-openwrt-24.10.0-rc3 /bin/bash /home/build/immortalwrt/build.sh
+          done
+
+
+      - name: Create GitHub Release Info
+        uses: softprops/action-gh-release@v2.1.0
+        with:
+          tag_name: Autobuild-x86-64
+          name: ImmortWrt-x86-64-efi
+          body_path: ${{ github.workspace }}/info.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload ImmortWrt as release assets
+        uses: softprops/action-gh-release@v2.1.0
+        with:
+          tag_name: Autobuild-x86-64
+          files: ${{ github.workspace }}/bin/targets/x86/64/*squashfs-combined-efi.img.gz
+          token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
