@@ -23,7 +23,7 @@ done
 if [ "$count" -eq 1 ]; then
   uci set network.lan.proto='dhcp'
 elif [ "$count" -gt 1 ]; then
-  uci set network.lan.ipaddr='192.168.100.1'
+  uci set network.lan.ipaddr='192.168.60.254'
 fi
 
 # 设置所有网口可访问网页终端
