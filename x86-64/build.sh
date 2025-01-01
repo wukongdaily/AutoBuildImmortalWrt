@@ -17,6 +17,7 @@ PACKAGES="$PACKAGES luci-i18n-argon-config-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-opkg-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-ttyd-zh-cn"
 PACKAGES="$PACKAGES luci-app-autoreboot"
+PACKAGES="$PACKAGES luci-app-vlmcsd"
 
 
 # 构建镜像
