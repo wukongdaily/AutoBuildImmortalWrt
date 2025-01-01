@@ -19,6 +19,8 @@ PACKAGES="$PACKAGES luci-i18n-ttyd-zh-cn"
 PACKAGES="$PACKAGES luci-app-autoreboot"
 PACKAGES="$PACKAGES luci-app-vlmcsd"
 PACKAGES="$PACKAGES luci-app-wol"
+PACKAGES="$PACKAGES luci-app-accesscontrol"
+PACKAGES="$PACKAGES luci-app-adguardhome"
 
 
 # 构建镜像
