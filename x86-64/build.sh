@@ -23,6 +23,9 @@ PACKAGES="$PACKAGES luci-i18n-homeproxy-zh-cn"
 PACKAGES="$PACKAGES openssh-sftp-server"
 PACKAGES="$PACKAGES luci-i18n-dockerman-zh-cn"
 # 自定义所需安装的包
+PACKAGES="$PACKAGES luci-app-homeproxy
+PACKAGES="$PACKAGES luci-app-ssr-plus
+PACKAGES="$PACKAGES luci-app-passwall2
 PACKAGES="$PACKAGES luci-app-neko
 PACKAGES="$PACKAGES luci-app-xray
 PACKAGES="$PACKAGES luci-app-fchomo
