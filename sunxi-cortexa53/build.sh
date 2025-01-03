@@ -2,6 +2,8 @@
 # yml 传入的路由器型号 PROFILE
 echo "Building for profile: $PROFILE"
 echo "Include Docker: $INCLUDE_DOCKER"
+# yml 传入的固件大小 ROOTFS_PARTSIZE
+echo "Building for ROOTFS_PARTSIZE: $ROOTSIZE"
 
 # 输出调试信息
 echo "$(date '+%Y-%m-%d %H:%M:%S') - Starting build process..."
@@ -36,7 +38,7 @@ fi
 echo "$(date '+%Y-%m-%d %H:%M:%S') - Building image with the following packages:"
 echo "$PACKAGES"
 
-make image PROFILE=$PROFILE PACKAGES="$PACKAGES" FILES="/home/build/immortalwrt/files"
+make image PROFILE=$PROFILE PACKAGES="$PACKAGES" FILES="/home/build/immortalwrt/files" ROOTFS_PARTSIZE=$ROOTSIZE
 
 if [ $? -ne 0 ]; then
     echo "$(date '+%Y-%m-%d %H:%M:%S') - Error: Build failed!"
