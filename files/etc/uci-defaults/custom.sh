@@ -1,5 +1,8 @@
 #!/bin/sh
-
+passwd root << EOI
+admin
+admin
+EOI
 # 设置默认防火墙规则，方便虚拟机首次访问 WebUI
 uci set firewall.@zone[1].input='ACCEPT'
 
@@ -25,6 +28,10 @@ if [ "$count" -eq 1 ]; then
 elif [ "$count" -gt 1 ]; then
   uci set network.lan.ipaddr='192.168.2.1'
 fi
+uci set network.wan.device='eth0'
+uci set network.wan.proto='pppoe'
+uci set network.wan.username='02700156594'
+uci set network.wan.password='123456'
 
 # 设置所有网口可访问网页终端
 #uci delete ttyd.@ttyd[0].interface
