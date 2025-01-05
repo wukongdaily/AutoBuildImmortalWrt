@@ -1,4 +1,4 @@
-name: build-rockchip-immortalWrt-23.05
+name: build-rockchip-immortalWrt-23.05.5
 
 on:
   workflow_dispatch:
@@ -57,7 +57,7 @@ jobs:
       - name: Create GitHub Release Info
         uses: softprops/action-gh-release@v2.1.0
         with:
-          tag_name: Autobuild-23.05
+          tag_name: Autobuild-23.05.4
           name: ImmortWrt-Rockchip
           body_path: ${{ github.workspace }}/info.md
           draft: false
@@ -68,7 +68,7 @@ jobs:
       - name: Upload ImmortWrt as release assets
         uses: softprops/action-gh-release@v2.1.0
         with:
-          tag_name: Autobuild-23.05
+          tag_name: Autobuild-23.05.4
           files: |
             ${{ github.workspace }}/*.img.gz
             ${{ github.workspace }}/*.sha256
