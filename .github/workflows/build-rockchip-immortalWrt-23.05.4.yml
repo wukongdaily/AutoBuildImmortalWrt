@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set executable permissions
-        run: chmod +x ${{ github.workspace }}/rockchip/23.05/build.sh
+        run: chmod +x ${{ github.workspace }}/rockchip/23.05.4/build.sh
 
       - name: Building Rockchip ImmortalWrt
         run: |
