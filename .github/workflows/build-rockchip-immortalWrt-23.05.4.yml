@@ -1,4 +1,4 @@
-name: build-rockchip-immortalWrt-23.05.4
+name: build-rockchip-immortalWrt-23.05
 
 on:
   workflow_dispatch:
@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set executable permissions
-        run: chmod +x ${{ github.workspace }}/rockchip/23.05.4/build.sh
+        run: chmod +x ${{ github.workspace }}/rockchip/23.05/build.sh
 
       - name: Building Rockchip ImmortalWrt
         run: |
@@ -40,7 +40,7 @@ jobs:
               -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
               -v "${{ github.workspace }}/files:/home/build/immortalwrt/files" \
               -v "${{ github.workspace }}/rockchip/imm.config:/home/build/immortalwrt/.config" \
-              -v "${{ github.workspace }}/rockchip/23.05.4/build.sh:/home/build/immortalwrt/build.sh" \
+              -v "${{ github.workspace }}/rockchip/23.05/build.sh:/home/build/immortalwrt/build.sh" \
               -e PROFILE=$profile \
               -e ROOTFS_PARTSIZE=$rootfs_partsize \
               immortalwrt/imagebuilder:rockchip-armv8-openwrt-23.05 /bin/bash /home/build/immortalwrt/build.sh
