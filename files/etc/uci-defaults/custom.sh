@@ -32,7 +32,7 @@ uci set network.wan.device='eth0'
 uci set network.wan.proto='pppoe'
 uci set network.wan.username='02700156594'
 uci set network.wan.password='123456'
-
+uci set network.wan.ipv6='auto'
 # 设置所有网口可访问网页终端
 #uci delete ttyd.@ttyd[0].interface
 
