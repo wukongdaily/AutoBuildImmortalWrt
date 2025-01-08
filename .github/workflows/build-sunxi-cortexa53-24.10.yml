@@ -46,7 +46,7 @@ jobs:
         run: |
           chmod +x ${{ github.workspace }}/sunxi-cortexa53/build.sh
 
-      - name: Build Gl-iNet ImmpotalWrt 24.10
+      - name: Build sunxi-cortexa53 ImmpotalWrt 24.10
         run: |
           profiles="${{ github.event.inputs.profile }}"
           include_docker="${{ github.event.inputs.include_docker }}"
@@ -65,8 +65,17 @@ jobs:
               -e PROFILE=$profile \
               -e INCLUDE_DOCKER=$include_docker \
               -e ROOTSIZE=$size \
-              immortalwrt/imagebuilder:sunxi-cortexa53-openwrt-24.10 /bin/bash /home/build/immortalwrt/build.sh
+              immortalwrt/imagebuilder:sunxi-cortexa53-openwrt-24.10.0-rc3 /bin/bash /home/build/immortalwrt/build.sh
           done
+
+      - name: Generate Firmware SHA-256
+        run: |
+          cp ${{ github.workspace }}/bin/targets/sunxi/cortexa53/*squashfs-sdcard.img.gz ${{ github.workspace }}
+          for file in *.img.gz; do
+            sha256sum "$file" > "$file.sha256"
+            sha256sum -c "$file.sha256"
+          done
+      
       - name: Create info
         run: |
           if [ "${{ github.event.inputs.include_docker }}" == "yes" ]; then
@@ -91,7 +100,9 @@ jobs:
         uses: softprops/action-gh-release@v2.1.0
         with:
           tag_name: Autobuild-sunxi-cortexa53
-          files: ${{ github.workspace }}/bin/targets/sunxi/cortexa53/*squashfs-sdcard.img.gz
+          files: |
+            ${{ github.workspace }}/*.img.gz
+            ${{ github.workspace }}/*.sha256
           token: ${{ secrets.GITHUB_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

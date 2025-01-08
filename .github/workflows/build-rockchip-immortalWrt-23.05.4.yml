@@ -46,6 +46,14 @@ jobs:
               immortalwrt/imagebuilder:rockchip-armv8-openwrt-23.05.4 /bin/bash /home/build/immortalwrt/build.sh
           done
 
+      - name: Generate Firmware SHA-256
+        run: |
+          cp ${{ github.workspace }}/bin/targets/rockchip/armv8/*.img.gz ${{ github.workspace }}
+          for file in *.img.gz; do
+            sha256sum "$file" > "$file.sha256"
+            sha256sum -c "$file.sha256"
+          done
+      
       - name: Create GitHub Release Info
         uses: softprops/action-gh-release@v2.1.0
         with:
@@ -61,7 +69,9 @@ jobs:
         uses: softprops/action-gh-release@v2.1.0
         with:
           tag_name: Autobuild-23.05.4
-          files: ${{ github.workspace }}/bin/targets/rockchip/armv8/*.img.gz
+          files: |
+            ${{ github.workspace }}/*.img.gz
+            ${{ github.workspace }}/*.sha256
           token: ${{ secrets.GITHUB_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,4 +1,4 @@
-name: build-sunxi-cortexa53-23.05.4-ImmpotalWrt
+name: build-RaspBerryPi-23.05.4-ImmortalWrt
 
 on:
   workflow_dispatch:
@@ -8,15 +8,12 @@ on:
         description: "请选择路由器型号"
         required: true
         options:
-          - friendlyarm_nanopi-r1s-h5
-          - xunlong_orangepi-zero-plus
-          - friendlyarm_nanopi-neo2
-          - xunlong_orangepi-pc2
-          - friendlyarm_nanopi-neo-plus2
-          - libretech_all-h3-cc-h5
-          - pine64_pine64-plus
-          - pine64_sopine-baseboard
-        default: friendlyarm_nanopi-r1s-h5
+          - rpi
+          - rpi-2
+          - rpi-3
+          - rpi-4
+          - rpi-5
+        default: rpi-4
       include_docker:
         description: |
           是否编译 Docker 插件
@@ -42,16 +39,30 @@ jobs:
 
       - name: Set executable permissions
         run: |
-          chmod +x ${{ github.workspace }}/sunxi-cortexa53/build.sh
+          chmod +x ${{ github.workspace }}/raspberrypi/23.05.4/build.sh
 
-      - name: Build sunxi-cortexa53 ImmpotalWrt 23.05.4
+      - name: Build raspberrypi ImmortalWrt 24.10
         run: |
           profiles="${{ github.event.inputs.profile }}"
+          if [ "$profiles" = "rpi" ]; then
+            tag=bcm27xx-bcm2708-openwrt-23.05.4
+            echo "cpu=bcm2708" >> $GITHUB_ENV
+          elif [ "$profiles" = "rpi-2" ]; then
+            tag=bcm27xx-bcm2709-openwrt-23.05.4
+            echo "cpu=bcm2709" >> $GITHUB_ENV
+          elif [ "$profiles" = "rpi-3" ]; then
+            tag=bcm27xx-bcm2710-openwrt-23.05.4
+            echo "cpu=bcm2710" >> $GITHUB_ENV
+          elif [ "$profiles" = "rpi-4" ]; then
+            tag=bcm27xx-bcm2711-openwrt-23.05.4
+            echo "cpu=bcm2711" >> $GITHUB_ENV
+          elif [ "$profiles" = "rpi-5" ]; then
+            tag=bcm27xx-bcm2712-openwrt-23.05.4
+            echo "cpu=bcm2712" >> $GITHUB_ENV
+          fi
           include_docker="${{ github.event.inputs.include_docker }}"
           size="${{ github.event.inputs.size }}"
-          
           IFS=',' read -r -a profile_array <<< "$profiles"
-          
           for profile in "${profile_array[@]}"; do
             echo "Building for profile: $profile"
             
@@ -59,26 +70,28 @@ jobs:
               --user root \
               -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
               -v "${{ github.workspace }}/files:/home/build/immortalwrt/files" \
-              -v "${{ github.workspace }}/sunxi-cortexa53/build.sh:/home/build/immortalwrt/build.sh" \
+              -v "${{ github.workspace }}/raspberrypi/imm.config:/home/build/immortalwrt/.config" \
+              -v "${{ github.workspace }}/raspberrypi/23.05.4/build.sh:/home/build/openwrt/build.sh" \
               -e PROFILE=$profile \
               -e INCLUDE_DOCKER=$include_docker \
               -e ROOTSIZE=$size \
-              immortalwrt/imagebuilder:sunxi-cortexa53-openwrt-23.05.4 /bin/bash /home/build/immortalwrt/build.sh
+              immortalwrt/imagebuilder:$tag /bin/bash /home/build/openwrt/build.sh
           done
-
+          ls ${{ github.workspace }}/bin/targets/bcm27xx/${{ env.cpu }}
+      
       - name: Generate Firmware SHA-256
         run: |
-          cp ${{ github.workspace }}/bin/targets/sunxi/cortexa53/*squashfs-sdcard.img.gz ${{ github.workspace }}
-          for file in *.img.gz; do
+          cp ${{ github.workspace }}/bin/targets/bcm27xx/${{ env.cpu }}/*squashfs-factory.img.gz  ${{ github.workspace }}
+          for file in *squashfs-factory.img.gz; do
             sha256sum "$file" > "$file.sha256"
             sha256sum -c "$file.sha256"
           done
-
+      
       - name: Create info
         run: |
           if [ "${{ github.event.inputs.include_docker }}" == "yes" ]; then
             extra_content="### 默认带docker"
-            echo -e "\n $extra_content" >> ${{ github.workspace }}/sunxi-cortexa53/info.md
+            echo -e "\n $extra_content" >> ${{ github.workspace }}/info.md
           else
             echo -e "NO docker"
           fi
@@ -86,18 +99,18 @@ jobs:
       - name: Create GitHub Release Info
         uses: softprops/action-gh-release@v2.1.0
         with:
-          tag_name: Autobuild-sunxi-cortexa53
-          name: ImmortalWrt-sunxi-cortexa53
-          body_path: ${{ github.workspace }}/sunxi-cortexa53/info.md
+          tag_name: Autobuild-raspberrypi
+          name: immortalwrt-raspberrypi
+          body_path: ${{ github.workspace }}/info.md
           draft: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload ImmortWrt as release assets
+      - name: Upload ImmortalWrt as release assets
         uses: softprops/action-gh-release@v2.1.0
         with:
-          tag_name: Autobuild-sunxi-cortexa53
+          tag_name: Autobuild-raspberrypi
           files: |
             ${{ github.workspace }}/*.img.gz
             ${{ github.workspace }}/*.sha256
