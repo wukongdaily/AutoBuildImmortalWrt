@@ -26,5 +26,7 @@ https://mirrors.sjtug.sjtu.edu.cn/immortalwrt/releases/23.05.4/packages/x86_64/l
 https://github.com/wukongdaily/RunFilesBuilder<br>
 https://github.com/wukongdaily/DockerTarBuilder
 
+## ❤️如何构建docker版ImmortalWrt（建议收藏）⬇️
+https://wkdaily.cpolar.top/15
 # 🌟鸣谢
 ### https://github.com/immortalwrt
