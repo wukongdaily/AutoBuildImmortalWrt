@@ -41,7 +41,7 @@ jobs:
         run: |
           chmod +x ${{ github.workspace }}/raspberrypi/23.05.4/build.sh
 
-      - name: Build raspberrypi ImmortalWrt 24.10
+      - name: Build raspberrypi ImmortalWrt 23.05.4
         run: |
           profiles="${{ github.event.inputs.profile }}"
           if [ "$profiles" = "rpi" ]; then
@@ -70,7 +70,6 @@ jobs:
               --user root \
               -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
               -v "${{ github.workspace }}/files:/home/build/immortalwrt/files" \
-              -v "${{ github.workspace }}/raspberrypi/imm.config:/home/build/immortalwrt/.config" \
               -v "${{ github.workspace }}/raspberrypi/23.05.4/build.sh:/home/build/openwrt/build.sh" \
               -e PROFILE=$profile \
               -e INCLUDE_DOCKER=$include_docker \
@@ -95,22 +94,12 @@ jobs:
           else
             echo -e "NO docker"
           fi
-          
-      - name: Create GitHub Release Info
-        uses: softprops/action-gh-release@v2.1.0
-        with:
-          tag_name: Autobuild-raspberrypi
-          name: immortalwrt-raspberrypi
-          body_path: ${{ github.workspace }}/info.md
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload ImmortalWrt as release assets
-        uses: softprops/action-gh-release@v2.1.0
+        uses: softprops/action-gh-release@v2.2.1
         with:
           tag_name: Autobuild-raspberrypi
+          body_path: ${{ github.workspace }}/info.md
           files: |
             ${{ github.workspace }}/*.img.gz
             ${{ github.workspace }}/*.sha256

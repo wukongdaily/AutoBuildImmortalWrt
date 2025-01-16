@@ -1,7 +1,20 @@
 #!/bin/bash
+# 该文件实际为imagebuilder容器内的build.sh
 # yml 传入的路由器型号 PROFILE
 echo "Building for profile: $PROFILE"
 echo "Include Docker: $INCLUDE_DOCKER"
+echo "Create pppoe-settings"
+mkdir -p  /home/build/immortalwrt/files/etc/config
+
+# 创建pppoe配置文件 yml传入pppoe变量————>pppoe-settings文件
+cat << EOF > /home/build/immortalwrt/files/etc/config/pppoe-settings
+enable_pppoe=${ENABLE_PPPOE}
+pppoe_account=${PPPOE_ACCOUNT}
+pppoe_password=${PPPOE_PASSWORD}
+EOF
+
+echo "cat pppoe-settings"
+cat /home/build/immortalwrt/files/etc/config/pppoe-settings
 
 # 输出调试信息
 echo "$(date '+%Y-%m-%d %H:%M:%S') - Starting build process..."
