@@ -28,7 +28,6 @@ PACKAGES="$PACKAGES luci-i18n-filebrowser-zh-cn"
 PACKAGES="$PACKAGES luci-app-argon-config"
 PACKAGES="$PACKAGES luci-i18n-argon-config-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-diskman-zh-cn"
-#23.05
 PACKAGES="$PACKAGES luci-i18n-opkg-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-ttyd-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-passwall-zh-cn"
@@ -48,6 +47,7 @@ PACKAGES="$PACKAGES luci-i18n-wechatpush-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-ddns-zh-cn"
 PACKAGES="$PACKAGES luci-theme-openwrt-2020"
 PACKAGES="$PACKAGES luci-i18n-v2raya-zh-cn"
+#23.05
 PACKAGES="$PACKAGES openssh-sftp-server"
 # 增加几个必备组件 方便用户安装iStore
 PACKAGES="$PACKAGES fdisk"
