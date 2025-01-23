@@ -57,7 +57,6 @@ PACKAGES="$PACKAGES luci-i18n-oled-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-speederv2-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-clamav-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-gost-zh-cn"
-PACKAGES="$PACKAGES luci-i18n-mjpg-streamer-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-p910nd-zh-cn"
 PACKAGES="$PACKAGES openssh-sftp-server"
 # 增加几个必备组件 方便用户安装iStore
