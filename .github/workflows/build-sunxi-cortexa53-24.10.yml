@@ -65,7 +65,7 @@ jobs:
               -e PROFILE=$profile \
               -e INCLUDE_DOCKER=$include_docker \
               -e ROOTSIZE=$size \
-              immortalwrt/imagebuilder:sunxi-cortexa53-openwrt-24.10.0-rc3 /bin/bash /home/build/immortalwrt/build.sh
+              immortalwrt/imagebuilder:sunxi-cortexa53-openwrt-24.10.0-rc4 /bin/bash /home/build/immortalwrt/build.sh
           done
 
       - name: Generate Firmware SHA-256
