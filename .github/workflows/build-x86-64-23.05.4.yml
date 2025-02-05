@@ -90,21 +90,11 @@ jobs:
             echo -e "NO docker"
           fi
 
-      - name: Create GitHub Release Info
-        uses: softprops/action-gh-release@v2.1.0
-        with:
-          tag_name: Autobuild-x86-64
-          name: ImmortWrt-x86-64-efi
-          body_path: ${{ github.workspace }}/info.md
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Upload ImmortWrt as release assets
-        uses: softprops/action-gh-release@v2.1.0
+        uses: softprops/action-gh-release@v2.2.1
         with:
           tag_name: Autobuild-x86-64
+          body_path: ${{ github.workspace }}/info.md
           files: |
             ${{ github.workspace }}/immortalwrt-23.05.4-x86-64-generic-squashfs-combined-efi.img.gz
             ${{ github.workspace }}/immortalwrt-23.05.4-x86-64-generic-squashfs-combined-efi.img.gz.sha256

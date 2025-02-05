@@ -113,7 +113,7 @@ jobs:
               -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
               -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
               -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
-              immortalwrt/imagebuilder:rockchip-armv8-openwrt-24.10.0-rc3 /bin/bash /home/build/immortalwrt/build.sh
+              immortalwrt/imagebuilder:rockchip-armv8-openwrt-24.10.0-rc4 /bin/bash /home/build/immortalwrt/build.sh
           done
       - name: Generate Firmware SHA-256
         run: |
@@ -123,21 +123,12 @@ jobs:
             sha256sum -c "$file.sha256"
           done
 
-      - name: Create GitHub Release Info
-        uses: softprops/action-gh-release@v2.1.0
+      - name: Upload ImmortWrt as release assets
+        uses: softprops/action-gh-release@v2.2.1
         with:
           tag_name: Autobuild
           name: ImmortWrt-Rockchip
           body_path: ${{ github.workspace }}/info.md
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload ImmortWrt as release assets
-        uses: softprops/action-gh-release@v2.1.0
-        with:
-          tag_name: Autobuild
           files: |
             ${{ github.workspace }}/*.img.gz
             ${{ github.workspace }}/*.sha256

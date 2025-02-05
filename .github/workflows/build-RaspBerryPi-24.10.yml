@@ -45,19 +45,19 @@ jobs:
         run: |
           profiles="${{ github.event.inputs.profile }}"
           if [ "$profiles" = "rpi" ]; then
-            tag=bcm27xx-bcm2708-openwrt-24.10.0-rc3
+            tag=bcm27xx-bcm2708-openwrt-24.10.0-rc4
             echo "cpu=bcm2708" >> $GITHUB_ENV
           elif [ "$profiles" = "rpi-2" ]; then
-            tag=bcm27xx-bcm2709-openwrt-24.10.0-rc3
+            tag=bcm27xx-bcm2709-openwrt-24.10.0-rc4
             echo "cpu=bcm2709" >> $GITHUB_ENV
           elif [ "$profiles" = "rpi-3" ]; then
-            tag=bcm27xx-bcm2710-openwrt-24.10.0-rc3
+            tag=bcm27xx-bcm2710-openwrt-24.10.0-rc4
             echo "cpu=bcm2710" >> $GITHUB_ENV
           elif [ "$profiles" = "rpi-4" ]; then
-            tag=bcm27xx-bcm2711-openwrt-24.10.0-rc3
+            tag=bcm27xx-bcm2711-openwrt-24.10.0-rc4
             echo "cpu=bcm2711" >> $GITHUB_ENV
           elif [ "$profiles" = "rpi-5" ]; then
-            tag=bcm27xx-bcm2712-openwrt-24.10.0-rc3
+            tag=bcm27xx-bcm2712-openwrt-24.10.0-rc4
             echo "cpu=bcm2712" >> $GITHUB_ENV
           fi
           include_docker="${{ github.event.inputs.include_docker }}"
@@ -70,7 +70,6 @@ jobs:
               --user root \
               -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
               -v "${{ github.workspace }}/files:/home/build/immortalwrt/files" \
-              -v "${{ github.workspace }}/raspberrypi/imm.config:/home/build/immortalwrt/.config" \
               -v "${{ github.workspace }}/raspberrypi/24.10/build.sh:/home/build/openwrt/build.sh" \
               -e PROFILE=$profile \
               -e INCLUDE_DOCKER=$include_docker \
@@ -95,22 +94,12 @@ jobs:
           else
             echo -e "NO docker"
           fi
-          
-      - name: Create GitHub Release Info
-        uses: softprops/action-gh-release@v2.1.0
-        with:
-          tag_name: Autobuild-raspberrypi
-          name: immortalwrt-raspberrypi
-          body_path: ${{ github.workspace }}/info.md
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+ 
       - name: Upload ImmortalWrt as release assets
-        uses: softprops/action-gh-release@v2.1.0
+        uses: softprops/action-gh-release@v2.2.1
         with:
           tag_name: Autobuild-raspberrypi
+          body_path: ${{ github.workspace }}/info.md
           files: |
             ${{ github.workspace }}/*.img.gz
             ${{ github.workspace }}/*.sha256
