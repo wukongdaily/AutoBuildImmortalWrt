@@ -10,7 +10,7 @@ on:
       include_docker:
         description: |
           是否编译 Docker 插件
-        required: true
+        required: no
         default: 'yes'
         type: choice
         options:
