@@ -40,7 +40,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set executable permissions
-        run: chmod +x ${{ github.workspace }}/24.10/x86-64/build.sh
+        run: chmod +x ${{ github.workspace }}/x86-64/24.10/build.sh
 
 
       - name: Validate PPPoE Inputs
