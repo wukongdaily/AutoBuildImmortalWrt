@@ -51,7 +51,6 @@ PACKAGES="$PACKAGES luci-i18n-upnp-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-eqos-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-usb-printer-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-mjpg-streamer-zh-cn"
-PACKAGES="$PACKAGES luci-i18n-wechatpush-zh-cn"
 
 # 增加几个必备组件 方便用户安装iStore
 PACKAGES="$PACKAGES fdisk"
