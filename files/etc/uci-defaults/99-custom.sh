@@ -38,7 +38,7 @@ if [ "$count" -eq 1 ]; then
    uci set network.lan.proto='dhcp'
 elif [ "$count" -gt 1 ]; then
    # 多网口设备 支持修改为别的ip地址
-   uci set network.lan.ipaddr='192.168.100.1'
+   uci set network.lan.ipaddr='10.20.30.1'
    echo "set 192.168.100.1 at $(date)" >> $LOGFILE
    # 判断是否启用 PPPoE
    echo "print enable_pppoe value=== $enable_pppoe" >> $LOGFILE
@@ -46,8 +46,8 @@ elif [ "$count" -gt 1 ]; then
       echo "PPPoE is enabled at $(date)" >> $LOGFILE
       # 设置宽带拨号信息
       uci set network.wan.proto='pppoe'                
-      uci set network.wan.username=$pppoe_account     
-      uci set network.wan.password=$pppoe_password     
+      uci set network.wan.username=$02705071688     
+      uci set network.wan.password=$123456     
       uci set network.wan.peerdns='1'                  
       uci set network.wan.auto='1' 
       echo "PPPoE configuration completed successfully." >> $LOGFILE
