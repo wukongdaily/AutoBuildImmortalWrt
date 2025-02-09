@@ -1,17 +1,22 @@
-name: build-x86-64-immortalwrt-24.10.0
-
+name: build-gl-inet-24.10.0
 on:
   workflow_dispatch:
     inputs:
       profile:
-        description: '请输入要编译固件大小 单位(MB)'
+        type: choice
+        description: "请选择路由器型号"
         required: true
-        default: '1024'
+        options:
+          - glinet_gl-mt3000
+          - glinet_gl-mt2500
+          - glinet_gl-mt6000
+          - glinet_gl-b2200
+        default: glinet_gl-mt3000
       include_docker:
         description: |
           是否编译 Docker 插件
         required: true
-        default: 'yes'
+        default: 'no'
         type: choice
         options:
           - 'yes'
@@ -22,14 +27,15 @@ on:
         default: 'no'
         type: choice
         options:
-        - 'yes'
-        - 'no'
+          - 'yes'
+          - 'no'
       pppoe_account:
         description: "宽带账号 (若启用PPPoE)"
         required: false
       pppoe_password:
         description: "宽带密码 (若启用PPPoE)"
         required: false
+
 
 jobs:
   build:
@@ -40,8 +46,8 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set executable permissions
-        run: chmod +x ${{ github.workspace }}/x86-64/build.sh
-
+        run: |
+          chmod +x ${{ github.workspace }}/mediatek-filogic/build.sh
 
       - name: Validate PPPoE Inputs
         run: |
@@ -51,11 +57,21 @@ jobs:
               exit 1
             fi
           fi
+      
 
-      - name: Build ImmortalWrt-x86-64-efi
+      - name: Build Gl-iNet ImmortalWrt 24.10.0
         run: |
           profiles="${{ github.event.inputs.profile }}"
           include_docker="${{ github.event.inputs.include_docker }}"
+    
+          if [ "$profiles" = "glinet_gl-b2200" ]; then
+            tag=ipq40xx-generic-openwrt-24.10.0
+            echo "platform=ipq40xx/generic" >> $GITHUB_ENV
+          else
+            tag=mediatek-filogic-openwrt-24.10.0
+            echo "platform=mediatek/filogic" >> $GITHUB_ENV
+          fi
+          
           IFS=',' read -r -a profile_array <<< "$profiles"
           
           for profile in "${profile_array[@]}"; do
@@ -64,21 +80,20 @@ jobs:
             docker run --rm -i \
               --user root \
               -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
-              -v "${{ github.workspace }}/files:/home/build/immortalwrt/files" \
-              -v "${{ github.workspace }}/x86-64/imm.config:/home/build/immortalwrt/.config" \
-              -v "${{ github.workspace }}/x86-64/24.10/build.sh:/home/build/immortalwrt/build.sh" \
+              -v "${{ github.workspace }}/glinet:/home/build/immortalwrt/files/etc/uci-defaults" \
+              -v "${{ github.workspace }}/mediatek-filogic/build-24.sh:/home/build/immortalwrt/build.sh" \
               -e PROFILE=$profile \
               -e INCLUDE_DOCKER=$include_docker \
               -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
               -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
               -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
-              immortalwrt/imagebuilder:x86-64-openwrt-24.10.0 /bin/bash /home/build/immortalwrt/build.sh
+              immortalwrt/imagebuilder:$tag /bin/bash /home/build/immortalwrt/build.sh
           done
 
       - name: Generate Firmware SHA-256
         run: |
-          cp ${{ github.workspace }}/bin/targets/x86/64/*squashfs-combined-efi.img.gz ${{ github.workspace }}
-          for file in *squashfs-combined-efi.img.gz; do
+          cp ${{ github.workspace }}/bin/targets/${{ env.platform }}/*.bin ${{ github.workspace }}
+          for file in *.bin; do
             sha256sum "$file" > "$file.sha256"
             sha256sum -c "$file.sha256"
           done
@@ -86,21 +101,21 @@ jobs:
       - name: Create info
         run: |
           if [ "${{ github.event.inputs.include_docker }}" == "yes" ]; then
-            extra_content="#### 默认带docker"
-            echo -e "\n $extra_content" >> ${{ github.workspace }}/info.md
+            extra_content="### 默认带docker"
+            echo -e "\n $extra_content" >> ${{ github.workspace }}/mediatek-filogic/info.md
           else
             echo -e "NO docker"
           fi
-
-      - name: Upload ImmortWrt as release assets
+          
+      - name: Upload ImmortalWrt as release assets
         uses: softprops/action-gh-release@v2.2.1
         with:
-          tag_name: Autobuild-x86-64
-          body_path: ${{ github.workspace }}/info.md
+          tag_name: Autobuild-GL-iNet
+          name: ImmortalWrt-GL-iNet
+          body_path: ${{ github.workspace }}/mediatek-filogic/info.md
           files: |
-            ${{ github.workspace }}/*squashfs-combined-efi.img.gz
+            ${{ github.workspace }}/*.bin
             ${{ github.workspace }}/*.sha256
           token: ${{ secrets.GITHUB_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
