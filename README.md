@@ -5,7 +5,7 @@
 
 ## 🤔 这是什么？
 它是一个工作流。可快速构建 带docker且支持自定义固件大小的 immortalWrt
-> 1、支持自定义固件大小 默认1GB <br>
+> 1、支持自定义固件大小 默认3GB <br>
 > 2、支持预安装docker（可选）<br>
 > 3、目前支持x86-64 和 rockchip 两个平台（后续会增加）<br>
 > 4、新增支持MT3000/MT2500/MT6000/B2200（docker可选）<br>
@@ -23,6 +23,13 @@ https://mirrors.sjtug.sjtu.edu.cn/immortalwrt/releases/23.05.4/packages/x86_64/l
 - 该固件刷入多网口设备默认WAN口采用DHCP模式，LAN 口ip为 192.168.100.1
 - 综合上述特点，单网口应该先接路由器，先在路由器查看一下它的ip 再访问。
 - 上述特点 你都可以通过 `99-custom.sh` 配置和调整
+
+files/etc/uci-defaults/99-custom.sh 更改预设管理页面ip，如果是单网口时，只有数据一个网口进出，为了解决冲突，可以把：uci set network.lan.ipaddr='192.168.123.1' 更改为：uci set network.lan.proto='dhcp'
+
+架构文件->build.sh 预装app文件
+
+编绎上方的：Actions->选择左边的CPU架构->Run workflow->Run workflow
+
 
 ## ❤️其它GitHub Action项目推荐🌟 （建议收藏）⬇️
 https://github.com/wukongdaily/RunFilesBuilder<br>
