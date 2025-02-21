@@ -24,10 +24,12 @@ https://mirrors.sjtug.sjtu.edu.cn/immortalwrt/releases/24.10.0/packages/mipsel_2
 - 综合上述特点，单网口应该先接路由器，先在路由器查看一下它的ip 再访问。
 - 上述特点 你都可以通过 `99-custom.sh` 配置和调整
 
-files/etc/uci-defaults/99-custom.sh 更改预设管理页面ip，如果是单网口时，只有数据一个网口进出，为了解决冲突，可以把：uci set network.lan.ipaddr='192.168.123.1' 更改为：uci set network.lan.proto='dhcp'
+files/etc/uci-defaults/99-custom.sh
+单网口设备 类似于NAS模式 动态获取ip模式 具体ip地址取决于上一级路由器给它分配的ip 方便后续使用web页面设置旁路由，可以更改：
+uci set network.lan.proto='static' -> uci set network.lan.proto='dhcp'
+
 
 架构文件->build.sh 预装app文件
-
 编绎上方的：Actions->选择左边的CPU架构->Run workflow->Run workflow
 
 
