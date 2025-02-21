@@ -15,8 +15,8 @@
 
 
 ## 如何查询都有哪些插件?
-https://mirrors.sjtug.sjtu.edu.cn/immortalwrt/releases/23.05.4/packages/aarch64_cortex-a53/luci/ <br>
-https://mirrors.sjtug.sjtu.edu.cn/immortalwrt/releases/23.05.4/packages/x86_64/luci/ 
+https://mirrors.sjtug.sjtu.edu.cn/immortalwrt/releases/24.10.0/packages/x86_64/luci/
+https://mirrors.sjtug.sjtu.edu.cn/immortalwrt/releases/24.10.0/packages/mipsel_24kc/luci/
 
 ## 该固件默认属性？(必读)
 - 该固件刷入单网口设备默认采用DHCP模式,自动获得ip。类似NAS的做法
