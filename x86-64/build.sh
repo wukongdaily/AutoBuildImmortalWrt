@@ -45,7 +45,7 @@ PACKAGES="$PACKAGES luci-i18n-samba4-zh-cn"
 #if [ "$INCLUDE_DOCKER" = "yes" ]; then
 #    PACKAGES="$PACKAGES luci-i18n-dockerman-zh-cn"
 #    echo "Adding package: luci-i18n-dockerman-zh-cn"
-fi
+#fi
 
 # 构建镜像
 echo "$(date '+%Y-%m-%d %H:%M:%S') - Building image with the following packages:"
