@@ -4,7 +4,7 @@
 LOGFILE="/tmp/uci-defaults-log.txt"
 echo "Starting 99-custom.sh at $(date)" >> $LOGFILE
 # 设置默认防火墙规则，方便虚拟机首次访问 WebUI
-uci set firewall.@zone[1].input='ACCEPT'
+#uci set firewall.@zone[1].input='ACCEPT'
 
 # 设置主机名映射，解决安卓原生 TV 无法联网的问题
 uci add dhcp domain
@@ -70,7 +70,7 @@ elif [ "$count" -gt 1 ]; then
    # LAN口设置静态IP
    uci set network.lan.proto='static'
    # 多网口设备 支持修改为别的ip地址
-   uci set network.lan.ipaddr='192.168.100.1'
+   uci set network.lan.ipaddr='192.168.3.1'
    uci set network.lan.netmask='255.255.255.0'
    echo "set 192.168.100.1 at $(date)" >> $LOGFILE
    # 判断是否启用 PPPoE
