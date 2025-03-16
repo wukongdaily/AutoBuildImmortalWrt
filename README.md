@@ -38,7 +38,7 @@ https://mirrors.sjtug.sjtu.edu.cn/immortalwrt/releases/23.05.4/packages/x86_64/l
 - 建议拨号用户使用之前重启一次光猫。
 - 综合上述特点，【单网口设备】应该先接路由器，先在上级路由器查看一下它的ip 再访问。
 - 上述特点 你都可以通过 `99-custom.sh` 配置和调整
-
+- r2s中需不需要docker在build.sh文件中的 PACKAGES="$PACKAGES luci-i18n-dockerman-zh-cn"
 ## ❤️其它GitHub Action项目推荐🌟 （建议收藏）⬇️
 https://github.com/wukongdaily/RunFilesBuilder<br>
 https://github.com/wukongdaily/DockerTarBuilder
