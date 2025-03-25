@@ -8,55 +8,13 @@ on:
         description: |
           输入 软路由型号 可选值如下：
         options:
-          - ariaboard_photonicat
-          - armsom_sige3
-          - armsom_sige7
-          - cyber_cyber3588-aib
-          - ezpro_mrkaio-m68s
-          - firefly_roc-rk3328-cc
-          - firefly_roc-rk3568-pc
-          - friendlyarm_nanopc-t4
-          - friendlyarm_nanopc-t6
-          - friendlyarm_nanopi-r2c
-          - friendlyarm_nanopi-r2c-plus
-          - friendlyarm_nanopi-r2s
-          - friendlyarm_nanopi-r3s
-          - friendlyarm_nanopi-r4s
-          - friendlyarm_nanopi-r4se
-          - friendlyarm_nanopi-r4s-enterprise
-          - friendlyarm_nanopi-r5c
-          - friendlyarm_nanopi-r5s
-          - friendlyarm_nanopi-r6c
-          - friendlyarm_nanopi-r6s
-          - huake_guangmiao-g4c
-          - lunzn_fastrhino-r66s
-          - lunzn_fastrhino-r68s
-          - lyt_t68m
-          - pine64_rock64
-          - pine64_rockpro64
-          - radxa_cm3_io
-          - radxa_e25
-          - radxa_rock-3a
-          - radxa_rock-3b
-          - radxa_rock-3c
-          - radxa_rock-5a
-          - radxa_rock-5b
-          - radxa_rock-pi-4a
-          - radxa_rock-pi-e
-          - radxa_rock-pi-s
-          - radxa_zero-3e
-          - radxa_zero-3w
-          - sinovoip_bpi-r2-pro
-          - xunlong_orangepi-5
           - xunlong_orangepi-5-plus
-          - xunlong_orangepi-r1-plus
-          - xunlong_orangepi-r1-plus-lts
         required: true
-        default: 'friendlyarm_nanopi-r3s'
+        default: 'xunlong_orangepi-5-plus'
       rootfs_partsize:
         description: '设置软件包大小 单位(MB)'
         required: true
-        default: '1024'
+        default: '13736'
       enable_pppoe:
         description: "是否配置PPPoE拨号信息?"
         required: true
