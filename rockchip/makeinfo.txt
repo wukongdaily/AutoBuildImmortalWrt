@@ -66,22 +66,22 @@ friendlyarm_nanopi-r2s:
     SupportedDevices: friendlyarm,nanopi-r2s
 friendlyarm_nanopi-r3s:
     FriendlyARM NanoPi R3S
-    Packages: kmod-r8168
+    Packages: kmod-r8169
     hasImageMetadata: 1
     SupportedDevices: friendlyarm,nanopi-r3s
 friendlyarm_nanopi-r4s:
     FriendlyARM NanoPi R4S
-    Packages: kmod-r8168
+    Packages: kmod-r8169
     hasImageMetadata: 1
     SupportedDevices: friendlyarm,nanopi-r4s
 friendlyarm_nanopi-r4se:
     FriendlyARM NanoPi R4SE
-    Packages: kmod-r8168
+    Packages: kmod-r8169
     hasImageMetadata: 1
     SupportedDevices: friendlyarm,nanopi-r4se
 friendlyarm_nanopi-r4s-enterprise:
     FriendlyARM NanoPi R4S Enterprise Edition
-    Packages: kmod-r8168
+    Packages: kmod-r8169
     hasImageMetadata: 1
     SupportedDevices: friendlyarm,nanopi-r4s-enterprise
 friendlyarm_nanopi-r5c:
@@ -106,7 +106,7 @@ friendlyarm_nanopi-r6s:
     SupportedDevices: friendlyarm,nanopi-r6s
 huake_guangmiao-g4c:
     Huake-Cloud GuangMiao G4C
-    Packages: kmod-r8168
+    Packages: kmod-r8169
     hasImageMetadata: 1
     SupportedDevices: huake,guangmiao-g4c
 lunzn_fastrhino-r66s:
