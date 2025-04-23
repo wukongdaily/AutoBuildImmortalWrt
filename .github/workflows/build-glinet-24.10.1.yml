@@ -1,4 +1,4 @@
-name: build-gl-inet-24.10.0
+name: build-gl-inet-24.10.1
 on:
   workflow_dispatch:
     inputs:
@@ -59,16 +59,16 @@ jobs:
           fi
       
 
-      - name: Build Gl-iNet ImmortalWrt 24.10.0
+      - name: Build Gl-iNet ImmortalWrt 24.10.1
         run: |
           profiles="${{ github.event.inputs.profile }}"
           include_docker="${{ github.event.inputs.include_docker }}"
     
           if [ "$profiles" = "glinet_gl-b2200" ]; then
-            tag=ipq40xx-generic-openwrt-24.10.0
+            tag=ipq40xx-generic-openwrt-24.10.1
             echo "platform=ipq40xx/generic" >> $GITHUB_ENV
           else
-            tag=mediatek-filogic-openwrt-24.10.0
+            tag=mediatek-filogic-openwrt-24.10.1
             echo "platform=mediatek/filogic" >> $GITHUB_ENV
           fi
           
