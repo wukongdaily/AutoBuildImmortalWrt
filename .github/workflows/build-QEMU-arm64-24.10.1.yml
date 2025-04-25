@@ -1,0 +1,94 @@
+name: build-QEMU-armsr-armv8-24.10.1
+# 你可以理解为这是一种ARM64平台下通用型OpenWrt ,产出格式为qcow2,适合所有ARM64平台的虚拟机
+# 比如斐讯N1刷了armbian系统,armbian系统里安装了PVE虚拟机 可用
+# 比如新款Apple Silicon芯片的苹果电脑里的虚拟机UTM 可用
+# 比如友善NanoPi R3S、R5S 官方推出的预装了PVE的debian系统 可用
+# 比如瑞莎E20C刷了Armbian系统，自己安装了QEMU+KVM虚拟机 可用
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        type: choice
+        description: |
+          可用于ARM64虚拟机(比如macOS下的UTM虚拟机 比如斐讯N1/R3S/R5S等arm64系统的PVE虚拟机)
+        options:
+          - generic
+        required: true
+        default: 'generic'
+      rootfs_partsize:
+        description: '设置软件包大小 单位(MB) 最大数值10240'
+        required: true
+        default: '2048'
+      enable_pppoe:
+        description: "是否配置PPPoE拨号信息?"
+        required: true
+        default: 'no'
+        type: choice
+        options:
+        - 'yes'
+        - 'no'
+      pppoe_account:
+        description: "宽带账号 (若启用PPPoE)"
+        required: false
+      pppoe_password:
+        description: "宽带密码 (若启用PPPoE)"
+        required: false
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set executable permissions
+        run: chmod +x ${{ github.workspace }}/armsr-armv8/build.sh
+      
+      - name: Validate PPPoE Inputs
+        run: |
+          if [[ "${{ inputs.enable_pppoe }}" == "yes" ]]; then
+            if [[ -z "${{ inputs.pppoe_account }}" || -z "${{ inputs.pppoe_password }}" ]]; then
+              echo "Error: PPPoE account and password must be provided when PPPoE is enabled!"
+              exit 1
+            fi
+          fi
+
+      - name: Building armsr-armv8 QEMU ImmortalWrt
+        run: |
+          profiles="${{ github.event.inputs.profile }}"
+          rootfs_partsize="${{ github.event.inputs.rootfs_partsize }}"
+          
+          IFS=',' read -r -a profile_array <<< "$profiles"
+          
+          for profile in "${profile_array[@]}"; do
+            echo "Building for profile: $profile"
+            
+            docker run --rm -i \
+              --user root \
+              -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
+              -v "${{ github.workspace }}/files:/home/build/immortalwrt/files" \
+              -v "${{ github.workspace }}/armsr-armv8/imm.config:/home/build/immortalwrt/.config" \
+              -v "${{ github.workspace }}/armsr-armv8/build.sh:/home/build/immortalwrt/build.sh" \
+              -e PROFILE=$profile \
+              -e ROOTFS_PARTSIZE=$rootfs_partsize \
+              -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
+              -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
+              -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
+              immortalwrt/imagebuilder:armsr-armv8-openwrt-24.10.1 /bin/bash /home/build/immortalwrt/build.sh
+          done
+      - name: Generate Firmware SHA-256
+        run: |
+          cp ${{ github.workspace }}/bin/targets/armsr/armv8/*.qcow2 ${{ github.workspace }}
+
+      - name: Upload ImmortWrt as release assets
+        uses: softprops/action-gh-release@v2.2.1
+        with:
+          tag_name: QEMU
+          name: ImmortWrt-QEMU-armsr-armv8-24.10.1
+          body_path: ${{ github.workspace }}/armsr-armv8/info.md
+          files: |
+            ${{ github.workspace }}/*.qcow2
+          token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
