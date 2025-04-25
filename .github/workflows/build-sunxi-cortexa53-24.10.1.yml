@@ -1,4 +1,4 @@
-name: build-RaspBerryPi-24.10.0
+name: build-sunxi-cortexa53-24.10.1
 
 on:
   workflow_dispatch:
@@ -8,12 +8,17 @@ on:
         description: "请选择路由器型号"
         required: true
         options:
-          - rpi
-          - rpi-2
-          - rpi-3
-          - rpi-4
-          - rpi-5
-        default: rpi-4
+          - xunlong_orangepi-zero3
+          - friendlyarm_nanopi-r1s-h5
+          - xunlong_orangepi-zero2
+          - xunlong_orangepi-zero-plus
+          - friendlyarm_nanopi-neo2
+          - xunlong_orangepi-pc2
+          - friendlyarm_nanopi-neo-plus2
+          - libretech_all-h3-cc-h5
+          - pine64_pine64-plus
+          - pine64_sopine-baseboard
+        default: xunlong_orangepi-zero3
       include_docker:
         description: |
           是否编译 Docker 插件
@@ -39,30 +44,16 @@ jobs:
 
       - name: Set executable permissions
         run: |
-          chmod +x ${{ github.workspace }}/raspberrypi/24.10/build.sh
+          chmod +x ${{ github.workspace }}/sunxi-cortexa53/build.sh
 
-      - name: Build raspberrypi ImmortalWrt 24.10.0
+      - name: Build sunxi-cortexa53 ImmpotalWrt 24.10.1
         run: |
           profiles="${{ github.event.inputs.profile }}"
-          if [ "$profiles" = "rpi" ]; then
-            tag=bcm27xx-bcm2708-openwrt-24.10.0
-            echo "cpu=bcm2708" >> $GITHUB_ENV
-          elif [ "$profiles" = "rpi-2" ]; then
-            tag=bcm27xx-bcm2709-openwrt-24.10.0
-            echo "cpu=bcm2709" >> $GITHUB_ENV
-          elif [ "$profiles" = "rpi-3" ]; then
-            tag=bcm27xx-bcm2710-openwrt-24.10.0
-            echo "cpu=bcm2710" >> $GITHUB_ENV
-          elif [ "$profiles" = "rpi-4" ]; then
-            tag=bcm27xx-bcm2711-openwrt-24.10.0
-            echo "cpu=bcm2711" >> $GITHUB_ENV
-          elif [ "$profiles" = "rpi-5" ]; then
-            tag=bcm27xx-bcm2712-openwrt-24.10.0
-            echo "cpu=bcm2712" >> $GITHUB_ENV
-          fi
           include_docker="${{ github.event.inputs.include_docker }}"
           size="${{ github.event.inputs.size }}"
+          
           IFS=',' read -r -a profile_array <<< "$profiles"
+          
           for profile in "${profile_array[@]}"; do
             echo "Building for profile: $profile"
             
@@ -70,18 +61,17 @@ jobs:
               --user root \
               -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
               -v "${{ github.workspace }}/files:/home/build/immortalwrt/files" \
-              -v "${{ github.workspace }}/raspberrypi/24.10/build.sh:/home/build/openwrt/build.sh" \
+              -v "${{ github.workspace }}/sunxi-cortexa53/24.10/build.sh:/home/build/immortalwrt/build.sh" \
               -e PROFILE=$profile \
               -e INCLUDE_DOCKER=$include_docker \
               -e ROOTSIZE=$size \
-              immortalwrt/imagebuilder:$tag /bin/bash /home/build/openwrt/build.sh
+              immortalwrt/imagebuilder:sunxi-cortexa53-openwrt-24.10.1 /bin/bash /home/build/immortalwrt/build.sh
           done
-          ls ${{ github.workspace }}/bin/targets/bcm27xx/${{ env.cpu }}
-      
+
       - name: Generate Firmware SHA-256
         run: |
-          cp ${{ github.workspace }}/bin/targets/bcm27xx/${{ env.cpu }}/*squashfs-factory.img.gz  ${{ github.workspace }}
-          for file in *squashfs-factory.img.gz; do
+          cp ${{ github.workspace }}/bin/targets/sunxi/cortexa53/*squashfs-sdcard.img.gz ${{ github.workspace }}
+          for file in *.img.gz; do
             sha256sum "$file" > "$file.sha256"
             sha256sum -c "$file.sha256"
           done
@@ -90,16 +80,17 @@ jobs:
         run: |
           if [ "${{ github.event.inputs.include_docker }}" == "yes" ]; then
             extra_content="### 默认带docker"
-            echo -e "\n $extra_content" >> ${{ github.workspace }}/info.md
+            echo -e "\n $extra_content" >> ${{ github.workspace }}/sunxi-cortexa53/info.md
           else
             echo -e "NO docker"
           fi
- 
-      - name: Upload ImmortalWrt as release assets
+
+      - name: Upload ImmortWrt as release assets
         uses: softprops/action-gh-release@v2.2.1
         with:
-          tag_name: Autobuild-raspberrypi
-          body_path: ${{ github.workspace }}/info.md
+          tag_name: Autobuild-sunxi-cortexa53
+          name: ImmortalWrt-sunxi-cortexa53
+          body_path: ${{ github.workspace }}/sunxi-cortexa53/info.md
           files: |
             ${{ github.workspace }}/*.img.gz
             ${{ github.workspace }}/*.sha256
