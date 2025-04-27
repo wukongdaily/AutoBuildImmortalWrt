@@ -1,4 +1,4 @@
-name: build-x86-64-immortalwrt-24.10.0
+name: build-x86-64-immortalwrt-24.10.1
 
 on:
   workflow_dispatch:
@@ -72,7 +72,7 @@ jobs:
               -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
               -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
               -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
-              immortalwrt/imagebuilder:x86-64-openwrt-24.10.0 /bin/bash /home/build/immortalwrt/build.sh
+              immortalwrt/imagebuilder:x86-64-openwrt-24.10.1 /bin/bash /home/build/immortalwrt/build.sh
           done
 
       - name: Generate Firmware SHA-256
