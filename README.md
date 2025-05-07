@@ -7,6 +7,8 @@
 
 默认软件包大小 10GB
 
+预装软件：
+
 curl 常用的命令行工具
 
 luci-i18n-firewall-zh-cn 防火墙
