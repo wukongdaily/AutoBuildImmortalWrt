@@ -70,7 +70,7 @@ elif [ "$count" -gt 1 ]; then
    # LAN口设置静态IP
    uci set network.lan.proto='static'
    # 多网口设备 支持修改为别的ip地址
-   uci set network.lan.ipaddr='192.168.100.1'
+   uci set network.lan.ipaddr='192.168.10.254'
    uci set network.lan.netmask='255.255.255.0'
    echo "set 192.168.100.1 at $(date)" >> $LOGFILE
    # 判断是否启用 PPPoE
@@ -101,7 +101,7 @@ uci commit
 
 # 设置编译作者信息
 FILE_PATH="/etc/openwrt_release"
-NEW_DESCRIPTION="Compiled by wukongdaily"
+NEW_DESCRIPTION="Compiled by github.com/uaena112"
 sed -i "s/DISTRIB_DESCRIPTION='[^']*'/DISTRIB_DESCRIPTION='$NEW_DESCRIPTION'/" "$FILE_PATH"
 
 exit 0
