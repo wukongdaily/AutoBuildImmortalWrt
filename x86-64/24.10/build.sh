@@ -47,6 +47,7 @@ PACKAGES="$PACKAGES luci-app-vlmcsd"
 PACKAGES="$PACKAGES luci-i18n-xlnetacc-zh-cn"
 PACKAGES="$PACKAGES luci-app-p910nd"
 PACKAGES="$PACKAGES luci-i18n-autoreboot-zh-cn"
+PACKAGES="$PACKAGES luci-app-adguardhome"
 
 # 判断是否需要编译 Docker 插件
 if [ "$INCLUDE_DOCKER" = "yes" ]; then
