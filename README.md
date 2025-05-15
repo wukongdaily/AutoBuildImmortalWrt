@@ -51,3 +51,7 @@ https://mirrors.sjtug.sjtu.edu.cn/immortalwrt/releases/23.05.4/packages/x86_64/l
 https://wkdaily.cpolar.top/15
 # 🌟鸣谢
 ### https://github.com/immortalwrt
+
+## ❤️赞助作者 ⬇️⬇️
+
+[![点击这里赞助我](https://img.shields.io/badge/点击这里赞助我-支持作者的项目-orange?logo=github)](https://wkdaily.cpolar.top/01)
