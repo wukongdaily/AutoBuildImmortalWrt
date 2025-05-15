@@ -45,7 +45,6 @@ PACKAGES="$PACKAGES luci-i18n-samba4-zh-cn"
 # 自己增加的组件
 PACKAGES="$PACKAGES luci-app-vlmcsd"
 PACKAGES="$PACKAGES luci-i18n-xlnetacc-zh-cn"
-PACKAGES="$PACKAGES luci-app-adguardhome"
 PACKAGES="$PACKAGES luci-app-p910nd"
 PACKAGES="$PACKAGES luci-i18n-autoreboot-zh-cn"
 
