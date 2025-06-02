@@ -45,10 +45,7 @@ PACKAGES="$PACKAGES luci-i18n-usb-printer-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-aria2-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-wechatpush-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-ddns-zh-cn"
-PACKAGES="$PACKAGES luci-i18n-alist-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-arpbind-zh-cn"
-PACKAGES="$PACKAGES luci-app-unblockneteasemusic"
-PACKAGES="$PACKAGES luci-i18n-wechatpush-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-vnstat2-zh-cn"
 PACKAGES="$PACKAGES luci-app-syncdial"
 PACKAGES="$PACKAGES luci-i18n-speederv2-zh-cn"
@@ -60,7 +57,7 @@ PACKAGES="$PACKAGES script-utils"
 PACKAGES="$PACKAGES luci-i18n-samba4-zh-cn"
 
 # 判断是否需要编译 Docker 插件
-if [ "$INCLUDE_DOCKER" = "no" ]; then
+if [ "$INCLUDE_DOCKER" = "yes" ]; then
     PACKAGES="$PACKAGES luci-i18n-dockerman-zh-cn"
     echo "Adding package: luci-i18n-dockerman-zh-cn"
 fi
