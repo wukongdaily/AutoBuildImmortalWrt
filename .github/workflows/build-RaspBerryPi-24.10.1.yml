@@ -5,7 +5,7 @@ on:
     inputs:
       profile:
         type: choice
-        description: "请选择路由器型号"
+        description: "rpi-3"
         required: true
         options:
           - rpi
