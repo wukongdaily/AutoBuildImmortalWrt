@@ -18,7 +18,7 @@ on:
       rootfs_partsize:
         description: '设置软件包大小 单位(MB) 最大数值10240'
         required: true
-        default: '2048'
+        default: '10240'
       enable_pppoe:
         description: "是否配置PPPoE拨号信息?"
         required: true
