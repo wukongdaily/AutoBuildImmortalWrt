@@ -69,7 +69,10 @@ elif [ "$count" -gt 1 ]; then
    fi
    # LAN口设置静态IP
    uci set network.lan.proto='static'
-   # 多网口设备 支持修改为别的ip地址
+   # 多网口设备 支持修改为别的ip地址,别的地址应该是网关地址，形如192.168.xx.1 项目说明里都强调过。
+   # 大家不能胡乱修改哦 比如有人修改为192.168.100.55 这是错误的理解 这个项目不能提前设置旁路地址
+   # 旁路的设置分2类情况,情况一是单网口的设备,默认是DHCP模式，ip应该在上一级路由器里查看。之后进入web页在设置旁路。
+   # 情况二旁路由如果是多网口设备，也应当用网关访问网页后，在自行在web网页里设置。总之大家不能直接在代码里修改旁路网关。千万不要徒增bug啦。
    uci set network.lan.ipaddr='192.168.100.1'
    uci set network.lan.netmask='255.255.255.0'
    echo "set 192.168.100.1 at $(date)" >> $LOGFILE
@@ -91,6 +94,28 @@ elif [ "$count" -gt 1 ]; then
    fi
 fi
 
+# 添加docker zone
+uci add firewall zone
+uci set firewall.@zone[-1].name='docker'
+uci set firewall.@zone[-1].input='ACCEPT'
+uci set firewall.@zone[-1].output='ACCEPT'
+uci set firewall.@zone[-1].forward='ACCEPT'
+uci set firewall.@zone[-1].device='docker0'
+
+# 添加 forwarding docker -> lan
+uci add firewall forwarding
+uci set firewall.@forwarding[-1].src='docker'
+uci set firewall.@forwarding[-1].dest='lan'
+
+# 添加 forwarding docker -> wan
+uci add firewall forwarding
+uci set firewall.@forwarding[-1].src='docker'
+uci set firewall.@forwarding[-1].dest='wan'
+
+# 添加 forwarding lan -> docker
+uci add firewall forwarding
+uci set firewall.@forwarding[-1].src='lan'
+uci set firewall.@forwarding[-1].dest='docker'
 
 # 设置所有网口可访问网页终端
 uci delete ttyd.@ttyd[0].interface
