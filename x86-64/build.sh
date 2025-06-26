@@ -40,7 +40,20 @@ PACKAGES="$PACKAGES openssh-sftp-server"
 PACKAGES="$PACKAGES fdisk"
 PACKAGES="$PACKAGES script-utils"
 PACKAGES="$PACKAGES luci-i18n-samba4-zh-cn"
-
+# 自定义软件包
+PACKAGES="luci-app-quickstart"
+PACKAGES="luci-app-store"
+PACKAGES="luci-app-filetransfer"
+PACKAGES="luci-app-poweroff"
+PACKAGES="luci-app-adguardhome"
+PACKAGES="luci-app-linkease"
+PACKAGES="luci-app-unblockmusic"
+PACKAGES="luci-app-smartdns"
+PACKAGES="luci-app-leigod-acc"
+PACKAGES="luci-app-netspeedtest"
+PACKAGES="luci-app-syncdial"
+PACKAGES="luci-app-mwan3"
+PACKAGES="luci-app-turboacc"
 # 判断是否需要编译 Docker 插件
 if [ "$INCLUDE_DOCKER" = "yes" ]; then
     PACKAGES="$PACKAGES luci-i18n-dockerman-zh-cn"
