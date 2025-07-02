@@ -1,4 +1,4 @@
-name: build-QEMU-armsr-armv8-24.10.1
+name: build-QEMU-armsr-armv8-24.10.2
 # 你可以理解为这是一种ARM64平台下通用型OpenWrt ,产出格式为qcow2,适合所有ARM64平台的虚拟机
 # 比如斐讯N1刷了armbian系统,armbian系统里安装了PVE虚拟机 可用
 # 比如新款Apple Silicon芯片的苹果电脑里的虚拟机UTM 可用
@@ -53,6 +53,18 @@ jobs:
               exit 1
             fi
           fi
+      
+      - name: Download Clash Meta, GeoIP, and GeoSite
+        run: |
+          PLATFORM="arm64" 
+          mkdir -p files/etc/openclash/core
+          # Download clash_meta
+          META_URL="https://raw.githubusercontent.com/vernesong/OpenClash/core/master/meta/clash-linux-${PLATFORM}.tar.gz"
+          wget -qO- $META_URL | tar xOvz > files/etc/openclash/core/clash_meta
+          chmod +x files/etc/openclash/core/clash_meta
+          # Download GeoIP and GeoSite
+          wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat -O files/etc/openclash/GeoIP.dat
+          wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat -O files/etc/openclash/GeoSite.dat
 
       - name: Building armsr-armv8 QEMU ImmortalWrt
         run: |
@@ -75,7 +87,7 @@ jobs:
               -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
               -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
               -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
-              immortalwrt/imagebuilder:armsr-armv8-openwrt-24.10.1 /bin/bash /home/build/immortalwrt/build.sh
+              immortalwrt/imagebuilder:armsr-armv8-openwrt-24.10.2 /bin/bash /home/build/immortalwrt/build.sh
           done
       - name: Generate Firmware SHA-256
         run: |
@@ -85,7 +97,7 @@ jobs:
         uses: softprops/action-gh-release@v2.2.1
         with:
           tag_name: QEMU
-          name: ImmortWrt-QEMU-armsr-armv8-24.10.1
+          name: ImmortWrt-QEMU-armsr-armv8-24.10.2
           body_path: ${{ github.workspace }}/armsr-armv8/info.md
           files: |
             ${{ github.workspace }}/*.qcow2
