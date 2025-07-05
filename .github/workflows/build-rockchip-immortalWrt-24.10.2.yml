@@ -1,4 +1,4 @@
-name: build-rockchip-immortalWrt-24.10.1
+name: build-rockchip-immortalWrt-24.10.2
 
 on:
   workflow_dispatch:
@@ -91,6 +91,18 @@ jobs:
               exit 1
             fi
           fi
+          
+      - name: Download Clash Meta, GeoIP, and GeoSite
+        run: |
+          PLATFORM="arm64" 
+          mkdir -p files/etc/openclash/core
+          # Download clash_meta
+          META_URL="https://raw.githubusercontent.com/vernesong/OpenClash/core/master/meta/clash-linux-${PLATFORM}.tar.gz"
+          wget -qO- $META_URL | tar xOvz > files/etc/openclash/core/clash_meta
+          chmod +x files/etc/openclash/core/clash_meta
+          # Download GeoIP and GeoSite
+          wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat -O files/etc/openclash/GeoIP.dat
+          wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat -O files/etc/openclash/GeoSite.dat
 
       - name: Building Rockchip ImmortalWrt
         run: |
@@ -113,7 +125,7 @@ jobs:
               -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
               -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
               -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
-              immortalwrt/imagebuilder:rockchip-armv8-openwrt-24.10.1 /bin/bash /home/build/immortalwrt/build.sh
+              immortalwrt/imagebuilder:rockchip-armv8-openwrt-24.10.2 /bin/bash /home/build/immortalwrt/build.sh
           done
       - name: Generate Firmware SHA-256
         run: |
