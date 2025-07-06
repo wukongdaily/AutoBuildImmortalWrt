@@ -42,7 +42,11 @@ PACKAGES="$PACKAGES luci-i18n-dockerman-zh-cn"
 PACKAGES="$PACKAGES fdisk"
 PACKAGES="$PACKAGES script-utils"
 PACKAGES="$PACKAGES luci-i18n-samba4-zh-cn"
+# GuoYang Add 
 PACKAGES="$PACKAGES luci-proto-wireguard"
+PACKAGES="$PACKAGES luci-i18n-udpxy-zh-cn"
+PACKAGES="$PACKAGES luci-i18n-ddns-go-zh-cn"
+PACKAGES="$PACKAGES luci-i18n-watchcat-zh-cn"
 
 
 # 构建镜像
