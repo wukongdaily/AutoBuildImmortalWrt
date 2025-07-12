@@ -51,6 +51,14 @@ on:
       pppoe_password:
         description: "宽带密码 (若启用PPPoE)"
         required: false
+      download_clash:
+        description: '是否下载 Clash Meta、GeoIP、GeoSite?'
+        required: true
+        default: 'yes'
+        type: choice
+        options:
+          - 'yes'
+          - 'no'
 
 jobs:
   build:
@@ -73,6 +81,7 @@ jobs:
           fi
       
       - name: Download Clash Meta, GeoIP, and GeoSite
+        if: ${{ github.event.inputs.download_clash == 'yes' }}
         run: |
           PLATFORM="arm64" 
           mkdir -p files/etc/openclash/core

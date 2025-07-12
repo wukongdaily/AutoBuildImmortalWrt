@@ -30,7 +30,14 @@ on:
         description: '请输入要编译固件大小 单位(MB)'
         required: true
         default: '1024'
-
+      download_clash:
+        description: '是否下载 Clash Meta、GeoIP、GeoSite?'
+        required: true
+        default: 'yes'
+        type: choice
+        options:
+          - 'yes'
+          - 'no'
 
 jobs:
   build:
@@ -45,6 +52,7 @@ jobs:
           chmod +x ${{ github.workspace }}/sunxi-cortexa53/build.sh
       
       - name: Download Clash Meta, GeoIP, and GeoSite
+        if: ${{ github.event.inputs.download_clash == 'yes' }}
         run: |
           PLATFORM="arm64" 
           mkdir -p files/etc/openclash/core
