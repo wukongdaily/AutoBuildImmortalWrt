@@ -1,4 +1,4 @@
-name: build-rockchip-immortalWrt-24.10.2
+name: build-rockchip-immortalWrt-24.10.1
 
 on:
   workflow_dispatch:
