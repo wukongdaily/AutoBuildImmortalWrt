@@ -1,0 +1,94 @@
+
+config interface 'loopback'
+	option device 'lo'
+	option proto 'static'
+	option ipaddr '127.0.0.1'
+	option netmask '255.0.0.0'
+
+config globals 'globals'
+	option packet_steering '1'
+
+config device
+	option name 'br-lan'
+	option type 'bridge'
+	list ports 'eth0'
+	option mtu '1492'
+	option mtu6 '1492'
+	option igmp_snooping '1'
+
+config interface 'lan'
+	option device 'br-lan'
+	option proto 'static'
+	option ipaddr '10.0.66.1'
+	option netmask '255.255.255.0'
+	option ip6assign '64'
+	option delegate '0'
+	option ip6ifaceid 'eui64'
+
+config interface 'wan'
+	option device 'eth1'
+	option proto 'pppoe'
+	option username '13438983004a'
+	option password '983004'
+	option ipv6 'auto'
+
+config device
+	option name 'eth0'
+	option mtu '1492'
+
+config device
+	option name 'eth1'
+	option mtu '1492'
+	option mtu6 '1492'
+
+config device
+	option name 'eth2'
+	option mtu '1492'
+
+config interface 'wg2'
+	option proto 'wireguard'
+	option private_key 'IDF19K3pwHshIGod1EDjNY2afnNpDrWJa/+yhkW0jGo='
+	option listen_port '51889'
+	list addresses '10.0.20.4'
+	option delegate '0'
+	option mtu '1492'
+
+config wireguard_wg2
+	option description 'HomeA'
+	option public_key 'dHtNe7VEczFYoCAxDDxbeeo1+LscSTUyoTmVEejZhHs='
+	option route_allowed_ips '1'
+	option endpoint_host 'homea.guoyang.space'
+	option endpoint_port '51889'
+	option persistent_keepalive '25'
+	list allowed_ips '10.0.20.1'
+	list allowed_ips '10.0.88.1/24'
+
+config wireguard_wg2
+	option description 'Phone'
+	option public_key 'wRbpxME8Ogezb5uAXnhJEOeLF5TMuGjCYJ78VmtoCWQ='
+	list allowed_ips '10.0.20.3'
+	option route_allowed_ips '1'
+
+config wireguard_wg2
+	option description 'HomeC'
+	option public_key 'Mqkdx/SIsYlqs5+z0EpMYkq1vpPjXyiRz9ucqR0DTTE='
+	option route_allowed_ips '1'
+	option endpoint_host 'cc.guoyang.space'
+	option endpoint_port '51889'
+	list allowed_ips '10.0.20.2'
+
+config interface 'wgs'
+	option proto 'wireguard'
+	option private_key 'cJwUZCwMsQcsOfLFZMiEYqRhvmHR9oivndVmynOB/EI='
+	option listen_port '51886'
+	list addresses '10.0.30.3/24'
+
+config wireguard_wgs
+	option description 'Server'
+	option public_key 'SXDqe6fDqLR+f6kjbU9jZB3UGQGq7hhmhTlI36Nv1hk='
+	option route_allowed_ips '1'
+	option endpoint_host '47.108.112.252'
+	option endpoint_port '51886'
+	option persistent_keepalive '25'
+	list allowed_ips '10.0.30.0/24'
+
