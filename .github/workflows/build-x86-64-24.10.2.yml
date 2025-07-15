@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       profile:
-        description: '请输入要编译固件大小 单位(MB)'
+        description: '100000MB'
         required: true
         default: '1024'
       include_docker:
