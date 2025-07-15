@@ -2,7 +2,7 @@
 # Log file for debugging
 LOGFILE="/tmp/uci-defaults-log.txt"
 echo "Starting 99-custom.sh at $(date)" >> $LOGFILE
-echo "编译固件大小为: $PROFILE MB"
+echo "编译固件大小为: 100000 MB"
 echo "Include Docker: $INCLUDE_DOCKER"
 
 echo "Create pppoe-settings"
@@ -60,18 +60,18 @@ PACKAGES="$PACKAGES luci-i18n-dufs-zh-cn"
 # ============= imm仓库外的第三方插件==============
 # ============= 若启用 则打开注释 ================
 # istore商店
-#PACKAGES="$PACKAGES luci-app-store"
+PACKAGES="$PACKAGES luci-app-store"
 # 首页和网络向导
-#PACKAGES="$PACKAGES luci-i18n-quickstart-zh-cn"
+PACKAGES="$PACKAGES luci-i18n-quickstart-zh-cn"
 # 去广告adghome
-#PACKAGES="$PACKAGES luci-app-adguardhome"
+PACKAGES="$PACKAGES luci-app-adguardhome"
 # 代理相关
 #PACKAGES="$PACKAGES luci-app-ssr-plus"
 #PACKAGES="$PACKAGES luci-app-passwall2"
 #PACKAGES="$PACKAGES luci-i18n-nikki-zh-cn"
 # VPN
-#PACKAGES="$PACKAGES luci-app-tailscale"
-#PACKAGES="$PACKAGES luci-i18n-tailscale-zh-cn"
+PACKAGES="$PACKAGES luci-app-tailscale"
+PACKAGES="$PACKAGES luci-i18n-tailscale-zh-cn"
 # 分区扩容 by sirpdboy 
 #PACKAGES="$PACKAGES luci-app-partexp"
 #PACKAGES="$PACKAGES luci-i18n-partexp-zh-cn"
