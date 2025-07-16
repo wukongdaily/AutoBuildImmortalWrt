@@ -44,7 +44,7 @@ PACKAGES="$PACKAGES luci-i18n-ttyd-zh-cn"
 PACKAGES="$PACKAGES php8"
 PACKAGES="$PACKAGES php8-cgi"
 
-# PACKAGES="$PACKAGES luci-i18n-passwall-zh-cn"
+PACKAGES="$PACKAGES luci-i18n-passwall-zh-cn"
 # PACKAGES="$PACKAGES luci-app-openclash"
 # PACKAGES="$PACKAGES luci-i18n-homeproxy-zh-cn"
 # PACKAGES="$PACKAGES openssh-sftp-server"
