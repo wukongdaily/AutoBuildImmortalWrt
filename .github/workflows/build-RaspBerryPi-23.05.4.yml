@@ -88,14 +88,14 @@ jobs:
       
       - name: Create info
         run: |
-          extra_content="#### 默认软件包大小" + ${{ github.event.inputs.include_docker }} / 1024 + "G"
-          echo -e "\n $extra_content" >> ${{ github.workspace }}/info.md
-          if [ "${{ github.event.inputs.include_docker }}" == "yes" ]; then
-            extra_content="### 默认带docker"
-            echo -e "\n $extra_content" >> ${{ github.workspace }}/info.md
-          else
-            echo -e "NO docker"
+          include_docker="${{ github.event.inputs.include_docker }}"
+          size="${{ github.event.inputs.size }}"
+          size_gb=$(awk -v s="$size" 'BEGIN {printf "%.1f", s/1024}'
+          extra_content="#### 默认软件包大小 ${size_gb}G"
+          if [ "$include_docker" == "yes" ]; then
+              extra_content="$extra_content\n### 默认带docker"
           fi
+          echo -e "\n$extra_content" >> ${{ github.workspace }}/info.md
 
       - name: Upload ImmortalWrt as release assets
         uses: softprops/action-gh-release@v2.2.1
