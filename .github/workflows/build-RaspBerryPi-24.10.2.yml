@@ -69,7 +69,7 @@ jobs:
             docker run --rm -i \
               --user root \
               -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
-              -v "${{ github.workspace }}/files:/home/build/immortalwrt/files" \
+              -v "${{ github.workspace }}/raspberrypi/files:/home/build/immortalwrt/files" \
               -v "${{ github.workspace }}/raspberrypi/24.10/build.sh:/home/build/openwrt/build.sh" \
               -e PROFILE=$profile \
               -e INCLUDE_DOCKER=$include_docker \
