@@ -88,6 +88,8 @@ jobs:
       
       - name: Create info
         run: |
+          extra_content="#### 默认软件包大小" + ${{ github.event.inputs.include_docker }} / 1024 + "G"
+          echo -e "\n $extra_content" >> ${{ github.workspace }}/info.md
           if [ "${{ github.event.inputs.include_docker }}" == "yes" ]; then
             extra_content="### 默认带docker"
             echo -e "\n $extra_content" >> ${{ github.workspace }}/info.md
