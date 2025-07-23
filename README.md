@@ -12,7 +12,8 @@
 > 5、新增全志平台R1S、香橙派Zero3等机型的工作流<br>
 > 6、新增用户预设置pppoe拨号功能<br>
 > 7、新增树莓派①②③④⑤<br>
-> 8、新增第三方软件包的集成功能 https://github.com/wukongdaily/AutoBuildImmortalWrt/discussions/209
+> 8、新增第三方软件包的集成功能 https://github.com/wukongdaily/AutoBuildImmortalWrt/discussions/209 <br>
+> 9、MT2500 和 MT6000 支持第三方插件的按需集成 
 
 
 ## 如何查询imm仓库内有哪些插件
