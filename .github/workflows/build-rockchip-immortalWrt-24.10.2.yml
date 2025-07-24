@@ -6,7 +6,7 @@ on:
       profile:
         type: choice
         description: |
-          输入 软路由型号 可选值如下：
+          AX6：
         options:
           - ariaboard_photonicat
           - armsom_sige3
