@@ -36,3 +36,5 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-store"
 # 应用过滤 openappfilter.com
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-appfilter"
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-appfilter-zh-cn"
+
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES dufs"
