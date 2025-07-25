@@ -1,0 +1,123 @@
+name: build-N1
+on:
+  workflow_dispatch:
+    inputs:
+      include_docker:
+        description: |
+          是否编译 Docker 插件
+        required: true
+        default: 'no'
+        type: choice
+        options:
+          - 'yes'
+          - 'no'
+      rootfs_partsize:
+        description: '设置软件包大小 单位(MB) 最大数值10240'
+        required: true
+        default: '1024'
+      openwrt_kernel:
+        description: "选择构建的内核 (带减号的代表主备双内核)"
+        required: false
+        default: "5.15.y_6.1.y"
+        type: choice
+        options:
+          - 5.4.y
+          - 5.10.y
+          - 5.15.y
+          - 6.1.y
+          - 6.6.y
+          - 6.12.y
+          - 5.4.y_5.10.y
+          - 5.15.y_6.1.y
+          - 6.1.y_6.12.y
+          - 6.1.y_6.6.y
+          - 6.6.y_6.12.y
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set executable permissions
+        run: chmod +x ${{ github.workspace }}/n1/build.sh
+
+      - name: Debug workspace contents
+        run: ls -R
+
+      - name: Copy banner
+        run: |
+          cp n1/99-banner.sh files/etc/uci-defaults/
+      
+      
+      - name: Building N1 ImmortalWrt
+        run: |
+          profiles="generic"
+          include_docker="${{ github.event.inputs.include_docker }}"
+          rootfs_partsize="${{ github.event.inputs.rootfs_partsize }}"
+          
+          IFS=',' read -r -a profile_array <<< "$profiles"
+          
+          for profile in "${profile_array[@]}"; do
+            echo "Building for profile: $profile"
+            
+            docker run --rm -i \
+              --user root \
+              -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
+              -v "${{ github.workspace }}/files/etc/uci-defaults:/home/build/immortalwrt/files/etc/uci-defaults" \
+              -v "${{ github.workspace }}/arch/arch.conf:/home/build/immortalwrt/files/etc/opkg/arch.conf" \
+              -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
+              -v "${{ github.workspace }}/n1/banner:/home/build/immortalwrt/files/mnt/banner" \
+              -v "${{ github.workspace }}/n1/imm.config:/home/build/immortalwrt/.config" \
+              -v "${{ github.workspace }}/n1/build.sh:/home/build/immortalwrt/build.sh" \
+              -e PROFILE=$profile \
+              -e INCLUDE_DOCKER=$include_docker \
+              -e ROOTFS_PARTSIZE=$rootfs_partsize \
+              immortalwrt/imagebuilder:armsr-armv8-openwrt-24.10.2 /bin/bash /home/build/immortalwrt/build.sh
+          done
+      
+      - name: 检查rootfs是否存在
+        run: ls -lh ${{ github.workspace }}/bin/targets/armsr/armv8/
+
+      - name: 查找rootfs.tar.gz所在路径
+        id: find_rootfs
+        run: |
+          ROOTFS_FILE=$(find bin/targets/armsr/armv8/ -type f -name "*rootfs.tar.gz" | head -n1)
+          echo "✅ Found: $ROOTFS_FILE"
+          if [ ! -f "$ROOTFS_FILE" ]; then
+            echo "❌ 找不到 rootfs.tar.gz 文件"
+            exit 1
+          fi
+          echo "file=$ROOTFS_FILE" >> $GITHUB_OUTPUT
+
+      - name: Package armsr-armv8 as ImmortalWrt for N1
+        uses: ophub/amlogic-s9xxx-openwrt@main
+        with:
+          openwrt_path: ${{ steps.find_rootfs.outputs.file }}
+          openwrt_board: s905d
+          openwrt_kernel: ${{ inputs.openwrt_kernel }}
+          builder_name: "wukongdaily"
+          auto_kernel: true
+
+      - name: Rename .img.gz file
+        id: rename
+        run: |
+          FILE=$(ls ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz | head -n1)
+          echo "Image file is: $FILE"
+          FILENAME=$(basename "$FILE")
+          echo "FILENAME=$FILENAME" >> $GITHUB_ENV
+          mv "$FILE" "${{ env.PACKAGED_OUTPUTPATH }}/immortalwrt-24.10.2-phicomm-n1-squashfs-sysupgrade.img.gz"
+
+
+      - name: Upload firmware to GitHub Releases
+        uses: softprops/action-gh-release@v2.2.1
+        with:
+          tag_name: phicomm-n1
+          name: ImmortalWrt for Phicomm N1
+          body_path: ${{ github.workspace }}/n1/info.md
+          files: |
+            ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
