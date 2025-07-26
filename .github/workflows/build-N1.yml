@@ -2,6 +2,16 @@ name: build-N1
 on:
   workflow_dispatch:
     inputs:
+      openwrt_kernel:
+        description: "选择构建的内核"
+        required: false
+        default: "6.1.146"
+        type: choice
+        options:
+          - 5.15.189
+          - 6.1.146
+          - 6.6.93
+          - 6.12.39
       include_docker:
         description: |
           是否编译 Docker 插件
@@ -11,27 +21,22 @@ on:
         options:
           - 'yes'
           - 'no'
-      rootfs_partsize:
-        description: '设置软件包大小 单位(MB) 最大数值10240'
-        required: true
-        default: '1024'
-      openwrt_kernel:
-        description: "选择构建的内核"
+      replace_banner:
+        description: '替换为ImmortalWrt的banner信息'
         required: false
-        default: "6.1.y"
+        default: false
+        type: boolean
+      rootfs_partsize:
+        description: '软件包大小1G固定'
+        required: true
+        default: "1024"
         type: choice
         options:
-          - 5.4.y
-          - 5.10.y
-          - 5.15.y
-          - 6.1.y
-          - 6.6.y
-          - 6.12.y
+          - '1024'
 
 jobs:
   build:
     runs-on: ubuntu-22.04
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -42,7 +47,8 @@ jobs:
       - name: Debug workspace contents
         run: ls -R
 
-      - name: Copy banner
+      - name: 处理是否替换banner信息
+        if: ${{ github.event.inputs.replace_banner == 'true' }}
         run: |
           cp n1/99-banner.sh files/etc/uci-defaults/
       
@@ -72,9 +78,6 @@ jobs:
               -e ROOTFS_PARTSIZE=$rootfs_partsize \
               immortalwrt/imagebuilder:armsr-armv8-openwrt-24.10.2 /bin/bash /home/build/immortalwrt/build.sh
           done
-      
-      - name: 检查rootfs是否存在
-        run: ls -lh ${{ github.workspace }}/bin/targets/armsr/armv8/
 
       - name: 查找rootfs.tar.gz所在路径
         id: find_rootfs
@@ -88,13 +91,14 @@ jobs:
           echo "file=$ROOTFS_FILE" >> $GITHUB_OUTPUT
 
       - name: Package armsr-armv8 as ImmortalWrt for N1
-        uses: ophub/amlogic-s9xxx-openwrt@main
-        with:
-          openwrt_path: ${{ steps.find_rootfs.outputs.file }}
-          openwrt_board: s905d
-          openwrt_kernel: ${{ inputs.openwrt_kernel }}
-          builder_name: "wukongdaily"
-          auto_kernel: true
+        uses: wukongdaily/flippy-openwrt-actions@master
+        if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
+        env:
+          OPENWRT_ARMVIRT: ${{ steps.find_rootfs.outputs.file }}
+          PACKAGE_SOC: s905d
+          KERNEL_VERSION_NAME: ${{ inputs.openwrt_kernel }}
+          KERNEL_AUTO_LATEST: false
+          WHOAMI: "wukongdaily"
 
       - name: Rename .img.gz file
         id: rename
@@ -103,7 +107,8 @@ jobs:
           echo "Image file is: $FILE"
           FILENAME=$(basename "$FILE")
           echo "FILENAME=$FILENAME" >> $GITHUB_ENV
-          mv "$FILE" "${{ env.PACKAGED_OUTPUTPATH }}/immortalwrt-24.10.2-phicomm-n1-squashfs-sysupgrade.img.gz"
+          KERNEL_VERSION=$(echo "$FILENAME" | grep -oP 'k\d+\.\d+\.\d+')
+          mv "$FILE" "${{ env.PACKAGED_OUTPUTPATH }}/immortalwrt-24.10.2-phicomm-n1-btrfs-$KERNEL_VERSION.img.gz"
 
 
       - name: Upload firmware to GitHub Releases
@@ -114,5 +119,6 @@ jobs:
           body_path: ${{ github.workspace }}/n1/info.md
           files: |
             ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz
+            ${{ github.workspace }}/bin/targets/armsr/armv8/*rootfs.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
