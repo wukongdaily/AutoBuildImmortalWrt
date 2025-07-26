@@ -1,4 +1,9 @@
-name: build-x86-64-immortalwrt-24.10.2
+# 此工作流是为了构建一个immortalwrt固件的安装器 格式为iso 可用于所有的虚拟机 和 物理机
+# 所谓安装器就是用来安装用的 iso引导的是一个启动速度极快的debian live系统 跑码后输入命令 ddd 即可调出安装菜单
+# 安装时 若是多张硬盘 你可以选择 需要安装的硬盘 此类方法安装的openwrt 安装后是有剩余空间的 更多信息请参考 wukongdaily/img-installer 项目
+# 几乎所有linux 都有各自的安装器 唯独openwrt和armbian 没有, 希望此工作流 弥补这个遗憾 让你更优雅的 安装openwrt 
+
+name: build ISO
 
 on:
   workflow_dispatch:
@@ -8,8 +13,7 @@ on:
         required: true
         default: '1024'
       include_docker:
-        description: |
-          是否编译 Docker 插件
+        description: "是否编译 Docker 插件"
         required: true
         default: 'yes'
         type: choice
@@ -22,8 +26,8 @@ on:
         default: 'no'
         type: choice
         options:
-        - 'yes'
-        - 'no'
+          - 'yes'
+          - 'no'
       pppoe_account:
         description: "宽带账号 (若启用PPPoE)"
         required: false
@@ -32,7 +36,7 @@ on:
         required: false
 
 jobs:
-  build:
+  build_immortalwrt:
     runs-on: ubuntu-22.04
 
     steps:
@@ -42,17 +46,16 @@ jobs:
       - name: Set executable permissions
         run: chmod +x ${{ github.workspace }}/x86-64/build.sh
 
-
       - name: Validate PPPoE Inputs
         run: |
-          if [[ "${{ inputs.enable_pppoe }}" == "yes" ]]; then
-            if [[ -z "${{ inputs.pppoe_account }}" || -z "${{ inputs.pppoe_password }}" ]]; then
+          if [[ "${{ github.event.inputs.enable_pppoe }}" == "yes" ]]; then
+            if [[ -z "${{ github.event.inputs.pppoe_account }}" || -z "${{ github.event.inputs.pppoe_password }}" ]]; then
               echo "Error: PPPoE account and password must be provided when PPPoE is enabled!"
               exit 1
             fi
           fi
 
-      - name: Build ImmortalWrt-x86-64-efi
+      - name: ✅ 正在构建ImmortalWrt固件
         run: |
           profiles="${{ github.event.inputs.profile }}"
           include_docker="${{ github.event.inputs.include_docker }}"
@@ -60,7 +63,6 @@ jobs:
           
           for profile in "${profile_array[@]}"; do
             echo "Building for profile: $profile"
-            
             docker run --rm -i \
               --user root \
               -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
@@ -76,31 +78,48 @@ jobs:
               immortalwrt/imagebuilder:x86-64-openwrt-24.10.2 /bin/bash /home/build/immortalwrt/build.sh
           done
 
-      - name: Generate Firmware SHA-256
+      - name: ✅ 复制固件到根目录
         run: |
           cp ${{ github.workspace }}/bin/targets/x86/64/*squashfs-combined-efi.img.gz ${{ github.workspace }}
-          for file in *squashfs-combined-efi.img.gz; do
-            sha256sum "$file" > "$file.sha256"
-            sha256sum -c "$file.sha256"
-          done
 
-      - name: Create info
+      - name: ✅ 上传固件到 artifact (for ISO generation)
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-img
+          path: |
+            *.img.gz
+
+  build_installer_iso:
+    runs-on: ubuntu-22.04
+    needs: build_immortalwrt
+
+    steps:
+      - name: Download firmware artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: firmware-img
+
+      - name: ⏬ 同步 img-installer 项目 准备制作ISO
         run: |
-          if [ "${{ github.event.inputs.include_docker }}" == "yes" ]; then
-            extra_content="#### 默认带docker"
-            echo -e "\n $extra_content" >> ${{ github.workspace }}/info.md
-          else
-            echo -e "NO docker"
-          fi
+          git clone https://github.com/wukongdaily/img-installer.git
+          cd img-installer
 
-      - name: Upload ImmortWrt as release assets
+      - name: Set executable permissions for scripts
+        run: |
+          chmod +x "${{ github.workspace }}/img-installer/custom.sh"
+          chmod +x "${{ github.workspace }}/img-installer/supportFiles/custom/build.sh"
+
+      - name: ✅ 制作 ISO
+        run: |
+          firmware_file=$(ls *squashfs-combined-efi.img.gz)
+          cd img-installer
+          bash autobuild/autobuild.sh "../$firmware_file"
+
+      - name: 🚀 上传 ISO 到 Release
         uses: softprops/action-gh-release@v2.2.1
         with:
-          tag_name: Autobuild-x86-64
-          body_path: ${{ github.workspace }}/info.md
+          tag_name: "Custom-Installer-x86_64-ISO"
+          body_path: "${{ github.workspace }}/img-installer/autobuild/info.md"
           files: |
-            ${{ github.workspace }}/*squashfs-combined-efi.img.gz
-            ${{ github.workspace }}/*.sha256
-          token: ${{ secrets.GITHUB_TOKEN }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            img-installer/output/custom-installer-x86_64.iso
+          token: "${{ secrets.GITHUB_TOKEN }}"

@@ -12,7 +12,7 @@ on:
           - glinet_gl-mt2500
           - glinet_gl-mt6000
           - glinet_gl-b2200
-        default: glinet_gl-mt3000
+        default: glinet_gl-mt6000
       include_docker:
         description: |
           是否编译 Docker 插件
@@ -82,6 +82,8 @@ jobs:
               --user root \
               -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
               -v "${{ github.workspace }}/glinet:/home/build/immortalwrt/files/etc/uci-defaults" \
+              -v "${{ github.workspace }}/arch/arch.conf:/home/build/immortalwrt/files/etc/opkg/arch.conf" \
+              -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
               -v "${{ github.workspace }}/mediatek-filogic/build.sh:/home/build/immortalwrt/build.sh" \
               -e PROFILE=$profile \
               -e INCLUDE_DOCKER=$include_docker \
