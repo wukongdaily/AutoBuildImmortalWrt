@@ -1,21 +1,24 @@
-name: build-x86-64-immortalwrt-23.05.4
-
+name: build-QEMU-armsr-armv8-24.10.2
+# 你可以理解为这是一种ARM64平台下通用型OpenWrt ,产出格式为qcow2,适合所有ARM64平台的虚拟机
+# 比如斐讯N1刷了armbian系统,armbian系统里安装了PVE虚拟机 可用
+# 比如新款Apple Silicon芯片的苹果电脑里的虚拟机UTM 可用
+# 比如友善NanoPi R3S、R5S 官方推出的预装了PVE的debian系统 可用
+# 比如瑞莎E20C刷了Armbian系统，自己安装了QEMU+KVM虚拟机 可用
 on:
   workflow_dispatch:
     inputs:
       profile:
-        description: '请输入要编译固件大小 单位(MB)'
-        required: true
-        default: '1024'
-      include_docker:
-        description: |
-          是否编译 Docker 插件
-        required: true
-        default: 'yes'
         type: choice
+        description: |
+          可用于ARM64虚拟机(比如macOS下的UTM虚拟机 比如斐讯N1/R3S/R5S等arm64系统的PVE虚拟机)
         options:
-          - 'yes'
-          - 'no'
+          - generic
+        required: true
+        default: 'generic'
+      rootfs_partsize:
+        description: '设置软件包大小 单位(MB) 最大数值10240'
+        required: true
+        default: '2048'
       enable_pppoe:
         description: "是否配置PPPoE拨号信息?"
         required: true
@@ -40,7 +43,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set executable permissions
-        run: chmod +x ${{ github.workspace }}/x86-64/build.sh
+        run: chmod +x ${{ github.workspace }}/armsr-armv8/build.sh
       
       - name: Validate PPPoE Inputs
         run: |
@@ -50,11 +53,11 @@ jobs:
               exit 1
             fi
           fi
-
-      - name: Build ImmortalWrt-x86-64-efi
+      
+      - name: Building armsr-armv8 QEMU ImmortalWrt
         run: |
           profiles="${{ github.event.inputs.profile }}"
-          include_docker="${{ github.event.inputs.include_docker }}"
+          rootfs_partsize="${{ github.event.inputs.rootfs_partsize }}"
           
           IFS=',' read -r -a profile_array <<< "$profiles"
           
@@ -64,42 +67,30 @@ jobs:
             docker run --rm -i \
               --user root \
               -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
-              -v "${{ github.workspace }}/files:/home/build/immortalwrt/files" \
-              -v "${{ github.workspace }}/x86-64/imm.config:/home/build/immortalwrt/.config" \
+              -v "${{ github.workspace }}/files/etc/uci-defaults:/home/build/immortalwrt/files/etc/uci-defaults" \
+              -v "${{ github.workspace }}/arch/arch.conf:/home/build/immortalwrt/files/etc/opkg/arch.conf" \
+              -v "${{ github.workspace }}/armsr-armv8/imm.config:/home/build/immortalwrt/.config" \
               -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
-              -v "${{ github.workspace }}/x86-64/build.sh:/home/build/immortalwrt/build.sh" \
+              -v "${{ github.workspace }}/armsr-armv8/build.sh:/home/build/immortalwrt/build.sh" \
               -e PROFILE=$profile \
-              -e INCLUDE_DOCKER=$include_docker \
+              -e ROOTFS_PARTSIZE=$rootfs_partsize \
               -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
               -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
               -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
-              immortalwrt/imagebuilder:x86-64-openwrt-23.05.4 /bin/bash /home/build/immortalwrt/build.sh
+              immortalwrt/imagebuilder:armsr-armv8-openwrt-24.10.2 /bin/bash /home/build/immortalwrt/build.sh
           done
-      
       - name: Generate Firmware SHA-256
         run: |
-          cp ${{ github.workspace }}/bin/targets/x86/64/immortalwrt-23.05.4-x86-64-generic-squashfs-combined-efi.img.gz ${{ github.workspace }}
-          sha256sum immortalwrt-23.05.4-x86-64-generic-squashfs-combined-efi.img.gz > immortalwrt-23.05.4-x86-64-generic-squashfs-combined-efi.img.gz.sha256
-          sha256sum -c immortalwrt-23.05.4-x86-64-generic-squashfs-combined-efi.img.gz.sha256
-
-      - name: Create info
-        run: |
-          if [ "${{ github.event.inputs.include_docker }}" == "yes" ]; then
-            extra_content="#### 默认带docker"
-            echo -e "\n $extra_content" >> ${{ github.workspace }}/info.md
-          else
-            echo -e "NO docker"
-          fi
+          cp ${{ github.workspace }}/bin/targets/armsr/armv8/*.qcow2 ${{ github.workspace }}
 
       - name: Upload ImmortWrt as release assets
         uses: softprops/action-gh-release@v2.2.1
         with:
-          tag_name: Autobuild-x86-64
-          body_path: ${{ github.workspace }}/info.md
+          tag_name: QEMU
+          name: ImmortWrt-QEMU-armsr-armv8-24.10.2
+          body_path: ${{ github.workspace }}/armsr-armv8/info.md
           files: |
-            ${{ github.workspace }}/immortalwrt-23.05.4-x86-64-generic-squashfs-combined-efi.img.gz
-            ${{ github.workspace }}/immortalwrt-23.05.4-x86-64-generic-squashfs-combined-efi.img.gz.sha256
+            ${{ github.workspace }}/*.qcow2
           token: ${{ secrets.GITHUB_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-

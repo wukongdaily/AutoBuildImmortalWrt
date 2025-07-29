@@ -1,0 +1,211 @@
+name: build-N1
+on:
+  workflow_dispatch:
+    inputs:
+      openwrt_kernel:
+        description: "选择构建的内核(斐讯N1)"
+        required: false
+        default: "6.6.93"
+        type: choice
+        options:
+          - 5.4.291
+          - 5.10.235
+          - 5.15.189
+          - 6.1.121
+          - 6.1.122
+          - 6.1.123
+          - 6.1.124
+          - 6.1.126
+          - 6.1.127
+          - 6.1.128
+          - 6.1.129
+          - 6.1.130
+          - 6.1.131
+          - 6.1.132
+          - 6.1.133
+          - 6.1.134
+          - 6.1.135
+          - 6.1.136
+          - 6.1.138
+          - 6.1.139
+          - 6.1.140
+          - 6.1.141
+          - 6.1.142
+          - 6.1.144
+          - 6.1.146
+          - 6.6.67
+          - 6.6.68
+          - 6.6.69
+          - 6.6.70
+          - 6.6.71
+          - 6.6.72
+          - 6.6.74
+          - 6.6.76
+          - 6.6.79
+          - 6.6.80
+          - 6.6.81
+          - 6.6.83
+          - 6.6.84
+          - 6.6.85
+          - 6.6.86
+          - 6.6.87
+          - 6.6.88
+          - 6.6.89
+          - 6.6.90
+          - 6.6.91
+          - 6.6.92
+          - 6.6.93
+          - 6.6.94
+          - 6.6.95
+          - 6.6.97
+          - 6.6.99
+          - 6.12.16
+          - 6.12.17
+          - 6.12.18
+          - 6.12.19
+          - 6.12.20
+          - 6.12.21
+          - 6.12.22
+          - 6.12.23
+          - 6.12.24
+          - 6.12.25
+          - 6.12.26
+          - 6.12.28
+          - 6.12.29
+          - 6.12.30
+          - 6.12.31
+          - 6.12.32
+          - 6.12.33
+          - 6.12.34
+          - 6.12.35
+          - 6.12.37
+          - 6.12.39
+          
+      include_docker:
+        description: |
+          是否编译 Docker 插件
+        required: true
+        default: 'no'
+        type: choice
+        options:
+          - 'yes'
+          - 'no'
+      skip_imagebuilder:
+        description: "直接使用底包快速构建固件, 忽略自定义插件 ----（跳过 ImageBuilder）"
+        required: false
+        default: false
+        type: boolean
+      replace_banner:
+        description: '替换为ImmortalWrt的banner信息'
+        required: false
+        default: false
+        type: boolean
+      rootfs_partsize:
+        description: '软件包大小1G固定'
+        required: true
+        default: "1024"
+        type: choice
+        options:
+          - '1024'
+      builder_name:
+        description: "设置打包作者的名称"
+        required: true
+        default: 'wukongdaily'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set executable permissions
+        run: chmod +x ${{ github.workspace }}/n1/build.sh
+
+      - name: Debug workspace contents
+        run: ls -R
+
+      - name: 处理是否替换 banner 信息
+        if: ${{ github.event.inputs.skip_imagebuilder == 'false' && github.event.inputs.replace_banner == 'true' }}
+        run: |
+          # 使用ImageBuilder构建 且用户勾选了替换banner时
+          cp n1/99-banner.sh files/etc/uci-defaults/
+      
+      - name: Building N1 ImmortalWrt rootfs
+        if: ${{ github.event.inputs.skip_imagebuilder != 'true' }}
+        run: |
+          echo "✅ 使用 ImageBuilder 构建 rootfs"
+          profiles="generic"
+          include_docker="${{ github.event.inputs.include_docker }}"
+          rootfs_partsize="${{ github.event.inputs.rootfs_partsize }}"
+          
+          IFS=',' read -r -a profile_array <<< "$profiles"
+          
+          for profile in "${profile_array[@]}"; do
+            echo "Building for profile: $profile"
+            
+            docker run --rm -i \
+              --user root \
+              -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
+              -v "${{ github.workspace }}/files/etc/uci-defaults:/home/build/immortalwrt/files/etc/uci-defaults" \
+              -v "${{ github.workspace }}/arch/arch.conf:/home/build/immortalwrt/files/etc/opkg/arch.conf" \
+              -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
+              -v "${{ github.workspace }}/n1/banner:/home/build/immortalwrt/files/mnt/banner" \
+              -v "${{ github.workspace }}/n1/imm.config:/home/build/immortalwrt/.config" \
+              -v "${{ github.workspace }}/n1/build.sh:/home/build/immortalwrt/build.sh" \
+              -e PROFILE=$profile \
+              -e INCLUDE_DOCKER=$include_docker \
+              -e ROOTFS_PARTSIZE=$rootfs_partsize \
+              immortalwrt/imagebuilder:armsr-armv8-openwrt-24.10.2 /bin/bash /home/build/immortalwrt/build.sh
+          done
+          
+      - name: Download prebuilt rootfs.tar.gz
+        if: ${{ github.event.inputs.skip_imagebuilder == 'true' }}
+        run: |
+          echo "📦 正在下载预构建 rootfs"
+          mkdir -p bin/targets/armsr/armv8
+          curl -L -o bin/targets/armsr/armv8/openwrt-armvirt-64-default-rootfs.tar.gz \
+            https://github.com/wukongdaily/AutoBuildImmortalWrt/releases/download/rootfs/immortalwrt-24.10.2-armsr-armv8-generic-rootfs.tar.gz
+
+      - name: 查找rootfs.tar.gz所在路径
+        id: find_rootfs
+        run: |
+          ROOTFS_FILE=$(find bin/targets/armsr/armv8/ -type f -name "*rootfs.tar.gz" | head -n1)
+          echo "✅ Found: $ROOTFS_FILE"
+          if [ ! -f "$ROOTFS_FILE" ]; then
+            echo "❌ 找不到 rootfs.tar.gz 文件"
+            exit 1
+          fi
+          echo "file=$ROOTFS_FILE" >> $GITHUB_OUTPUT
+
+      - name: Package armsr-armv8 as ImmortalWrt for N1
+        uses: wukongdaily/flippy-openwrt-actions@master
+        if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
+        env:
+          OPENWRT_ARMVIRT: ${{ steps.find_rootfs.outputs.file }}
+          PACKAGE_SOC: s905d
+          KERNEL_VERSION_NAME: ${{ inputs.openwrt_kernel }}
+          KERNEL_AUTO_LATEST: false
+          WHOAMI: ${{ inputs.builder_name }}
+
+      - name: Rename .img.gz file
+        id: rename
+        run: |
+          FILE=$(ls ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz | head -n1)
+          echo "Image file is: $FILE"
+          FILENAME=$(basename "$FILE")
+          echo "FILENAME=$FILENAME" >> $GITHUB_ENV
+          KERNEL_VERSION=$(echo "$FILENAME" | grep -oP 'k\d+\.\d+\.\d+')
+          mv "$FILE" "${{ env.PACKAGED_OUTPUTPATH }}/immortalwrt-24.10.2-phicomm-n1-btrfs-$KERNEL_VERSION.img.gz"
+
+
+      - name: Upload firmware to GitHub Releases
+        uses: softprops/action-gh-release@v2.2.1
+        with:
+          tag_name: phicomm-n1
+          name: ImmortalWrt for Phicomm N1
+          body_path: ${{ github.workspace }}/n1/info.md
+          files: |
+            ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

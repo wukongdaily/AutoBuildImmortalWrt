@@ -1,4 +1,4 @@
-name: build-rockchip-immortalWrt-24.10.0
+name: build-rockchip-immortalWrt-24.10.2
 
 on:
   workflow_dispatch:
@@ -91,6 +91,7 @@ jobs:
               exit 1
             fi
           fi
+          
 
       - name: Building Rockchip ImmortalWrt
         run: |
@@ -105,15 +106,17 @@ jobs:
             docker run --rm -i \
               --user root \
               -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
-              -v "${{ github.workspace }}/files:/home/build/immortalwrt/files" \
+              -v "${{ github.workspace }}/files/etc/uci-defaults:/home/build/immortalwrt/files/etc/uci-defaults" \
+              -v "${{ github.workspace }}/arch/arch.conf:/home/build/immortalwrt/files/etc/opkg/arch.conf" \
               -v "${{ github.workspace }}/rockchip/imm.config:/home/build/immortalwrt/.config" \
+              -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
               -v "${{ github.workspace }}/rockchip/build.sh:/home/build/immortalwrt/build.sh" \
               -e PROFILE=$profile \
               -e ROOTFS_PARTSIZE=$rootfs_partsize \
               -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
               -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
               -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
-              immortalwrt/imagebuilder:rockchip-armv8-openwrt-24.10.0 /bin/bash /home/build/immortalwrt/build.sh
+              immortalwrt/imagebuilder:rockchip-armv8-openwrt-24.10.2 /bin/bash /home/build/immortalwrt/build.sh
           done
       - name: Generate Firmware SHA-256
         run: |
