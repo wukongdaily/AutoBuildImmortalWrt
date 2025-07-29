@@ -80,7 +80,7 @@ elif [ "$count" -gt 1 ]; then
     # 情况二旁路由如果是多网口设备，也应当用网关访问网页后，在自行在web网页里设置。总之大家不能直接在代码里修改旁路网关。千万不要徒增bug啦。
     uci set network.lan.ipaddr='192.168.0.1'
     uci set network.lan.netmask='255.255.255.0'
-    echo "set 192.168.100.1 at $(date)" >>$LOGFILE
+    echo "set 192.168.0.1 at $(date)" >>$LOGFILE
     # 判断是否启用 PPPoE
     echo "print enable_pppoe value=== $enable_pppoe" >>$LOGFILE
     if [ "$enable_pppoe" = "yes" ]; then
