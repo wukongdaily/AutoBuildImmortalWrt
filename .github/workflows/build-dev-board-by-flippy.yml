@@ -1,86 +1,51 @@
-name: build-N1
+name: Build Dev Board Firmware (Flippy)
 on:
   workflow_dispatch:
     inputs:
       openwrt_kernel:
-        description: "选择构建的内核(斐讯N1)"
+        description: "选择构建的内核 当高版本内核没有时 系统会自动挑选匹配的内核。比如radxa e52c 即便你选择了6.1.y 可能最终构建还是5.10.160"
         required: false
-        default: "6.6.93"
+        default: "6.6.y"
         type: choice
         options:
-          - 5.4.291
-          - 5.10.235
-          - 5.15.189
-          - 6.1.121
-          - 6.1.122
-          - 6.1.123
-          - 6.1.124
-          - 6.1.126
-          - 6.1.127
-          - 6.1.128
-          - 6.1.129
-          - 6.1.130
-          - 6.1.131
-          - 6.1.132
-          - 6.1.133
-          - 6.1.134
-          - 6.1.135
-          - 6.1.136
-          - 6.1.138
-          - 6.1.139
-          - 6.1.140
-          - 6.1.141
-          - 6.1.142
-          - 6.1.144
-          - 6.1.146
-          - 6.6.67
-          - 6.6.68
-          - 6.6.69
-          - 6.6.70
-          - 6.6.71
-          - 6.6.72
-          - 6.6.74
-          - 6.6.76
-          - 6.6.79
-          - 6.6.80
-          - 6.6.81
-          - 6.6.83
-          - 6.6.84
-          - 6.6.85
-          - 6.6.86
-          - 6.6.87
-          - 6.6.88
-          - 6.6.89
-          - 6.6.90
-          - 6.6.91
-          - 6.6.92
-          - 6.6.93
-          - 6.6.94
-          - 6.6.95
-          - 6.6.97
-          - 6.6.99
-          - 6.12.16
-          - 6.12.17
-          - 6.12.18
-          - 6.12.19
-          - 6.12.20
-          - 6.12.21
-          - 6.12.22
-          - 6.12.23
-          - 6.12.24
-          - 6.12.25
-          - 6.12.26
-          - 6.12.28
-          - 6.12.29
-          - 6.12.30
-          - 6.12.31
-          - 6.12.32
-          - 6.12.33
-          - 6.12.34
-          - 6.12.35
-          - 6.12.37
-          - 6.12.39
-          
+          - 5.4.y
+          - 5.10.y
+          - 5.15.y
+          - 6.1.y
+          - 6.6.y
+          - 6.12.y
+      openwrt_soc:
+        description: "选择开发板型号"
+        required: false
+        default: "e25"
+        type: choice
+        options:
+          - e20c
+          - e24c
+          - e25
+          - e52c
+          - e54c
+          - rock5b
+          - rock5c
+          - r66s
+          - r68s
+          - ht2
+          - h28k
+          - h66k
+          - h68k
+          - h69k
+          - h69k-max
+          - h88k
+          - h88k-v3
+          - jp-tvbox
+          - l1pro
+          - s905
+          - s905x2
+          - s905x3
+          - s912
+          - s922x
+          - s922x-n2
+
       include_docker:
         description: |
           是否编译 Docker 插件
@@ -131,7 +96,7 @@ jobs:
           # 使用ImageBuilder构建 且用户勾选了替换banner时
           cp n1/99-banner.sh files/etc/uci-defaults/
       
-      - name: Building N1 ImmortalWrt rootfs
+      - name: Build Rootfs for Radxa and Other Boards (ImmortalWrt)
         if: ${{ github.event.inputs.skip_imagebuilder != 'true' }}
         run: |
           echo "✅ 使用 ImageBuilder 构建 rootfs"
@@ -178,14 +143,14 @@ jobs:
           fi
           echo "file=$ROOTFS_FILE" >> $GITHUB_OUTPUT
 
-      - name: Package armsr-armv8 as ImmortalWrt for N1
-        uses: wukongdaily/flippy-openwrt-actions@master
+      - name: Package armsr-armv8 as ImmortalWrt for Radxa
+        uses: ophub/flippy-openwrt-actions@main
         if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
         env:
           OPENWRT_ARMVIRT: ${{ steps.find_rootfs.outputs.file }}
-          PACKAGE_SOC: s905d
+          PACKAGE_SOC: ${{ inputs.openwrt_soc }}
           KERNEL_VERSION_NAME: ${{ inputs.openwrt_kernel }}
-          KERNEL_AUTO_LATEST: false
+          KERNEL_AUTO_LATEST: true
           WHOAMI: ${{ inputs.builder_name }}
 
       - name: Rename .img.gz file
@@ -196,15 +161,16 @@ jobs:
           FILENAME=$(basename "$FILE")
           echo "FILENAME=$FILENAME" >> $GITHUB_ENV
           KERNEL_VERSION=$(echo "$FILENAME" | grep -oP 'k\d+\.\d+\.\d+')
-          mv "$FILE" "${{ env.PACKAGED_OUTPUTPATH }}/immortalwrt-24.10.2-phicomm-n1-btrfs-$KERNEL_VERSION.img.gz"
+          MODEL=${{ inputs.openwrt_soc }}
+          mv "$FILE" "${{ env.PACKAGED_OUTPUTPATH }}/immortalwrt-24.10.2-$MODEL-btrfs-$KERNEL_VERSION.img.gz"
 
 
       - name: Upload firmware to GitHub Releases
         uses: softprops/action-gh-release@v2.2.1
         with:
-          tag_name: phicomm-n1
-          name: ImmortalWrt for Phicomm N1
-          body_path: ${{ github.workspace }}/n1/info.md
+          tag_name: flippy
+          name: ImmortalWrt for Radxa Series and Similar Devices
+          body_path: ${{ github.workspace }}/n1/radxa.md
           files: |
             ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz
         env:
