@@ -144,7 +144,7 @@ jobs:
           echo "file=$ROOTFS_FILE" >> $GITHUB_OUTPUT
 
       - name: Package armsr-armv8 as ImmortalWrt for Radxa
-        uses: wukongdaily/flippy-openwrt-actions@kernel-6.1
+        uses: ophub/flippy-openwrt-actions@main
         if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
         env:
           OPENWRT_ARMVIRT: ${{ steps.find_rootfs.outputs.file }}
