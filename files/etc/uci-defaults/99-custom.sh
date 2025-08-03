@@ -157,7 +157,7 @@ uci commit
 
 # 设置编译作者信息
 FILE_PATH="/etc/openwrt_release"
-NEW_DESCRIPTION="Packaged by yangnan18937492269"
+NEW_DESCRIPTION="Packaged by 微信18937492269"
 sed -i "s/DISTRIB_DESCRIPTION='[^']*'/DISTRIB_DESCRIPTION='$NEW_DESCRIPTION'/" "$FILE_PATH"
 
 exit 0
