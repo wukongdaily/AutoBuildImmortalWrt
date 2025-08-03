@@ -1,1 +1,0 @@
-friendlyarm_nanopi-r2c ,friendlyarm_nanopi-r2c-plus ,friendlyarm_nanopi-r2s ,friendlyarm_nanopi-r3s ,friendlyarm_nanopi-r4s ,friendlyarm_nanopi-r4se ,friendlyarm_nanopi-r4s-enterprise ,friendlyarm_nanopi-r5c ,friendlyarm_nanopi-r5s ,friendlyarm_nanopi-r6c ,friendlyarm_nanopi-r6s ,lunzn_fastrhino-r66s ,lunzn_fastrhino-r68s ,lyt_t68m
