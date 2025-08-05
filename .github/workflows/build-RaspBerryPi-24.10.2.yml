@@ -28,7 +28,6 @@ on:
         required: true
         default: '1024'
 
-
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -59,7 +58,16 @@ jobs:
           elif [ "$profiles" = "rpi-5" ]; then
             tag=bcm27xx-bcm2712-openwrt-24.10.2
             echo "cpu=bcm2712" >> $GITHUB_ENV
+            profiles="bcm2712-rpi-5"
+            # 自动写 arch.conf，优先 Cortex-A76
+            mkdir -p ${{ github.workspace }}/arch
+            cat > ${{ github.workspace }}/arch/arch.conf <<EOF
+arch all 1
+arch aarch64_generic 10
+arch aarch64_cortex-a76 15
+EOF
           fi
+
           include_docker="${{ github.event.inputs.include_docker }}"
           size="${{ github.event.inputs.size }}"
           IFS=',' read -r -a profile_array <<< "$profiles"
