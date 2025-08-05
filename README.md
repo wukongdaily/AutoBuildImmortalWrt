@@ -73,8 +73,8 @@ https://wkdaily.cpolar.cn/15
 - https://github.com/wukongdaily/RunFilesBuilder
 - https://github.com/wukongdaily/store
 - https://github.com/xiaorouji/openwrt-passwall
-- 添加新的功能及私人订制地址
 - https://github.com/xiaorouji/openwrt-passwall2
 - https://github.com/sirpdboy/luci-theme-kucat
 - https://github.com/AdguardTeam/AdGuardHome
 - https://github.com/kiddin9/kwrt-packages
+- 添加新的功能及私人订制地址
