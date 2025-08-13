@@ -59,6 +59,12 @@ PACKAGES="$PACKAGES luci-app-openclash"
 PACKAGES="$PACKAGES luci-i18n-homeproxy-zh-cn"
 PACKAGES="$PACKAGES openssh-sftp-server"
 PACKAGES="$PACKAGES luci-i18n-samba4-zh-cn"
+PACKAGES="$PACKAGES luci-theme-kucat"
+PACKAGES="$PACKAGES luci-app-turboacc"
+PACKAGES="$PACKAGES luci-app-store"
+PACKAGES="$PACKAGES luci-app-subconverter"
+PACKAGES="$PACKAGES luci-app-adguardhome"
+PACKAGES="$PACKAGES luci-theme-edge"
 # 文件管理器
 PACKAGES="$PACKAGES luci-i18n-filemanager-zh-cn"
 # 静态文件服务器dufs(推荐)
