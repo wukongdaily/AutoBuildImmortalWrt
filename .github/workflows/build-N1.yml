@@ -5,7 +5,7 @@ on:
       openwrt_kernel:
         description: "选择构建的内核(斐讯N1)"
         required: false
-        default: "6.6.93"
+        default: "6.1.146"
         type: choice
         options:
           - 5.4.291
@@ -85,7 +85,7 @@ on:
         description: |
           是否编译 Docker 插件
         required: true
-        default: 'no'
+        default: 'yes'
         type: choice
         options:
           - 'yes'
@@ -110,7 +110,7 @@ on:
       builder_name:
         description: "设置打包作者的名称"
         required: true
-        default: 'wukongdaily'
+        default: 'iFengke'
 
 jobs:
   build:
@@ -203,7 +203,7 @@ jobs:
         uses: softprops/action-gh-release@v2.2.1
         with:
           tag_name: phicomm-n1
-          name: ImmortalWrt for Phicomm N1
+          name: OpenWrt wit apps for Phicomm N1
           body_path: ${{ github.workspace }}/n1/info.md
           files: |
             ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz
