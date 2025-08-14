@@ -20,7 +20,7 @@ else
     . "$SETTINGS_FILE"
 fi
 
-# 计算网卡数量
+# 计算网卡数量并分配 LAN 和 WAN
 count=0
 ifnames=""
 for iface in /sys/class/net/*; do
@@ -36,67 +36,52 @@ ifnames=$(echo "$ifnames" | awk '{$1=$1};1')
 
 # 网络设置
 if [ "$count" -eq 1 ]; then
-    # 单网口设备 类似于NAS模式 动态获取ip模式 具体ip地址取决于上一级路由器给它分配的ip 也方便后续你使用web页面设置旁路由
-    # 单网口设备 不支持修改ip 不要在此处修改ip 单网口采用dhcp模式 删除默认的192.168.1.1
+    # 单网口设备，设置为 LAN，动态获取 IP（DHCP 模式）
     uci set network.lan.proto='dhcp'
     uci delete network.lan.ipaddr
     uci delete network.lan.netmask
-    uci delete network.lan.gateway     
-    uci delete network.lan.dns 
+    uci delete network.lan.gateway
+    uci delete network.lan.dns
     uci commit network
-elif [ "$count" -gt 1 ]; then
-    # 提取第一个接口作为WAN
-    wan_ifname=$(echo "$ifnames" | awk '{print $1}')
-    # 剩余接口保留给LAN
-    lan_ifnames=$(echo "$ifnames" | cut -d ' ' -f2-)
-    # 设置WAN接口基础配置
-    uci set network.wan=interface
-    # 提取第一个接口作为WAN
-    uci set network.wan.device="$wan_ifname"
-    # WAN接口默认DHCP
-    uci set network.wan.proto='dhcp'
-    # 设置WAN6绑定网口eth0
-    uci set network.wan6=interface
-    uci set network.wan6.device="$wan_ifname"
-    # 更新LAN接口成员
-    # 查找对应设备的section名称
+    echo "Single interface detected, set as LAN with DHCP." >>$LOGFILE
+elif [ "$count" -ge 2 ]; then
+    # 提取第一个接口作为 LAN
+    lan_ifname=$(echo "$ifnames" | awk '{print $1}')
+    # 提取第二个接口作为 WAN
+    wan_ifname=$(echo "$ifnames" | awk '{print $2}')
+    # 设置 LAN 接口
     section=$(uci show network | awk -F '[.=]' '/\.@?device\[\d+\]\.name=.br-lan.$/ {print $2; exit}')
     if [ -z "$section" ]; then
-        echo "error：cannot find device 'br-lan'." >>$LOGFILE
+        echo "error: cannot find device 'br-lan'." >>$LOGFILE
     else
-        # 删除原来的ports列表
+        # 删除原来的 ports 列表
         uci -q delete "network.$section.ports"
-        # 添加新的ports列表
-        for port in $lan_ifnames; do
-            uci add_list "network.$section.ports"="$port"
-        done
-        echo "ports of device 'br-lan' are update." >>$LOGFILE
+        # 添加 LAN 网口
+        uci add_list "network.$section.ports"="$lan_ifname"
+        echo "ports of device 'br-lan' updated to $lan_ifname." >>$LOGFILE
     fi
-    # LAN口设置静态IP
+    # 设置 LAN 为静态 IP
     uci set network.lan.proto='static'
-    # 多网口设备 支持修改为别的ip地址,别的地址应该是网关地址，形如192.168.xx.1 项目说明里都强调过。
-    # 大家不能胡乱修改哦 比如有人修改为192.168.100.55 这是错误的理解 这个项目不能提前设置旁路地址
-    # 旁路的设置分2类情况,情况一是单网口的设备,默认是DHCP模式，ip应该在上一级路由器里查看。之后进入web页在设置旁路。
-    # 情况二旁路由如果是多网口设备，也应当用网关访问网页后，在自行在web网页里设置。总之大家不能直接在代码里修改旁路网关。千万不要徒增bug啦。
-    uci set network.lan.ipaddr='192.168.2.2'
     uci set network.lan.netmask='255.255.255.0'
-    echo "set 192.168.100.1 at $(date)" >>$LOGFILE
-    # 判断是否启用 PPPoE
-    echo "print enable_pppoe value=== $enable_pppoe" >>$LOGFILE
-    if [ "$enable_pppoe" = "yes" ]; then
-        echo "PPPoE is enabled at $(date)" >>$LOGFILE
-        # 设置ipv4宽带拨号信息
-        uci set network.wan.proto='pppoe'
-        uci set network.wan.username=$pppoe_account
-        uci set network.wan.password=$pppoe_password
-        uci set network.wan.peerdns='1'
-        uci set network.wan.auto='1'
-        # 设置ipv6 默认不配置协议
-        uci set network.wan6.proto='none'
-        echo "PPPoE configuration completed successfully." >>$LOGFILE
+    IP_VALUE_FILE="/etc/config/custom_router_ip.txt"
+    if [ -f "$IP_VALUE_FILE" ]; then
+        CUSTOM_IP=$(cat "$IP_VALUE_FILE")
+        uci set network.lan.ipaddr="$CUSTOM_IP"
+        echo "custom router ip is $CUSTOM_IP" >>$LOGFILE
     else
-        echo "PPPoE is not enabled. Skipping configuration." >>$LOGFILE
+        uci set network.lan.ipaddr='192.168.100.1'
+        echo "default router ip is 192.168.100.1" >>$LOGFILE
     fi
+    # 设置 WAN 接口基础配置
+    uci set network.wan=interface
+    uci set network.wan.device="$wan_ifname"
+    uci set network.wan.proto='dhcp'
+    # 设置 WAN6 绑定网口
+    uci set network.wan6=interface
+    uci set network.wan6.device="$wan_ifname"
+    uci set network.wan6.proto='none'
+    uci commit network
+    echo "LAN set to $lan_ifname, WAN set to $wan_ifname." >>$LOGFILE
 fi
 
 # 若安装了dockerd 则设置docker的防火墙规则
