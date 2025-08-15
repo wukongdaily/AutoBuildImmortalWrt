@@ -1,0 +1,340 @@
+# 此工作流99% 使用luci 24.10.x 来构建 极个别机型使用快照版和23.05.4版本来构建
+# 23.05.4 特有机型列表
+# abt_asr3000-ubootmod
+# cetron_ct3003-stock
+# cmcc_a10
+# cmcc_rax3000m-emmc-ubootmod
+# cmcc_rax3000m-nand-ubootmod
+# imou_lc-hx3001-ubootmod
+# jcg_q30 捷成
+# jcg_q30-ubootmod
+# qihoo_360t7-ubootmod
+# xiaomi_mi-router-wr30u-112m-nmbm
+# xiaomi_redmi-router-ax6000 该机型在24.10.2 分化为2个机型
+# —————————————————————————————24.10.2—————————————————————————————————
+# xiaomi_redmi-router-ax6000-stock ————原厂默认 bootloader（stock）版本
+# xiaomi_redmi-router-ax6000-ubootmod—————改装过 bootloader 的版本（ubootmod）
+
+name: Build Wireless Router ImmortalWrt 24.10.x
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        type: choice
+        description: "请选择mtk路由器型号"
+        required: true
+        options:
+          - glinet_gl-mt2500
+          - glinet_gl-mt3000
+          - glinet_gl-mt6000
+          - glinet_gl-axt1800
+          - glinet_gl-ax1800
+          - glinet_gl-b2200
+          - glinet_gl-x3000
+          - glinet_gl-xe3000
+          # 就是Fudy MT3000
+          - huasifei_wh3000-emmc
+          - cudy_tr3000-v1
+          - cudy_tr3000-v1-ubootmod
+          - cudy_tr3000-256mb-v1
+          - jcg_q30-pro
+          - jcg_q30
+          - jcg_q30-ubootmod
+          # 京东云AX6000百里
+          - jdcloud_re-cp-03
+          - xiaomi_mi-router-ax3000t
+          - xiaomi_mi-router-ax3000t-ubootmod
+          - xiaomi_mi-router-wr30u-stock
+          - xiaomi_mi-router-wr30u-ubootmod
+          - xiaomi_mi-router-wr30u-112m-nmbm
+          - xiaomi_redmi-router-ax6000
+          - xiaomi_redmi-router-ax6000-stock
+          - xiaomi_redmi-router-ax6000-ubootmod
+          - qnap_301w
+          - redmi_ax6
+          - redmi_ax6-stock
+          - spectrum_sax1v1k
+          - tplink_eap660hd-v1
+          - xiaomi_ax3600
+          - xiaomi_ax3600-stock
+          - xiaomi_ax9000
+          - xiaomi_ax9000-stock
+          - cmcc_a10-stock
+          - cmcc_a10-ubootmod
+          - cmcc_rax3000m
+          - cmcc_rax3000me
+          - cmcc_rax3000m-emmc-ubootmod
+          - cmcc_rax3000m-nand-ubootmod
+          - imou_lc-hx3001-ubootmod
+          - qihoo_360t7-ubootmod
+          - xiaomi_mi-router-wr30u-112m-nmbm
+          - xiaomi_redmi-router-ax6000
+          - abt_asr3000
+          - abt_asr3000-ubootmod
+          - cetron_ct3003-stock
+          - cmcc_a10
+          - acelink_ew-7886cax
+          - acer_predator-w6
+          - acer_predator-w6d
+          - acer_vero-w6m
+          - arcadyan_mozart
+          - asus_rt-ax52
+          - asus_rt-ax59u
+          - asus_tuf-ax4200
+          - asus_tuf-ax6000
+          - bananapi_bpi-r3
+          - bananapi_bpi-r3-mini
+          - bananapi_bpi-r4
+          - bananapi_bpi-r4-poe
+          - cetron_ct3003
+          - cetron_ct3003-ubootmod
+          - comfast_cf-e393ax
+          - confiabits_mt7981
+          - cudy_ap3000-v1
+          - cudy_ap3000outdoor-v1
+          - cudy_m3000-v1
+          - cudy_re3000-v1
+          - cudy_wr3000-v1
+          - cudy_wr3000e-v1
+          - cudy_wr3000h-v1
+          - cudy_wr3000s-v1
+          - dlink_aquila-pro-ai-m30-a1
+          - dlink_aquila-pro-ai-m60-a1
+          - edgecore_eap111
+          - gatonetworks_gdsp
+          - h3c_magic-nx30-pro
+          - h3c_magic-nx30-pro-nmbm
+          - imou_lc-hx3001
+          - keenetic_kn-3811
+          - keenetic_kn-3911
+          - konka_komi-a31
+          - livinet_zr-3020
+          - livinet_zr-3020-ubootmod
+          - mediatek_mt7981-rfb
+          - mediatek_mt7986a-rfb-nand
+          - mediatek_mt7986b-rfb
+          - mediatek_mt7988a-rfb
+          - mercusys_mr80x-v3
+          - mercusys_mr90x-v1
+          - mercusys_mr90x-v1-ubi
+          - netcore_n60
+          - netcore_n60-pro
+          - netgear_wax220
+          - netis_nx31
+          - nokia_ea0326gmp
+          - openembed_som7981
+          - openwrt_one
+          - qihoo_360t7
+          - routerich_ax3000
+          - routerich_ax3000-ubootmod
+          - routerich_ax3000-v1
+          - ruijie_rg-x60-pro
+          - smartrg_sdg-8612
+          - smartrg_sdg-8614
+          - smartrg_sdg-8622
+          - smartrg_sdg-8632
+          - smartrg_sdg-8733
+          - smartrg_sdg-8733a
+          - smartrg_sdg-8734
+          - tplink_archer-ax80-v1
+          - tplink_re6000xd
+          - tplink_tl-xdr4288
+          - tplink_tl-xdr6086
+          - tplink_tl-xdr6088
+          - tplink_tl-xtr8488
+          - ubnt_unifi-6-plus
+          - unielec_u7981-01-emmc
+          - unielec_u7981-01-nand
+          - wavlink_wl-wn573hx3
+          - wavlink_wl-wn586x3
+          - yuncore_ax835
+          - zbtlink_zbt-z8102ax
+          - zbtlink_zbt-z8103ax
+          - zyxel_ex5601-t0-stock
+          - zyxel_ex5601-t0-ubootmod
+          - zyxel_ex5700-telenor
+          - zyxel_nwa50ax-pro
+          - arcadyan_aw1000
+          - asus_rt-ax89x
+          - buffalo_wxr-5950ax12
+          - cmcc_rm2-6
+          - compex_wpq873
+          - dynalink_dl-wrx36
+          - edgecore_eap102
+          - edimax_cax1800
+          - linksys_mx4200v1
+          - linksys_mx4200v2
+          - linksys_mx4300
+          - linksys_mx5300
+          - linksys_mx8500
+          - netgear_rax120v2
+          - netgear_sxr80
+          - netgear_sxs80
+          - netgear_wax218
+          - netgear_wax620
+          - netgear_wax630
+          - prpl_haze
+          - yuncore_ax880
+          - zbtlink_zbt-z800ax
+          - zte_mf269
+          - zte_mf269-stock
+          - zyxel_nbg7815
+        default: glinet_gl-mt6000
+      custom_router_ip:
+        description: "请设置路由器的管理地址 格式:192.168.x.1 或 10.x.x.1"
+        required: true
+        default: "192.168.100.1"
+      include_docker:
+        description: |
+          是否编译 Docker 插件
+        required: true
+        default: 'no'
+        type: choice
+        options:
+          - 'yes'
+          - 'no'
+      enable_pppoe:
+        description: "是否配置PPPoE拨号信息?"
+        required: true
+        default: 'no'
+        type: choice
+        options:
+          - 'yes'
+          - 'no'
+      pppoe_account:
+        description: "宽带账号 (若启用PPPoE)"
+        required: false
+      pppoe_password:
+        description: "宽带密码 (若启用PPPoE)"
+        required: false
+
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set executable permissions
+        run: |
+          chmod +x ${{ github.workspace }}/mediatek-filogic/build24.sh
+      
+      - name: Save Custom Router IP into OpenWrt files
+        run: |
+          mkdir -p "${{ github.workspace }}/custom"
+          echo "${{ github.event.inputs.custom_router_ip }}" > "${{ github.workspace }}/custom/custom_router_ip.txt"
+          echo "您设置的路由器管理地址是:${{ github.event.inputs.custom_router_ip }}"
+          # 后续步骤会将该文件映射到路由器/etc/config/custom_router_ip.txt 以便用于开机脚本99-custom.sh读取用户设置的ip
+
+
+      - name: Validate PPPoE Inputs
+        run: |
+          if [[ "${{ inputs.enable_pppoe }}" == "yes" ]]; then
+            if [[ -z "${{ inputs.pppoe_account }}" || -z "${{ inputs.pppoe_password }}" ]]; then
+              echo "Error: PPPoE account and password must be provided when PPPoE is enabled!"
+              exit 1
+            fi
+          fi
+
+
+      - name: Build Wireless ImmortalWrt 24.10.2
+        run: |
+          profile="${{ github.event.inputs.profile }}"
+          echo "Building for profile: $profile"
+          include_docker="${{ github.event.inputs.include_docker }}"
+          echo "platform=mediatek/filogic" >> $GITHUB_ENV
+          # 读取 ipq807x 机型文件
+          ipq807x_models=$(cat model/ipq807x.txt | tr '\n' '|')
+          ipq807x_models=${ipq807x_models%|}
+          if [[ "$profile" =~ ^($ipq807x_models)$ ]]; then
+              case_tag="qualcommax-ipq807x-openwrt-24.10.2"
+              case_platform="qualcommax/ipq807x"
+          fi
+          # 判断机型
+          case "$profile" in
+              glinet_gl-b2200)
+              # 虽然它是高通ipq40xx平台 但由于都是gl机型 故放在一起 找起来方便
+                  tag=ipq40xx-generic-openwrt-24.10.2
+                  echo "platform=ipq40xx/generic" >> $GITHUB_ENV
+                  ;;
+              glinet_gl-axt1800|glinet_gl-ax1800)
+              # 虽然它是高通ipq60xx平台 但由于都是gl机型 故放在一起 找起来方便
+                  tag=qualcommax-ipq60xx-snapshot
+                  echo "platform=qualcommax/ipq60xx" >> $GITHUB_ENV
+                  ;;
+              cudy_tr3000-256mb-v1)
+              # 由于256MB版本tr3000 还没有出正式版24.10.2 故使用快照版本来构建
+                  tag=mediatek-filogic-24.10-SNAPSHOT
+                  ;;
+              # 下列机型目前没有24.10 因此采用23.05.4分支来构建
+              cmcc_rax3000m-emmc-ubootmod | \
+              cmcc_rax3000m-nand-ubootmod | \
+              cmcc_a10 | \
+              abt_asr3000-ubootmod | \
+              imou_lc-hx3001-ubootmod | \
+              jcg_q30 | \
+              jcg_q30-ubootmod | \
+              xiaomi_mi-router-wr30u-112m-nmbm | \
+              cetron_ct3003-stock | \
+              xiaomi_redmi-router-ax6000 | \
+              qihoo_360t7-ubootmod)
+   
+                  tag=mediatek-filogic-openwrt-23.05.4
+                  ls ${{ github.workspace }}/mediatek-filogic/
+                  cp ${{ github.workspace }}/mediatek-filogic/build23.sh ${{ github.workspace }}/mediatek-filogic/build24.sh
+                  ;;
+              *)
+                  # 如果前面匹配了 ipq807x 文件，则使用文件里的 tag
+                  if [[ -n "$case_tag" ]]; then
+                      tag=$case_tag
+                      echo "platform=$case_platform" >> $GITHUB_ENV
+                  else
+                      # 默认分支
+                      tag=mediatek-filogic-openwrt-24.10.2
+                  fi
+                  ;;
+            esac
+
+            docker run --rm -i \
+              --user root \
+              -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
+              -v "${{ github.workspace }}/glinet:/home/build/immortalwrt/files/etc/uci-defaults" \
+              -v "${{ github.workspace }}/custom:/home/build/immortalwrt/files/etc/config" \
+              -v "${{ github.workspace }}/arch/arch.conf:/home/build/immortalwrt/files/etc/opkg/arch.conf" \
+              -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
+              -v "${{ github.workspace }}/mediatek-filogic/build24.sh:/home/build/immortalwrt/build.sh" \
+              -e PROFILE=$profile \
+              -e INCLUDE_DOCKER=$include_docker \
+              -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
+              -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
+              -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
+            immortalwrt/imagebuilder:$tag /bin/bash /home/build/immortalwrt/build.sh
+          
+
+      - name: Create info
+        run: |
+          if [ "${{ github.event.inputs.include_docker }}" == "yes" ]; then
+            extra_content="### 默认带docker"
+            echo -e "\n $extra_content" >> ${{ github.workspace }}/mediatek-filogic/info.md
+          else
+            echo -e "NO docker"
+          fi
+          custom_router_ip="${{ github.event.inputs.custom_router_ip }}"
+          extra_content_ip="#### 管理地址 $custom_router_ip"
+          echo -e "\n $extra_content_ip" >> ${{ github.workspace }}/mediatek-filogic/info.md
+          
+          
+      - name: Upload ImmortalWrt as release assets
+        uses: softprops/action-gh-release@v2.2.1
+        with:
+          tag_name: ${{ github.event.inputs.profile }}
+          name: ImmortalWrt-Wireless
+          body_path: ${{ github.workspace }}/mediatek-filogic/info.md
+          files: |
+            ${{ github.workspace }}/bin/targets/${{ env.platform }}/*
+          token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

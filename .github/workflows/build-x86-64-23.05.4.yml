@@ -3,6 +3,10 @@ name: build-x86-64-immortalwrt-23.05.4
 on:
   workflow_dispatch:
     inputs:
+      custom_router_ip:
+        description: "请设置路由器的管理地址(仅对多网口路由器有效) 格式:192.168.x.1 或 10.x.x.1"
+        required: true
+        default: "192.168.100.1"
       profile:
         description: '请输入要编译固件大小 单位(MB)'
         required: true
@@ -42,6 +46,14 @@ jobs:
       - name: Set executable permissions
         run: chmod +x ${{ github.workspace }}/x86-64/build23.sh
       
+      - name: Save Custom Router IP into OpenWrt files
+        run: |
+          mkdir -p "${{ github.workspace }}/custom"
+          echo "${{ github.event.inputs.custom_router_ip }}" > "${{ github.workspace }}/custom/custom_router_ip.txt"
+          echo "您设置的路由器管理地址是:${{ github.event.inputs.custom_router_ip }}"
+          # 后续步骤会将该文件映射到路由器/etc/config/custom_router_ip.txt 以便用于开机脚本99-custom.sh读取用户设置的ip
+      
+      
       - name: Validate PPPoE Inputs
         run: |
           if [[ "${{ inputs.enable_pppoe }}" == "yes" ]]; then
@@ -65,6 +77,7 @@ jobs:
               --user root \
               -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
               -v "${{ github.workspace }}/files:/home/build/immortalwrt/files" \
+              -v "${{ github.workspace }}/custom:/home/build/immortalwrt/files/etc/config" \
               -v "${{ github.workspace }}/x86-64/imm.config:/home/build/immortalwrt/.config" \
               -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
               -v "${{ github.workspace }}/x86-64/build23.sh:/home/build/immortalwrt/build.sh" \
@@ -78,18 +91,27 @@ jobs:
 
       - name: Create info
         run: |
+          cat > ${{ github.workspace }}/router-info.md <<EOF
+          ## 📡 路由器后台信息
+
+          - 🏠 **后台地址**: ${{ github.event.inputs.custom_router_ip }}
+          - 👤 **用户名**: root
+          - 🔑 **密码**: 无
+          EOF
+
           if [ "${{ github.event.inputs.include_docker }}" == "yes" ]; then
             extra_content="#### 默认带docker"
-            echo -e "\n $extra_content" >> ${{ github.workspace }}/info.md
+            echo -e "\n$extra_content" >> ${{ github.workspace }}/router-info.md
           else
-            echo -e "NO docker"
+            echo -e "\n#### 不带docker" >> ${{ github.workspace }}/router-info.md
           fi
+
 
       - name: Upload ImmortWrt as release assets
         uses: softprops/action-gh-release@v2.2.1
         with:
           tag_name: Autobuild-x86-64
-          body_path: ${{ github.workspace }}/info.md
+          body_path: ${{ github.workspace }}/router-info.md
           files: |
             ${{ github.workspace }}/bin/targets/x86/64/immortalwrt-23.05.4-x86-64-generic-squashfs-combined-efi.img.gz
           token: ${{ secrets.GITHUB_TOKEN }}
