@@ -17,7 +17,8 @@ else
    # 读取pppoe信息(由build.sh写入)
    . "$SETTINGS_FILE"
 fi
-
+# 设置子网掩码 
+uci set network.lan.netmask='255.255.255.0'
 # 设置路由器管理后台地址
 IP_VALUE_FILE="/etc/config/custom_router_ip.txt"
 if [ -f "$IP_VALUE_FILE" ]; then
