@@ -168,4 +168,18 @@ FILE_PATH="/etc/openwrt_release"
 NEW_DESCRIPTION="Packaged by wukongdaily"
 sed -i "s/DISTRIB_DESCRIPTION='[^']*'/DISTRIB_DESCRIPTION='$NEW_DESCRIPTION'/" "$FILE_PATH"
 
+sed -i '/DISTRIB_RELEASE/d' "$FILE_PATH"
+echo "DISTRIB_RELEASE='R25.8.18'" >> "$FILE_PATH"
+
+RC_LOCAL="/etc/rc.local"
+# 确保 rc.local 存在
+[ -f "$RC_LOCAL" ] || {
+    echo "#!/bin/sh" > "$RC_LOCAL"
+    echo "exit 0" >> "$RC_LOCAL"
+    chmod +x "$RC_LOCAL"
+}
+# 如果没有这行，就在 exit 0 之前添加
+grep -qF "dmesg -n 3" "$RC_LOCAL" || \
+    sed -i '/^exit 0/i dmesg -n 3' "$RC_LOCAL"
 exit 0
+
