@@ -3,7 +3,10 @@
 # Log file for debugging
 LOGFILE="/etc/config/uci-defaults-log.txt"
 echo "Starting 99-custom.sh at $(date)" >>$LOGFILE
-# 设置默认防火墙规则，方便虚拟机首次访问 WebUI
+# 设置默认防火墙规则，方便单网口虚拟机首次访问 WebUI 
+# 因为本项目中 单网口模式是dhcp模式 直接就能上网并且访问web界面 避免新手每次都要修改/etc/config/network中的静态ip
+# 当你刷机运行后 都调整好了 你完全可以在web页面自行关闭 wan口防火墙的入站数据
+# 具体操作方法：网络——防火墙 在wan的入站数据 下拉选项里选择 拒绝 保存并应用即可。
 uci set firewall.@zone[1].input='ACCEPT'
 
 # 设置主机名映射，解决安卓原生 TV 无法联网的问题
