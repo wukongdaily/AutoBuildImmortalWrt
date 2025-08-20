@@ -87,7 +87,7 @@ elif [ "$count" -gt 1 ]; then
         uci set network.lan.ipaddr=$CUSTOM_IP
         echo "custom router ip is $CUSTOM_IP" >> $LOGFILE
     else
-        uci set network.lan.ipaddr='192.168.100.1'
+        uci set network.lan.ipaddr='192.168.10.1'
         echo "default router ip is 192.168.100.1" >> $LOGFILE
     fi
 
