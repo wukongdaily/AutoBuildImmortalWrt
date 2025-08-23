@@ -41,6 +41,12 @@ https://www.youtube.com/watch?v=7i6BQeitUtE
 - 综合上述特点，【单网口设备】应该先接路由器，先在上级路由器查看一下它的ip 再访问。
 - 上述特点 你都可以通过 `99-custom.sh` 配置和调整
 
+## 特别说明
+本项目构建的固件 为了易用性 wan口防火墙规则入站 是开启的，待首次调试完毕后，建议自行关闭。操作方法如下
+网络——防火墙—— wan 的入站 选择拒绝 然后保存并应用即可。更多讨论[ 请参考这个话题](https://github.com/wukongdaily/AutoBuildImmortalWrt/discussions/341)
+<img width="3860" height="870" alt="image" src="https://github.com/user-attachments/assets/d826bccd-f0df-4d4a-877d-b711b81fcf1a" />
+同时此项设置的相关代码详见 `files/etc/uci-defaults/99-custom.sh` 行首
+
 ## ❤️其它GitHub Action项目推荐🌟 （建议收藏）⬇️
 - ### [一键生成run插件] 🆕
 - https://github.com/wukongdaily/RunFilesBuilder<br>
