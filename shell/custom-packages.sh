@@ -69,5 +69,5 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-ksmbd luci-i18n-ksmbd-zh-cn"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-zerotier luci-i18n-zerotier-zh-cn"
 # rustdesk-server
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-rustdesk-server luci-i18n-rustdesk-server-zh-cn"
-# lsof
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES lsof iperf3"
+# other
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES lsof iperf3 cgroupfs-mount"
