@@ -54,6 +54,7 @@ on:
           - qnap_301w
           - redmi_ax6
           - redmi_ax6-stock
+          - xiaomi_redmi-router-ax6s
           - spectrum_sax1v1k
           - tplink_eap660hd-v1
           - xiaomi_ax3600
@@ -604,6 +605,10 @@ jobs:
               cudy_tr3000-256mb-v1)
                   # 由于256MB版本tr3000 还没有出正式版24.10.2 故使用快照版本来构建
                   tag=mediatek-filogic-24.10-SNAPSHOT
+                  ;;
+              xiaomi_redmi-router-ax6s)
+                  tag=mediatek-mt7622-openwrt-24.10.2
+                  echo "platform=mediatek/mt7622" >> $GITHUB_ENV
                   ;;
               # 下列机型目前没有24.10 因此采用23.05.4分支来构建
               cmcc_rax3000m-emmc-ubootmod | \
