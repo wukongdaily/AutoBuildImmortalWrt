@@ -10,16 +10,16 @@
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-quickstart-zh-cn"
 # 去广告adghome
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-adguardhome"
- #代理相关
+#代理相关
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-passwall-zh-cn"
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-ssr-plus"
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-passwall2"
+#CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-ssr-plus"
+#CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-passwall2"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-nikki-zh-cn"
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-nekobox"
- #同样是代理相关 但以下2个属于imm仓库内的软件 一般在build24.sh中已经集成 你也可以在此处调整它的去留 若去除组件则使用减号- 若添加则 不使用减号 或者 不处理
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES -luci-app-openclash"
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES -luci-i18n-homeproxy-zh-cn"
- #VPN
+#CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-nekobox"
+#同样是代理相关 但以下2个属于imm仓库内的软件 一般在build24.sh中已经集成 你也可以在此处调整它的去留 若去除组件则使用减号- 若添加则 不使用减号 或者 不处理
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-openclash"
+#CUSTOM_PACKAGES="$CUSTOM_PACKAGES -luci-i18n-homeproxy-zh-cn"
+#VPN
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-tailscale luci-i18n-tailscale-zh-cn"
 #分区扩容 by sirpdboy 
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-partexp luci-i18n-partexp-zh-cn"
@@ -29,16 +29,16 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-theme-kucat"
 #当luci-app-advancedplus插件开启时 需排除冲突项 luci-app-argon-config和luci-i18n-argon-config-zh-cn 减号代表排除
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-advancedplus luci-i18n-advancedplus-zh-cn -luci-app-argon-config -luci-i18n-argon-config-zh-cn"
 #网络测速 by sirpdboy 
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-netspeedtest luci-i18n-netspeedtest-zh-cn"
+#CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-netspeedtest luci-i18n-netspeedtest-zh-cn"
 # MosDNS
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-mosdns luci-i18n-mosdns-zh-cn"
 # Turbo ACC 网络加速
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-turboacc"
 # 应用过滤 openappfilter.com
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-appfilter luci-i18n-appfilter-zh-cn"
- #设置向导 by sirpdboy
+#设置向导 by sirpdboy
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-netwizard luci-i18n-netwizard-zh-cn"
 # Lucky大吉 
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-lucky lucky"
+#CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-lucky lucky"
 # 集客AC
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-gecoosac gecoosac"
+#CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-gecoosac gecoosac"
