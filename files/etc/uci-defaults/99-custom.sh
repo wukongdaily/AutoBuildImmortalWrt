@@ -67,7 +67,7 @@ if [ "$count" -eq 1 ]; then
     # uci delete network.lan.gateway
     # uci delete network.lan.dns
     # uci commit network
-
+    
     # LAN口设置静态IP
     uci set network.lan.proto='static'
     # 多网口设备 支持修改为别的管理后台地址 在Github Action 的UI上自行输入即可 
