@@ -121,6 +121,8 @@ jobs:
           body_path: ${{ github.workspace }}/router-info.md
           files: |
             ${{ github.workspace }}/bin/targets/x86/64/*squashfs-combined-efi.img.gz
+            echo "增加rootfs格式"
+            ${{ github.workspace }}/bin/targets/x86/64/*rootfs.tar.gz
           token: ${{ secrets.GITHUB_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
