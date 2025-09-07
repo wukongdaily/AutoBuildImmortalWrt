@@ -15,7 +15,7 @@ if [ ! -f "$SETTINGS_FILE" ]; then
     echo "PPPoE settings file not found. Skipping." >> $LOGFILE
 else
    # 读取pppoe信息(由build.sh写入)
-   . "$SETTINGS_FILE"
+   。 "$SETTINGS_FILE"
 fi
 # 设置子网掩码 
 uci set network.lan.netmask='255.255.255.0'
@@ -102,7 +102,7 @@ uci commit
 
 # 设置编译作者信息
 FILE_PATH="/etc/openwrt_release"
-NEW_DESCRIPTION="Packaged by wukongdaily"
+NEW_DESCRIPTION="Packaged by Hoya"
 sed -i "s/DISTRIB_DESCRIPTION='[^']*'/DISTRIB_DESCRIPTION='$NEW_DESCRIPTION'/" "$FILE_PATH"
 
 exit 0
