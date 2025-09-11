@@ -38,7 +38,7 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-mosdns luci-i18n-mosdns-zh-cn"
 # 静态文件服务器
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES -luci-i18n-dufs-zh-cn"
 # SNMP服务器（iKuai跨三层应用支持）
-#CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-snmpd-zh-cn
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-snmpd luci-i18n-snmpd-zh-cn
 # 应用过滤 openappfilter.com
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-appfilter luci-i18n-appfilter-zh-cn"
 # 设置向导 by sirpdboy
