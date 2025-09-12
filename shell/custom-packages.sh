@@ -22,7 +22,11 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-homeproxy-zh-cn"
 # VPN
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-tailscale luci-i18n-tailscale-zh-cn"
 # 分区扩容 by sirpdboy 
-#CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-partexp luci-i18n-partexp-zh-cn"
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-partexp luci-i18n-partexp-zh-cn"
+# DDNS by Eric
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-ddns"
+# windows 激活 by Eric
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-kms"
 # 酷猫主题 by sirpdboy 
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-theme-kucat"
 # 进阶设置 by sirpdboy 
