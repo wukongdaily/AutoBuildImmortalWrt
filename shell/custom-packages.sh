@@ -26,7 +26,7 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-partexp luci-i18n-partexp-zh-cn"
 # DDNS by Eric
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-ddns"
 # windows 激活 by Eric
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-kms"
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-vlmcsd"
 # 酷猫主题 by sirpdboy 
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-theme-kucat"
 # 进阶设置 by sirpdboy 
