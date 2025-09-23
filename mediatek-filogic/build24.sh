@@ -90,13 +90,10 @@ PACKAGES="$PACKAGES kmod-usb-net"
 PACKAGES="$PACKAGES kmod-usb-net-cdc-ether"
 PACKAGES="$PACKAGES kmod-usb-net-rndis"
 PACKAGES="$PACKAGES usb-modeswitch"
-PACKAGES="$PACKAGES kmod-usb-net-ipheth"
-PACKAGES="$PACKAGES luci-proto-ipheth"
 PACKAGES="$PACKAGES luci-proto-qmi"
 PACKAGES="$PACKAGES luci-proto-mbim"
 PACKAGES="$PACKAGES kmod-usb-net-qmi-wwan"
 PACKAGES="$PACKAGES luci-mod-network"
-PACKAGES="$PACKAGES luci-proto-dhcp"
 
 
 # 第三方软件包 合并
