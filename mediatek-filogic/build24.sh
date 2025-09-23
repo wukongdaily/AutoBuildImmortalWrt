@@ -67,11 +67,6 @@ PACKAGES="$PACKAGES openvpn-openssl"
 PACKAGES="$PACKAGES luci-proto-openconnect"
 PACKAGES="$PACKAGES openconnect"
 
-# Transmission 支持
-PACKAGES="$PACKAGES transmission-daemon"
-PACKAGES="$PACKAGES luci-app-transmission"
-PACKAGES="$PACKAGES transmission-web"
-
 # USB 硬盘支持
 PACKAGES="$PACKAGES luci-app-hd-idle"
 PACKAGES="$PACKAGES luci-app-samba4"
