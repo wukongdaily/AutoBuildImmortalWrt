@@ -61,6 +61,44 @@ PACKAGES="$PACKAGES luci-i18n-filemanager-zh-cn"
 # 静态文件服务器dufs(推荐)
 PACKAGES="$PACKAGES luci-i18n-dufs-zh-cn"
 
+# VPN 支持 (OpenVPN 和 OpenConnect)
+PACKAGES="$PACKAGES luci-app-openvpn"
+PACKAGES="$PACKAGES openvpn-openssl"
+PACKAGES="$PACKAGES luci-proto-openconnect"
+PACKAGES="$PACKAGES openconnect"
+
+# Transmission 支持
+PACKAGES="$PACKAGES transmission-daemon"
+PACKAGES="$PACKAGES luci-app-transmission"
+PACKAGES="$PACKAGES transmission-web"
+
+# USB 硬盘支持
+PACKAGES="$PACKAGES luci-app-hd-idle"
+PACKAGES="$PACKAGES luci-app-samba4"
+PACKAGES="$PACKAGES block-mount"
+PACKAGES="$PACKAGES usbutils"
+PACKAGES="$PACKAGES kmod-usb-core"
+PACKAGES="$PACKAGES kmod-usb3"
+PACKAGES="$PACKAGES kmod-usb-storage"
+PACKAGES="$PACKAGES kmod-usb-storage-uas"
+PACKAGES="$PACKAGES kmod-fs-ext4"
+PACKAGES="$PACKAGES kmod-fs-ntfs"
+PACKAGES="$PACKAGES kmod-fs-vfat"
+
+# USB 热点支持 (ZTE F50/iPhone/安卓)
+PACKAGES="$PACKAGES kmod-usb-net"
+PACKAGES="$PACKAGES kmod-usb-net-cdc-ether"
+PACKAGES="$PACKAGES kmod-usb-net-rndis"
+PACKAGES="$PACKAGES usb-modeswitch"
+PACKAGES="$PACKAGES kmod-usb-net-ipheth"
+PACKAGES="$PACKAGES luci-proto-ipheth"
+PACKAGES="$PACKAGES luci-proto-qmi"
+PACKAGES="$PACKAGES luci-proto-mbim"
+PACKAGES="$PACKAGES kmod-usb-net-qmi-wwan"
+PACKAGES="$PACKAGES luci-mod-network"
+PACKAGES="$PACKAGES luci-proto-dhcp"
+
+
 # 第三方软件包 合并
 # ======== shell/custom-packages.sh =======
 if [ "$PROFILE" = "glinet_gl-axt1800" ] || [ "$PROFILE" = "glinet_gl-ax1800" ]; then
