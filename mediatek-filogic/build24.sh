@@ -68,6 +68,13 @@ PACKAGES="$PACKAGES luci-proto-openconnect"
 PACKAGES="$PACKAGES openconnect"
 PACKAGES="$PACKAGES luci-app-openclash"
 
+# USB 手机热点
+PACKAGES="$PACKAGES kmod-usb-net"
+PACKAGES="$PACKAGES kmod-usb-net-ipheth"
+PACKAGES="$PACKAGES libimobiledevice"
+PACKAGES="$PACKAGES usbmuxd"
+PACKAGES="$PACKAGES kmod-usb-net-rndis"
+PACKAGES="$PACKAGES usb-modeswitch"
 
 # 第三方软件包 合并
 # ======== shell/custom-packages.sh =======
