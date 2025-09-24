@@ -66,6 +66,7 @@ PACKAGES="$PACKAGES luci-app-openvpn"
 PACKAGES="$PACKAGES openvpn-openssl"
 PACKAGES="$PACKAGES luci-proto-openconnect"
 PACKAGES="$PACKAGES openconnect"
+PACKAGES="$PACKAGES luci-app-openclash"
 
 
 # 第三方软件包 合并
