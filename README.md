@@ -7,7 +7,7 @@
 它是一个工作流。可快速构建 带docker且支持自定义固件大小的 immortalWrt
 > 1、支持自定义固件大小 默认1GB <br>
 > 2、支持可选预安装docker（可选）<br>
-> 3、支持按需增加第三方软件<br>
+> 3、支持按需增加第三方软件 https://github.com/wukongdaily/AutoBuildImmortalWrt/discussions/209 <br>
 > 4、点击这里查看👉🏻[全部支持的机型列表](https://github.com/wukongdaily/AutoBuildImmortalWrt/blob/master/SUPPORT.md) 👈🏻
 
 ## [基本用法步骤](https://github.com/wukongdaily/AutoBuildImmortalWrt/wiki) 👈🏻
