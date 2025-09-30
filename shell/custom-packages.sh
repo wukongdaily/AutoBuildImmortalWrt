@@ -29,7 +29,7 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-netspeedtest luci-i18n-netspeedtest-z
 # MosDNS
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-mosdns luci-i18n-mosdns-zh-cn"
 # Turbo ACC 网络加速
-#CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-turboacc"
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-turboacc"
 # 应用过滤 openappfilter.com
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-appfilter luci-i18n-appfilter-zh-cn"
 # 设置向导 by sirpdboy
@@ -38,3 +38,7 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-mosdns luci-i18n-mosdns-zh-cn"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-lucky lucky"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES -luci-app-argon-config -luci-i18n-argon-config-zh-cn"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-openlist luci-i18n-openlist-zh-cn"
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-filetransfer luci-i18n-filetransfer-zh-cn"
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES -luci-app-filebrowser-go -luci-i18n-filebrowser-go-zh-cn"
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES webdav2 luci-app-unishare"
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES -luci-app-filemanager -luci-i18n-filemanager-zh-cn
