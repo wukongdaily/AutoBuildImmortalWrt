@@ -38,7 +38,6 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-turboacc"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-lucky lucky"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES -luci-app-argon-config -luci-i18n-argon-config-zh-cn"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-openlist luci-i18n-openlist-zh-cn"
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-filetransfer luci-i18n-filetransfer-zh-cn"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES -luci-app-filebrowser-go -luci-i18n-filebrowser-go-zh-cn"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES webdav2 luci-app-unishare"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES -luci-app-filemanager -luci-i18n-filemanager-zh-cn
