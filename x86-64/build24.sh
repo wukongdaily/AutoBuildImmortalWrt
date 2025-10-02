@@ -59,6 +59,18 @@ PACKAGES="$PACKAGES luci-app-openclash"
 PACKAGES="$PACKAGES luci-i18n-homeproxy-zh-cn"
 PACKAGES="$PACKAGES openssh-sftp-server"
 PACKAGES="$PACKAGES luci-i18n-samba4-zh-cn"
+PACKAGES="$PACKAGES luci-app-udpxy"
+PACKAGES="$PACKAGES luci-app-upnp"
+PACKAGES="$PACKAGES luci-app-zerotier"
+PACKAGES="$PACKAGES luci-app-ipsec-vpnd"
+PACKAGES="$PACKAGES luci-app-ddns"
+PACKAGES="$PACKAGES luci-app-openvpn-server"
+PACKAGES="$PACKAGES luci-app-openvpn"
+PACKAGES="$PACKAGES luci-app-strongswan-swanctl"
+PACKAGES="$PACKAGES luci-app-softether"
+PACKAGES="$PACKAGES luci-app-softethervpn"
+
+
 # 文件管理器
 PACKAGES="$PACKAGES luci-i18n-filemanager-zh-cn"
 # 静态文件服务器dufs(推荐)
