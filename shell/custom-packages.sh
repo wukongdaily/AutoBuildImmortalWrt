@@ -35,7 +35,8 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-openclash"
 # 设置向导 by sirpdboy
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-netwizard luci-i18n-netwizard-zh-cn"
 # Lucky大吉 
-#CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-lucky lucky"
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-lucky lucky"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES -luci-app-argon-config -luci-i18n-argon-config-zh-cn"
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-openlist luci-i18n-openlist-zh-cn"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-filetransfer"
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES webdav2 luci-app-unishare"
