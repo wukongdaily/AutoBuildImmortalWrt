@@ -182,10 +182,127 @@ uci delete ttyd.@ttyd[0].interface
 # 设置所有网口可连接 SSH
 uci set dropbear.@dropbear[0].Interface=''
 uci commit
-
+wlan_name0="OpenWrt_2.4G"
+wlan_name1="OpenWrt_5G"
+wlan_password="password"
+root_password="password"
+lan_ip_address="192.168.6.1"
+hostname="OpenWrt"
+# 记录潜在错误
+exec >/tmp/setup.log 2>&1
+# 设置管理员密码
+if [ -n "$root_password" ]; then
+  (echo "$root_password"; sleep 1; echo "$root_password") | passwd > /dev/null
+fi
+# 配置LAN
+if [ -n "$lan_ip_address" ]; then
+  uci set network.lan.ipaddr="$lan_ip_address"
+  uci set network.lan.netmask="255.255.255.0"
+  uci commit network
+fi
+# 配置原有WLAN
+if [ -n "$wlan_name0" -a -n "$wlan_password" -a ${#wlan_password} -ge 8 ]; then
+  uci set wireless.radio0.disabled='0'
+  uci set wireless.radio0.htmode='HT40'
+  uci set wireless.radio0.channel='auto'
+  uci set wireless.radio0.cell_density='0'
+  uci set wireless.default_radio0.ssid="$wlan_name0"
+  uci set wireless.default_radio0.encryption='sae-mixed'
+  uci set wireless.default_radio0.key="$wlan_password"
+fi
+if [ -n "$wlan_name1" -a -n "$wlan_password" -a ${#wlan_password} -ge 8 ]; then
+  uci set wireless.radio1.disabled='0'
+  uci set wireless.radio1.htmode='VHT80'
+  uci set wireless.radio1.channel='auto'
+  uci set wireless.radio1.cell_density='0'
+  uci set wireless.default_radio1.ssid="$wlan_name1"
+  uci set wireless.default_radio1.encryption='sae-mixed'
+  uci set wireless.default_radio1.key="$wlan_password"
+fi
+# 添加10个5G Wi-Fi信号 (wifi1到wifi10)
+for i in $(seq 1 10); do
+  uci set wireless.wifi$i=wifi-iface
+  uci set wireless.wifi$i.device='radio1'
+  uci set wireless.wifi$i.mode='ap'
+  uci set wireless.wifi$i.ssid="wifi$i"
+  uci set wireless.wifi$i.encryption='psk-mixed'
+  uci set wireless.wifi$i.key='password'
+  uci set wireless.wifi$i.network="lan$i"
+  uci set wireless.wifi$i.htmode='VHT160'
+done
+# 添加10个2.4G Wi-Fi信号 (wifi11到wifi20)
+for i in $(seq 11 20); do
+  uci set wireless.wifi$i=wifi-iface
+  uci set wireless.wifi$i.device='radio0'
+  uci set wireless.wifi$i.mode='ap'
+  uci set wireless.wifi$i.ssid="wifi$i"
+  uci set wireless.wifi$i.encryption='psk-mixed'
+  uci set wireless.wifi$i.key='password'
+  uci set wireless.wifi$i.network="lan$i"
+  uci set wireless.wifi$i.htmode='HT40'
+done
+uci commit wireless
+# 设置主机名
+if [ -n "$hostname" ]; then
+  uci set system.@system[0].hostname="$hostname"
+  uci commit system
+fi
+# 设置时区
+uci set system.@system[0].zonename='Asia/Shanghai'
+uci set system.@system[0].timezone='CST-8'
+# 添加20个LAN接口 (lan1到lan20)
+for i in $(seq 1 20); do
+  ip_addr="192.168.$((10 + i)).1"
+  uci set network.lan$i=interface
+  uci set network.lan$i.proto='static'
+  uci set network.lan$i.ipaddr="$ip_addr"
+  uci set network.lan$i.netmask='255.255.255.0'
+  uci set network.lan$i.ip6assign='60'
+  # 启用DHCP
+  uci set dhcp.lan$i=dhcp
+  uci set dhcp.lan$i.interface="lan$i"
+  uci set dhcp.lan$i.start='100'
+  uci set dhcp.lan$i.limit='150'
+  uci set dhcp.lan$i.leasetime='12h'
+  # 分配到LAN防火墙区域
+  uci add_list firewall.lan.network="lan"
+done
+uci commit network
+uci commit dhcp
+uci commit firewall
+# 设置本机防火墙
+uci add firewall rule
+uci set firewall.@rule[-1].name='Allow_Local'
+uci set firewall.@rule[-1].family='ipv6'
+uci set firewall.@rule[-1].src='wan'
+uci set firewall.@rule[-1].dest_port='22 18080 18443'
+uci set firewall.@rule[-1].target='ACCEPT'
+# 设置WireGuard区域防火墙
+uci add firewall rule
+uci set firewall.@rule[-1].name='Allow_VPN'
+uci set firewall.@rule[-1].family='ipv6'
+uci set firewall.@rule[-1].src='wan'
+uci set firewall.@rule[-1].dest_port='52080'
+uci set firewall.@rule[-1].target='ACCEPT'
+# 设置LAN转发
+uci add firewall rule
+uci set firewall.@rule[-1].name='Allow_LAN'
+uci set firewall.@rule[-1].family='ipv6'
+uci set firewall.@rule[-1].src='wan'
+uci set firewall.@rule[-1].dest='lan'
+uci set firewall.@rule[-1].dest_port='22 8006 8069 9090 18080 18443'
+uci set firewall.@rule[-1].target='ACCEPT'
+# 重启网络服务
+/etc/init.d/network restart
+# 重启无线网络服务
+wifi up
+# 重启DHCP服务
+/etc/init.d/dnsmasq restart
+# 重启防火墙服务
+/etc/init.d/firewall restart
 # 设置编译作者信息
 FILE_PATH="/etc/openwrt_release"
-NEW_DESCRIPTION="Packaged by wukongdaily"
+NEW_DESCRIPTION="Packaged by iFengke"
 sed -i "s/DISTRIB_DESCRIPTION='[^']*'/DISTRIB_DESCRIPTION='$NEW_DESCRIPTION'/" "$FILE_PATH"
 
 # 若luci-app-advancedplus (进阶设置)已安装 则去除zsh的调用 防止命令行报 /usb/bin/zsh: not found的提示
