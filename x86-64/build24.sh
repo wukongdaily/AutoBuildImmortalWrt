@@ -63,6 +63,7 @@ PACKAGES="$PACKAGES luci-app-udpxy"
 PACKAGES="$PACKAGES luci-app-upnp"
 PACKAGES="$PACKAGES luci-app-ipsec-vpnd"
 PACKAGES="$PACKAGES luci-app-ddns"
+PACKAGES="$PACKAGES luci-app-ipsec-vpnd
 # 文件管理器
 PACKAGES="$PACKAGES luci-i18n-filemanager-zh-cn"
 # 静态文件服务器dufs(推荐)
