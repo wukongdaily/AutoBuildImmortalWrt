@@ -103,4 +103,4 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-echo "$(date '+%Y-%m-%d %H:%M:%S') - Build completed successfully."
+echo "$(date '+%Y-%m-%d %H:%M:%S') - Build completed by MyeongJun-Park."
