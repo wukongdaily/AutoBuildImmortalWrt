@@ -62,7 +62,16 @@ PACKAGES="$PACKAGES luci-i18n-samba4-zh-cn"
 # 文件管理器
 PACKAGES="$PACKAGES luci-i18n-filemanager-zh-cn"
 # 静态文件服务器dufs(推荐)
-PACKAGES="$PACKAGES luci-i18n-dufs-zh-cn"
+#PACKAGES="$PACKAGES luci-i18n-dufs-zh-cn"
+# 新加的
+PACKAGES="$PACKAGES luci-app-ramfree" #释放内存
+PACKAGES="$PACKAGES luci-i18n-ramfree-zh-cn"
+PACKAGES="$PACKAGES luci-app-autoreboot" #计划重启
+PACKAGES="$PACKAGES luci-i18n-autoreboot-zh-cn"
+PACKAGES="$PACKAGES luci-app-netdata" #Netdata实时监控（图表）
+PACKAGES="$PACKAGES luci-i18n-netdata-zh-cn"
+PACKAGES="$PACKAGES luci-app-upnp" #通用即插即用UPnP（端口自动转发）
+PACKAGES="$PACKAGES luci-i18n-upnp-zh-cn"
 # ======== shell/custom-packages.sh =======
 # 合并imm仓库以外的第三方插件
 PACKAGES="$PACKAGES $CUSTOM_PACKAGES"
