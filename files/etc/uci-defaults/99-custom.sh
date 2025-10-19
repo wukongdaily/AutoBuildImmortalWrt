@@ -62,10 +62,10 @@ esac
 if [ "$count" -eq 1 ]; then
 # 单网口设备，改静态模式
     uci set network.lan.proto='static'
-    uci delete network.lan.ipaddr='192.168.5.2'
-    uci delete network.lan.netmask='255.255.255.0'
-    uci delete network.lan.gateway='192.168.5.1'
-    uci delete network.lan.dns='223.5.5.5'
+    uci set network.lan.ipaddr='192.168.5.2'
+    uci set network.lan.netmask='255.255.255.0'
+    uci set network.lan.gateway='192.168.5.1'
+    uci set network.lan.dns='223.5.5.5'
     uci commit network
 elif [ "$count" -gt 1 ]; then
     # 多网口设备配置
