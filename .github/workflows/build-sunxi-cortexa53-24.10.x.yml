@@ -1,11 +1,11 @@
-name: build-sunxi-cortexa53-24.10.0
+name: build-sunxi-cortexa53-24.10.x
 
 on:
   workflow_dispatch:
     inputs:
       profile:
         type: choice
-        description: "请选择路由器型号"
+        description: "请选择开发板型号"
         required: true
         options:
           - xunlong_orangepi-zero3
@@ -19,6 +19,21 @@ on:
           - pine64_pine64-plus
           - pine64_sopine-baseboard
         default: xunlong_orangepi-zero3
+      luci_version:
+        description: "选择luci版本"
+        required: false
+        default: "24.10.3"
+        type: choice
+        options:
+          - 24.10.0
+          - 24.10.1
+          - 24.10.2
+          - 24.10.3
+      enable_store:
+        description: "集成 store 商店"
+        required: false
+        type: boolean
+        default: true
       include_docker:
         description: |
           是否编译 Docker 插件
@@ -44,13 +59,23 @@ jobs:
 
       - name: Set executable permissions
         run: |
-          chmod +x ${{ github.workspace }}/sunxi-cortexa53/build.sh
-
-      - name: Build sunxi-cortexa53 ImmpotalWrt 24.10
+          chmod +x ${{ github.workspace }}/sunxi-cortexa53/build24.sh
+      
+      - name: Enable Store integration
+        run: |
+          if [ "${{ github.event.inputs.enable_store }}" == "true" ]; then
+            echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-store"' >> shell/custom-packages.sh
+            echo "✅ 已追加 luci-app-store"
+          else
+            echo "❎ 未启用 luci-app-store"
+          fi
+      
+      - name: Build sunxi-cortexa53 ImmpotalWrt 24.10.2
         run: |
           profiles="${{ github.event.inputs.profile }}"
           include_docker="${{ github.event.inputs.include_docker }}"
           size="${{ github.event.inputs.size }}"
+          luci_version="${{ github.event.inputs.luci_version }}"
           
           IFS=',' read -r -a profile_array <<< "$profiles"
           
@@ -60,22 +85,17 @@ jobs:
             docker run --rm -i \
               --user root \
               -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
-              -v "${{ github.workspace }}/files:/home/build/immortalwrt/files" \
-              -v "${{ github.workspace }}/sunxi-cortexa53/24.10/build.sh:/home/build/immortalwrt/build.sh" \
+              -v "${{ github.workspace }}/files/etc/uci-defaults:/home/build/immortalwrt/files/etc/uci-defaults" \
+              -v "${{ github.workspace }}/arch/arch.conf:/home/build/immortalwrt/files/etc/opkg/arch.conf" \
+              -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
+              -v "${{ github.workspace }}/sunxi-cortexa53/build24.sh:/home/build/immortalwrt/build.sh" \
               -e PROFILE=$profile \
               -e INCLUDE_DOCKER=$include_docker \
               -e ROOTSIZE=$size \
-              immortalwrt/imagebuilder:sunxi-cortexa53-openwrt-24.10.0 /bin/bash /home/build/immortalwrt/build.sh
+              immortalwrt/imagebuilder:sunxi-cortexa53-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
           done
 
-      - name: Generate Firmware SHA-256
-        run: |
-          cp ${{ github.workspace }}/bin/targets/sunxi/cortexa53/*squashfs-sdcard.img.gz ${{ github.workspace }}
-          for file in *.img.gz; do
-            sha256sum "$file" > "$file.sha256"
-            sha256sum -c "$file.sha256"
-          done
-      
+     
       - name: Create info
         run: |
           if [ "${{ github.event.inputs.include_docker }}" == "yes" ]; then
@@ -92,8 +112,7 @@ jobs:
           name: ImmortalWrt-sunxi-cortexa53
           body_path: ${{ github.workspace }}/sunxi-cortexa53/info.md
           files: |
-            ${{ github.workspace }}/*.img.gz
-            ${{ github.workspace }}/*.sha256
+            ${{ github.workspace }}/bin/targets/sunxi/cortexa53/*squashfs-sdcard.img.gz
           token: ${{ secrets.GITHUB_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

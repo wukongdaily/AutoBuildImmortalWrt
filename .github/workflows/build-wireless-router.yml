@@ -1,0 +1,680 @@
+# 此工作流99% 使用luci 24.10.x 来构建 极个别机型使用快照版和23.05.4版本来构建
+# 23.05.4 特有机型列表
+# abt_asr3000-ubootmod
+# cetron_ct3003-stock
+# cmcc_a10
+# cmcc_rax3000m-emmc-ubootmod
+# cmcc_rax3000m-nand-ubootmod
+# imou_lc-hx3001-ubootmod
+# jcg_q30 捷成
+# jcg_q30-ubootmod
+# qihoo_360t7-ubootmod
+# xiaomi_mi-router-wr30u-112m-nmbm
+# xiaomi_redmi-router-ax6000 该机型在24.10.3 分化为2个机型
+# —————————————————————————————24.10.3—————————————————————————————————
+# xiaomi_redmi-router-ax6000-stock ————原厂默认 bootloader（stock）版本
+# xiaomi_redmi-router-ax6000-ubootmod—————改装过 bootloader 的版本（ubootmod）
+
+name: Build Wireless Router ImmortalWrt 24.10.x
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        type: choice
+        description: "请选择mtk路由器型号"
+        required: true
+        options:
+          - glinet_gl-mt2500
+          - glinet_gl-mt3000
+          - glinet_gl-mt6000
+          - glinet_gl-axt1800
+          - glinet_gl-ax1800
+          - glinet_gl-b2200
+          - glinet_gl-x3000
+          - glinet_gl-xe3000
+          # 就是Fudy MT3000
+          - huasifei_wh3000-emmc
+          - cudy_tr3000-v1
+          - cudy_tr3000-v1-ubootmod
+          - cudy_tr3000-256mb-v1
+          - jcg_q30-pro
+          - jcg_q30
+          - jcg_q30-ubootmod
+          # 京东云AX6000百里
+          - jdcloud_re-cp-03
+          - xiaomi_mi-router-ax3000t
+          - xiaomi_mi-router-ax3000t-ubootmod
+          - xiaomi_mi-router-wr30u-stock
+          - xiaomi_mi-router-wr30u-ubootmod
+          - xiaomi_mi-router-wr30u-112m-nmbm
+          - xiaomi_redmi-router-ax6000
+          - xiaomi_redmi-router-ax6000-stock
+          - xiaomi_redmi-router-ax6000-ubootmod
+          - qnap_301w
+          - redmi_ax6
+          - redmi_ax6-stock
+          - xiaomi_redmi-router-ax6s
+          - spectrum_sax1v1k
+          - tplink_eap660hd-v1
+          - xiaomi_ax3600
+          - xiaomi_ax3600-stock
+          - xiaomi_ax9000
+          - xiaomi_ax9000-stock
+          - cmcc_a10-stock
+          - cmcc_a10-ubootmod
+          - cmcc_rax3000m
+          - cmcc_rax3000me
+          - cmcc_rax3000m-emmc-ubootmod
+          - cmcc_rax3000m-nand-ubootmod
+          - imou_lc-hx3001-ubootmod
+          - qihoo_360t7-ubootmod
+          - xiaomi_mi-router-wr30u-112m-nmbm
+          - xiaomi_redmi-router-ax6000
+          - abt_asr3000
+          - abt_asr3000-ubootmod
+          - cetron_ct3003-stock
+          - cmcc_a10
+          - acelink_ew-7886cax
+          - acer_predator-w6
+          - acer_predator-w6d
+          - acer_vero-w6m
+          - arcadyan_mozart
+          - asus_rt-ax52
+          - asus_rt-ax59u
+          - asus_tuf-ax4200
+          - asus_tuf-ax6000
+          - bananapi_bpi-r3
+          - bananapi_bpi-r3-mini
+          - bananapi_bpi-r4
+          - bananapi_bpi-r4-poe
+          - cetron_ct3003
+          - cetron_ct3003-ubootmod
+          - comfast_cf-e393ax
+          - confiabits_mt7981
+          - cudy_ap3000-v1
+          - cudy_ap3000outdoor-v1
+          - cudy_m3000-v1
+          - cudy_re3000-v1
+          - cudy_wr3000-v1
+          - cudy_wr3000e-v1
+          - cudy_wr3000h-v1
+          - cudy_wr3000s-v1
+          - dlink_aquila-pro-ai-m30-a1
+          - dlink_aquila-pro-ai-m60-a1
+          - edgecore_eap111
+          - gatonetworks_gdsp
+          - h3c_magic-nx30-pro
+          - h3c_magic-nx30-pro-nmbm
+          - imou_lc-hx3001
+          - keenetic_kn-3811
+          - keenetic_kn-3911
+          - konka_komi-a31
+          - livinet_zr-3020
+          - livinet_zr-3020-ubootmod
+          - mediatek_mt7981-rfb
+          - mediatek_mt7986a-rfb-nand
+          - mediatek_mt7986b-rfb
+          - mediatek_mt7988a-rfb
+          - mercusys_mr80x-v3
+          - mercusys_mr90x-v1
+          - mercusys_mr90x-v1-ubi
+          - netcore_n60
+          - netcore_n60-pro
+          - netgear_wax220
+          - netis_nx31
+          - nokia_ea0326gmp
+          - openembed_som7981
+          - openwrt_one
+          - qihoo_360t7
+          - routerich_ax3000
+          - routerich_ax3000-ubootmod
+          - routerich_ax3000-v1
+          - ruijie_rg-x60-pro
+          - smartrg_sdg-8612
+          - smartrg_sdg-8614
+          - smartrg_sdg-8622
+          - smartrg_sdg-8632
+          - smartrg_sdg-8733
+          - smartrg_sdg-8733a
+          - smartrg_sdg-8734
+          - tplink_archer-ax80-v1
+          - tplink_re6000xd
+          - tplink_tl-xdr4288
+          - tplink_tl-xdr6086
+          - tplink_tl-xdr6088
+          - tplink_tl-xtr8488
+          - ubnt_unifi-6-plus
+          - unielec_u7981-01-emmc
+          - unielec_u7981-01-nand
+          - wavlink_wl-wn573hx3
+          - wavlink_wl-wn586x3
+          - yuncore_ax835
+          - zbtlink_zbt-z8102ax
+          - zbtlink_zbt-z8103ax
+          - zyxel_ex5601-t0-stock
+          - zyxel_ex5601-t0-ubootmod
+          - zyxel_ex5700-telenor
+          - zyxel_nwa50ax-pro
+          - arcadyan_aw1000
+          - asus_rt-ax89x
+          - buffalo_wxr-5950ax12
+          - cmcc_rm2-6
+          - compex_wpq873
+          - dynalink_dl-wrx36
+          - edgecore_eap102
+          - edimax_cax1800
+          - linksys_mx4200v1
+          - linksys_mx4200v2
+          - linksys_mx4300
+          - linksys_mx5300
+          - linksys_mx8500
+          - netgear_rax120v2
+          - netgear_sxr80
+          - netgear_sxs80
+          - netgear_wax218
+          - netgear_wax620
+          - netgear_wax630
+          - prpl_haze
+          - yuncore_ax880
+          - zbtlink_zbt-z800ax
+          - zte_mf269
+          - zte_mf269-stock
+          - zyxel_nbg7815
+          #324 新增mt7621平台的路由器
+          - adslr_g7
+          - afoundry_ew1200
+          - alfa-network_ax1800rm
+          - alfa-network_quad-e4g
+          - ampedwireless_ally-00x19k
+          - ampedwireless_ally-r1900k
+          - arcadyan_we410443
+          - arcadyan_we420223-99
+          - asiarf_ap7621-001
+          - asiarf_ap7621-nv1
+          - asus_rp-ac56
+          - asus_rp-ac87
+          - asus_rt-ac57u-v1
+          - asus_rt-ac65p
+          - asus_rt-ac85p
+          - asus_rt-ax53u
+          - asus_rt-ax54
+          - asus_rt-n56u-b1
+          - beeline_smartbox-flash
+          - beeline_smartbox-giga
+          - beeline_smartbox-pro
+          - beeline_smartbox-turbo
+          - beeline_smartbox-turbo-plus
+          - belkin_rt1800
+          - bolt_arion
+          - buffalo_wsr-1166dhp
+          - buffalo_wsr-2533dhpl2
+          - buffalo_wsr-2533dhpls
+          - buffalo_wsr-600dhp
+          - comfast_cf-e390ax
+          - comfast_cf-ew72-v2
+          - confiabits_mt7621-v1
+          - cudy_m1300-v2
+          - cudy_m1800
+          - cudy_wr1300-v1
+          - cudy_wr1300-v2
+          - cudy_wr1300-v3
+          - cudy_wr2100
+          - cudy_x6-v1
+          - cudy_x6-v2
+          - d-team_newifi-d2
+          - d-team_pbr-m1
+          - dlink_covr-x1860-a1
+          - dlink_dap-1620-b1
+          - dlink_dap-x1860-a1
+          - dlink_dir-1935-a1
+          - dlink_dir-1960-a1
+          - dlink_dir-2055-a1
+          - dlink_dir-2150-a1
+          - dlink_dir-2150-r1
+          - dlink_dir-2640-a1
+          - dlink_dir-2660-a1
+          - dlink_dir-3040-a1
+          - dlink_dir-3060-a1
+          - dlink_dir-853-a1
+          - dlink_dir-853-a3
+          - dlink_dir-853-r1
+          - dlink_dir-860l-b1
+          - dlink_dir-867-a1
+          - dlink_dir-878-a1
+          - dlink_dir-878-r1
+          - dlink_dir-882-a1
+          - dlink_dir-882-r1
+          - dlink_dra-1360-a1
+          - dna_valokuitu-plus-ex400
+          - dual-q_h721
+          - edimax_ra21s
+          - edimax_re23s
+          - edimax_rg21s
+          - elecom_wmc-m1267gst2
+          - elecom_wmc-s1267gs2
+          - elecom_wmc-x1800gst
+          - elecom_wrc-1167ghbk2-s
+          - elecom_wrc-1167gs2-b
+          - elecom_wrc-1167gst2
+          - elecom_wrc-1750gs
+          - elecom_wrc-1750gst2
+          - elecom_wrc-1750gsv
+          - elecom_wrc-1900gst
+          - elecom_wrc-2533ghbk-i
+          - elecom_wrc-2533gs2
+          - elecom_wrc-2533gst
+          - elecom_wrc-2533gst2
+          - elecom_wrc-x1800gs
+          - elecom_wsc-x1800gs
+          - etisalat_s3
+          - firefly_firewrt
+          - gehua_ghl-r-001
+          - gemtek_wvrtm-127acn
+          - gemtek_wvrtm-130acn
+          - genexis_pulse-ex400
+          - glinet_gl-mt1300
+          - gnubee_gb-pc1
+          - gnubee_gb-pc2
+          - h3c_tx1800-plus
+          - h3c_tx1801-plus
+          - h3c_tx1806
+          - haier_har-20s2u1
+          - hanyang_hyc-g920
+          - hilink_hlk-7621a-evb
+          - hiwifi_hc5962
+          - huasifei_ws1208v2
+          - humax_e10
+          - iodata_wn-ax1167gr
+          - iodata_wn-ax1167gr2
+          - iodata_wn-ax2033gr
+          - iodata_wn-deax1800gr
+          - iodata_wn-dx1167r
+          - iodata_wn-dx1200gr
+          - iodata_wn-dx2033gr
+          - iodata_wn-gx300gr
+          - iodata_wnpr2600g
+          - iptime_a3002mesh
+          - iptime_a3004ns-dual
+          - iptime_a3004t
+          - iptime_a6004ns-m
+          - iptime_a6ns-m
+          - iptime_a8004t
+          - iptime_ax2004m
+          - iptime_t5004
+          - jcg_jhr-ac876m
+          - jcg_q20
+          - jcg_y2
+          - jdcloud_re-cp-02
+          - jdcloud_re-sp-01b
+          - keenetic_kn-3010
+          - keenetic_kn-3510
+          - lenovo_newifi-d1
+          - linksys_e5600
+          - linksys_e7350
+          - linksys_ea6350-v4
+          - linksys_ea7300-v1
+          - linksys_ea7300-v2
+          - linksys_ea7500-v2
+          - linksys_ea8100-v1
+          - linksys_ea8100-v2
+          - linksys_re6500
+          - linksys_re7000
+          - mediatek_ap-mt7621a-v60
+          - mediatek_mt7621-eval-board
+          - meig_slt866
+          - mercusys_mr70x-v1
+          - mikrotik_ltap-2hnd
+          - mikrotik_routerboard-750gr3
+          - mikrotik_routerboard-760igs
+          - mikrotik_routerboard-m11g
+          - mikrotik_routerboard-m33g
+          - mqmaker_witi
+          - mtc_wr1201
+          - mts_wg430223
+          - netgear_eax12
+          - netgear_ex6150
+          - netgear_r6220
+          - netgear_r6260
+          - netgear_r6350
+          - netgear_r6700-v2
+          - netgear_r6800
+          - netgear_r6850
+          - netgear_r6900-v2
+          - netgear_r7200
+          - netgear_r7450
+          - netgear_wac104
+          - netgear_wac124
+          - netgear_wax202
+          - netgear_wax214v2
+          - netgear_wndr3700-v5
+          - netis_n6
+          - netis_wf2881
+          - openfi_5pro
+          - oraybox_x3a
+          - phicomm_k2p
+          - planex_vr500
+          - raisecom_msg1500-x-00
+          - renkforce_ws-wn530hp3-a
+          - rostelecom_rt-fe-1a
+          - rostelecom_rt-sf-1
+          - ruijie_rg-ew1200g-pro-v1.1
+          - samknows_whitebox-v8
+          - sercomm_na502
+          - sercomm_na502s
+          - sim_simax1800t
+          - snr_snr-cpe-me1
+          - snr_snr-cpe-me2-lite
+          - snr_snr-cpe-me2-sfp
+          - storylink_sap-g3200u3
+          - telco-electronics_x1
+          - tenbay_t-mb5eu-v01
+          - thunder_timecloud
+          - totolink_a7000r
+          - totolink_x5000r
+          - tozed_zlt-s12-pro
+          - tplink_archer-a6-v3
+          - tplink_archer-ax23-v1
+          - tplink_archer-c6-v3
+          - tplink_archer-c6u-v1
+          - tplink_deco-m4r-v4
+          - tplink_eap235-wall-v1
+          - tplink_eap613-v1
+          - tplink_eap615-wall-v1
+          - tplink_ec330-g5u-v1
+          - tplink_er605-v2
+          - tplink_ex220-v1
+          - tplink_mr600-v2-eu
+          - tplink_re350-v1
+          - tplink_re500-v1
+          - tplink_re650-v1
+          - tplink_re650-v2
+          - tplink_tl-wpa8631p-v3
+          - ubnt_edgerouter-x
+          - ubnt_edgerouter-x-sfp
+          - ubnt_unifi-6-lite
+          - ubnt_unifi-flexhd
+          - ubnt_unifi-nanohd
+          - ubnt_usw-flex
+          - unielec_u7621-01-16m
+          - unielec_u7621-06-16m
+          - unielec_u7621-06-32m
+          - unielec_u7621-06-64m
+          - wavlink_wl-wn531a6
+          - wavlink_wl-wn533a8
+          - wavlink_wl-wn573hx1
+          - wavlink_ws-wn572hp3-4g
+          - wevo_11acnas
+          - wevo_w2914ns-v2
+          - wifire_s1500-nbn
+          - winstars_ws-wn536p3
+          - winstars_ws-wn583a6
+          - wodesys_wd-r1802u
+          - xiaomi_mi-router-3-pro
+          - xiaomi_mi-router-3g
+          - xiaomi_mi-router-3g-v2
+          - xiaomi_mi-router-4
+          - xiaomi_mi-router-4a-gigabit
+          - xiaomi_mi-router-4a-gigabit-v2
+          - xiaomi_mi-router-ac2100
+          - xiaomi_mi-router-cr6606
+          - xiaomi_mi-router-cr6608
+          - xiaomi_mi-router-cr6609
+          - xiaomi_redmi-router-ac2100
+          - xiaoyu_xy-c5
+          - xzwifi_creativebox-v1
+          - youhua_wr1200js
+          - youku_yk-l2
+          - yuncore_ax820
+          - yuncore_fap640
+          - yuncore_fap690
+          - yuncore_g720
+          - z-router_zr-2660
+          - zbtlink_zbt-we1326
+          - zbtlink_zbt-we3526
+          - zbtlink_zbt-wg1602-16m
+          - zbtlink_zbt-wg1602-v04-16m
+          - zbtlink_zbt-wg1602-v04-32m
+          - zbtlink_zbt-wg1608-16m
+          - zbtlink_zbt-wg1608-32m
+          - zbtlink_zbt-wg2626
+          - zbtlink_zbt-wg3526-16m
+          - zbtlink_zbt-wg3526-32m
+          - zio_freezio
+          - zte_e8820s
+          - zyxel_lte3301-plus
+          - zyxel_lte5398-m904
+          - zyxel_nr7101
+          - zyxel_nwa50ax
+          - zyxel_nwa55axe
+          - zyxel_wap6805
+          - zyxel_wsm20
+          # 新增斐讯K3 AC88U等 bcm53xx/generic 平台
+          - phicomm_k3
+          - asus_rt-ac3100
+          - asus_rt-ac56u
+          - asus_rt-ac68u
+          - asus_rt-ac87u
+          - asus_rt-ac88u
+          - asus_rt-n18u
+          - buffalo_wxr-1900dhp
+          - buffalo_wzr-1750dhp
+          - buffalo_wzr-600dhp2
+          - buffalo_wzr-900dhp
+          - dlink_dir-885l
+          - dlink_dir-890l
+          - dlink_dwl-8610ap
+          - linksys_ea6300-v1
+          - linksys_ea6500-v2
+          - linksys_ea9200
+          - linksys_ea9500
+          - luxul_abr-4500
+          - luxul_xap-1610
+          - luxul_xbr-4500
+          - luxul_xwr-3150
+          - meraki_mr26
+          - meraki_mr32
+          - meraki_mx64
+          - meraki_mx64_a0
+          - meraki_mx65
+          - netgear_r6250
+          - netgear_r6300-v2
+          - netgear_r7000
+          - netgear_r7900
+          - netgear_r8000
+          - smartrg_sr400ac
+          - tenda_ac9
+        default: glinet_gl-mt6000
+      custom_router_ip:
+        description: "请设置路由器的管理地址 格式:192.168.x.1 或 10.x.x.1"
+        required: true
+        default: "192.168.100.1"
+      enable_store:
+        description: "集成 store 商店"
+        required: false
+        type: boolean
+        default: false
+      include_docker:
+        description: |
+          是否编译 Docker 插件
+        required: true
+        default: 'no'
+        type: choice
+        options:
+          - 'yes'
+          - 'no'
+      enable_pppoe:
+        description: "是否配置PPPoE拨号信息?"
+        required: true
+        default: 'no'
+        type: choice
+        options:
+          - 'yes'
+          - 'no'
+      pppoe_account:
+        description: "宽带账号 (若启用PPPoE)"
+        required: false
+      pppoe_password:
+        description: "宽带密码 (若启用PPPoE)"
+        required: false
+
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set executable permissions
+        run: |
+          chmod +x ${{ github.workspace }}/mediatek-filogic/build24.sh
+      
+      - name: Save Custom Router IP into OpenWrt files
+        run: |
+          mkdir -p "${{ github.workspace }}/custom"
+          echo "${{ github.event.inputs.custom_router_ip }}" > "${{ github.workspace }}/custom/custom_router_ip.txt"
+          echo "您设置的路由器管理地址是:${{ github.event.inputs.custom_router_ip }}"
+          # 后续步骤会将该文件映射到路由器/etc/config/custom_router_ip.txt 以便用于开机脚本99-custom.sh读取用户设置的ip
+
+
+      - name: Validate PPPoE Inputs
+        run: |
+          if [[ "${{ inputs.enable_pppoe }}" == "yes" ]]; then
+            if [[ -z "${{ inputs.pppoe_account }}" || -z "${{ inputs.pppoe_password }}" ]]; then
+              echo "Error: PPPoE account and password must be provided when PPPoE is enabled!"
+              exit 1
+            fi
+          fi
+      
+      - name: Enable Store integration
+        run: |
+          if [ "${{ github.event.inputs.enable_store }}" == "true" ]; then
+            echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-store"' >> shell/custom-packages.sh
+            echo "✅ 已追加 luci-app-store"
+          else
+            echo "❎ 未启用 luci-app-store"
+          fi
+
+
+      - name: Build Wireless ImmortalWrt
+        run: |
+          profile="${{ github.event.inputs.profile }}"
+          echo "Building for profile: $profile"
+          include_docker="${{ github.event.inputs.include_docker }}"
+          # 默认平台
+          echo "platform=mediatek/filogic" >> $GITHUB_ENV
+
+          # 读取 ipq807x 机型文件
+          ipq807x_models=$(cat model/ipq807x.txt | tr '\n' '|')
+          ipq807x_models=${ipq807x_models%|}
+          if [[ "$profile" =~ ^($ipq807x_models)$ ]]; then
+              case_tag="qualcommax-ipq807x-openwrt-24.10.3"
+              case_platform="qualcommax/ipq807x"
+          fi
+
+          # 读取 mt7621 机型文件
+          mt7621_models=$(cat model/mt7621.txt | tr '\n' '|')
+          mt7621_models=${mt7621_models%|}
+          if [[ "$profile" =~ ^($mt7621_models)$ ]]; then
+              case_tag="ramips-mt7621-openwrt-24.10.3"
+              case_platform="ramips/mt7621"
+          fi
+
+          # 读取 bcm53xx/generic 机型文件
+          bcm53xx_models=$(cat model/bcm53xx.txt | tr '\n' '|')
+          bcm53xx_models=${bcm53xx_models%|}
+          if [[ "$profile" =~ ^($bcm53xx_models)$ ]]; then
+              case_tag="bcm53xx-generic-openwrt-24.10.3"
+              case_platform="bcm53xx/generic"
+          fi
+
+          # 判断机型
+          case "$profile" in
+              glinet_gl-b2200)
+                  # 虽然它是高通ipq40xx平台 但由于都是gl机型 故放在一起 找起来方便
+                  tag=ipq40xx-generic-openwrt-24.10.3
+                  echo "platform=ipq40xx/generic" >> $GITHUB_ENV
+                  ;;
+              glinet_gl-axt1800|glinet_gl-ax1800)
+                  # 虽然它是高通ipq60xx平台 但由于都是gl机型 故放在一起 找起来方便
+                  tag=qualcommax-ipq60xx-snapshot
+                  echo "platform=qualcommax/ipq60xx" >> $GITHUB_ENV
+                  ;;
+              cudy_tr3000-256mb-v1)
+                  # 由于256MB版本tr3000 还没有出正式版24.10.3 故使用快照版本来构建
+                  tag=mediatek-filogic-24.10-SNAPSHOT
+                  ;;
+              xiaomi_redmi-router-ax6s)
+                  tag=mediatek-mt7622-openwrt-24.10.3
+                  echo "platform=mediatek/mt7622" >> $GITHUB_ENV
+                  ;;
+              # 下列机型目前没有24.10 因此采用23.05.4分支来构建
+              cmcc_rax3000m-emmc-ubootmod | \
+              cmcc_rax3000m-nand-ubootmod | \
+              cmcc_a10 | \
+              abt_asr3000-ubootmod | \
+              imou_lc-hx3001-ubootmod | \
+              jcg_q30 | \
+              jcg_q30-ubootmod | \
+              xiaomi_mi-router-wr30u-112m-nmbm | \
+              cetron_ct3003-stock | \
+              xiaomi_redmi-router-ax6000 | \
+              qihoo_360t7-ubootmod)
+                  tag=mediatek-filogic-openwrt-23.05.4
+                  ls ${{ github.workspace }}/mediatek-filogic/
+                  cp ${{ github.workspace }}/mediatek-filogic/build23.sh ${{ github.workspace }}/mediatek-filogic/build24.sh
+                  ;;
+              *)
+                  # 如果前面匹配了 ipq807x、mt7621、bcm53xx 机型文件，则使用对应 tag
+                  if [[ -n "$case_tag" ]]; then
+                      tag=$case_tag
+                      echo "platform=$case_platform" >> $GITHUB_ENV
+                  else
+                      # 默认分支
+                      tag=mediatek-filogic-openwrt-24.10.3
+                  fi
+                  ;;
+            esac
+          
+            docker run --rm -i \
+              --user root \
+              -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
+              -v "${{ github.workspace }}/glinet:/home/build/immortalwrt/files/etc/uci-defaults" \
+              -v "${{ github.workspace }}/custom:/home/build/immortalwrt/files/etc/config" \
+              -v "${{ github.workspace }}/arch/arch.conf:/home/build/immortalwrt/files/etc/opkg/arch.conf" \
+              -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
+              -v "${{ github.workspace }}/mediatek-filogic/build24.sh:/home/build/immortalwrt/build.sh" \
+              -e PROFILE=$profile \
+              -e INCLUDE_DOCKER=$include_docker \
+              -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
+              -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
+              -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
+            immortalwrt/imagebuilder:$tag /bin/bash /home/build/immortalwrt/build.sh
+          
+
+      - name: Create info
+        run: |
+          if [ "${{ github.event.inputs.include_docker }}" == "yes" ]; then
+            extra_content="### 默认带docker"
+            echo -e "\n $extra_content" >> ${{ github.workspace }}/mediatek-filogic/info.md
+          else
+            echo -e "NO docker"
+          fi
+          custom_router_ip="${{ github.event.inputs.custom_router_ip }}"
+          extra_content_ip="#### 管理地址 $custom_router_ip"
+          echo -e "\n $extra_content_ip" >> ${{ github.workspace }}/mediatek-filogic/info.md
+          
+          
+      - name: Upload ImmortalWrt as release assets
+        uses: softprops/action-gh-release@v2.2.1
+        with:
+          tag_name: ${{ github.event.inputs.profile }}
+          name: ImmortalWrt-Wireless
+          body_path: ${{ github.workspace }}/mediatek-filogic/info.md
+          files: |
+            ${{ github.workspace }}/bin/targets/${{ env.platform }}/*
+          token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
