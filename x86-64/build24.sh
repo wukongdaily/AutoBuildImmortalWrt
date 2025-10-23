@@ -6,7 +6,18 @@ LOGFILE="/tmp/uci-defaults-log.txt"
 echo "Starting 99-custom.sh at $(date)" >> $LOGFILE
 echo "编译固件大小为: $PROFILE MB"
 echo "Include Docker: $INCLUDE_DOCKER"
+# Add the QModem feed source
+echo 'src-git qmodem https://github.com/FUjr/QModem.git;main' >> feeds.conf.default
 
+# Update and install the feed packages
+./scripts/feeds update qmodem
+./scripts/feeds install -a -p qmodem
+
+# (Optional) Force install to overwrite existing drivers/apps
+./scripts/feeds install -a -f -p qmodem
+
+# Enter the build configuration menu
+make menuconfig
 echo "Create pppoe-settings"
 mkdir -p  /home/build/immortalwrt/files/etc/config
 
