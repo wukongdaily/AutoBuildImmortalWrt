@@ -13,8 +13,6 @@ echo 'src-git qmodem https://github.com/FUjr/QModem.git;main' >> feeds.conf.defa
 ./scripts/feeds update qmodem
 ./scripts/feeds install -a -p qmodem
 
-# (Optional) Force install to overwrite existing drivers/apps
-./scripts/feeds install -a -f -p qmodem
 
 # Enter the build configuration menu
 
