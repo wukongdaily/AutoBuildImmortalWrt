@@ -17,7 +17,7 @@ echo 'src-git qmodem https://github.com/FUjr/QModem.git;main' >> feeds.conf.defa
 ./scripts/feeds install -a -f -p qmodem
 
 # Enter the build configuration menu
-make menuconfig
+
 echo "Create pppoe-settings"
 mkdir -p  /home/build/immortalwrt/files/etc/config
 
