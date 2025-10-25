@@ -78,6 +78,10 @@ elif [ "$count" -gt 1 ]; then
     uci set network.wan6=interface
     uci set network.wan6.device="$wan_ifname"
     uci set network.wan6.proto='dhcpv6'
+    
+    # 配置路由名字
+    uci set system.@system[0].hostname='iStoreOS'
+    uci commit system
 
     # 查找 br-lan 设备 section
     section=$(uci show network | awk -F '[.=]' '/\.@?device\[\d+\]\.name=.br-lan.$/ {print $2; exit}')
