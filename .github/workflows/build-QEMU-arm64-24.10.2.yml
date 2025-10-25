@@ -1,4 +1,4 @@
-name: build-QEMU-armsr-armv8-24.10.2
+name: build-QEMU-armsr-armv8-24.10.x
 # 你可以理解为这是一种ARM64平台下通用型OpenWrt ,产出格式为qcow2,适合所有ARM64平台的虚拟机
 # 比如斐讯N1刷了armbian系统,armbian系统里安装了PVE虚拟机 可用
 # 比如新款Apple Silicon芯片的苹果电脑里的虚拟机UTM 可用
@@ -7,6 +7,16 @@ name: build-QEMU-armsr-armv8-24.10.2
 on:
   workflow_dispatch:
     inputs:
+      luci_version:
+        description: "选择luci版本"
+        required: false
+        default: "24.10.3"
+        type: choice
+        options:
+          - 24.10.0
+          - 24.10.1
+          - 24.10.2
+          - 24.10.3
       profile:
         type: choice
         description: |
@@ -72,6 +82,7 @@ jobs:
         run: |
           profiles="${{ github.event.inputs.profile }}"
           rootfs_partsize="${{ github.event.inputs.rootfs_partsize }}"
+          luci_version="${{ github.event.inputs.luci_version }}"
           
           IFS=',' read -r -a profile_array <<< "$profiles"
           
@@ -91,7 +102,7 @@ jobs:
               -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
               -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
               -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
-              immortalwrt/imagebuilder:armsr-armv8-openwrt-24.10.2 /bin/bash /home/build/immortalwrt/build.sh
+              immortalwrt/imagebuilder:armsr-armv8-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
           done
       - name: Generate Firmware SHA-256
         run: |
@@ -101,7 +112,7 @@ jobs:
         uses: softprops/action-gh-release@v2.2.1
         with:
           tag_name: QEMU
-          name: ImmortWrt-QEMU-armsr-armv8-24.10.2
+          name: ImmortWrt-QEMU-armsr-armv8-24.10.x
           body_path: ${{ github.workspace }}/armsr-armv8/info.md
           files: |
             ${{ github.workspace }}/*.qcow2

@@ -10,8 +10,8 @@
 # jcg_q30-ubootmod
 # qihoo_360t7-ubootmod
 # xiaomi_mi-router-wr30u-112m-nmbm
-# xiaomi_redmi-router-ax6000 该机型在24.10.2 分化为2个机型
-# —————————————————————————————24.10.2—————————————————————————————————
+# xiaomi_redmi-router-ax6000 该机型在24.10.3 分化为2个机型
+# —————————————————————————————24.10.3—————————————————————————————————
 # xiaomi_redmi-router-ax6000-stock ————原厂默认 bootloader（stock）版本
 # xiaomi_redmi-router-ax6000-ubootmod—————改装过 bootloader 的版本（ubootmod）
 
@@ -54,6 +54,7 @@ on:
           - qnap_301w
           - redmi_ax6
           - redmi_ax6-stock
+          - xiaomi_redmi-router-ax6s
           - spectrum_sax1v1k
           - tplink_eap660hd-v1
           - xiaomi_ax3600
@@ -557,7 +558,7 @@ jobs:
           fi
 
 
-      - name: Build Wireless ImmortalWrt 24.10.2
+      - name: Build Wireless ImmortalWrt
         run: |
           profile="${{ github.event.inputs.profile }}"
           echo "Building for profile: $profile"
@@ -569,7 +570,7 @@ jobs:
           ipq807x_models=$(cat model/ipq807x.txt | tr '\n' '|')
           ipq807x_models=${ipq807x_models%|}
           if [[ "$profile" =~ ^($ipq807x_models)$ ]]; then
-              case_tag="qualcommax-ipq807x-openwrt-24.10.2"
+              case_tag="qualcommax-ipq807x-openwrt-24.10.3"
               case_platform="qualcommax/ipq807x"
           fi
 
@@ -577,7 +578,7 @@ jobs:
           mt7621_models=$(cat model/mt7621.txt | tr '\n' '|')
           mt7621_models=${mt7621_models%|}
           if [[ "$profile" =~ ^($mt7621_models)$ ]]; then
-              case_tag="ramips-mt7621-openwrt-24.10.2"
+              case_tag="ramips-mt7621-openwrt-24.10.3"
               case_platform="ramips/mt7621"
           fi
 
@@ -585,7 +586,7 @@ jobs:
           bcm53xx_models=$(cat model/bcm53xx.txt | tr '\n' '|')
           bcm53xx_models=${bcm53xx_models%|}
           if [[ "$profile" =~ ^($bcm53xx_models)$ ]]; then
-              case_tag="bcm53xx-generic-openwrt-24.10.2"
+              case_tag="bcm53xx-generic-openwrt-24.10.3"
               case_platform="bcm53xx/generic"
           fi
 
@@ -593,7 +594,7 @@ jobs:
           case "$profile" in
               glinet_gl-b2200)
                   # 虽然它是高通ipq40xx平台 但由于都是gl机型 故放在一起 找起来方便
-                  tag=ipq40xx-generic-openwrt-24.10.2
+                  tag=ipq40xx-generic-openwrt-24.10.3
                   echo "platform=ipq40xx/generic" >> $GITHUB_ENV
                   ;;
               glinet_gl-axt1800|glinet_gl-ax1800)
@@ -602,8 +603,12 @@ jobs:
                   echo "platform=qualcommax/ipq60xx" >> $GITHUB_ENV
                   ;;
               cudy_tr3000-256mb-v1)
-                  # 由于256MB版本tr3000 还没有出正式版24.10.2 故使用快照版本来构建
+                  # 由于256MB版本tr3000 还没有出正式版24.10.3 故使用快照版本来构建
                   tag=mediatek-filogic-24.10-SNAPSHOT
+                  ;;
+              xiaomi_redmi-router-ax6s)
+                  tag=mediatek-mt7622-openwrt-24.10.3
+                  echo "platform=mediatek/mt7622" >> $GITHUB_ENV
                   ;;
               # 下列机型目前没有24.10 因此采用23.05.4分支来构建
               cmcc_rax3000m-emmc-ubootmod | \
@@ -628,7 +633,7 @@ jobs:
                       echo "platform=$case_platform" >> $GITHUB_ENV
                   else
                       # 默认分支
-                      tag=mediatek-filogic-openwrt-24.10.2
+                      tag=mediatek-filogic-openwrt-24.10.3
                   fi
                   ;;
             esac

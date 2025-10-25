@@ -1,8 +1,18 @@
-name: build-rockchip-immortalWrt-24.10.2
+name: build-rockchip-immortalWrt-24.10.x
 
 on:
   workflow_dispatch:
     inputs:
+      luci_version:
+        description: "选择luci版本"
+        required: false
+        default: "24.10.3"
+        type: choice
+        options:
+          - 24.10.0
+          - 24.10.1
+          - 24.10.2
+          - 24.10.3
       profile:
         type: choice
         description: |
@@ -53,6 +63,10 @@ on:
           - xunlong_orangepi-r1-plus-lts
         required: true
         default: 'friendlyarm_nanopi-r3s'
+      custom_router_ip:
+        description: "请设置软路由的管理地址(注意仅对多网口软路由有效) 格式:192.168.x.1 或 10.x.x.1"
+        required: true
+        default: "192.168.100.1"
       rootfs_partsize:
         description: '设置软件包大小 单位(MB)'
         required: true
@@ -97,6 +111,13 @@ jobs:
       - name: Set executable permissions
         run: chmod +x ${{ github.workspace }}/rockchip/build24.sh
       
+      - name: Save Custom Router IP into OpenWrt files
+        run: |
+          mkdir -p "${{ github.workspace }}/custom"
+          echo "${{ github.event.inputs.custom_router_ip }}" > "${{ github.workspace }}/custom/custom_router_ip.txt"
+          echo "您设置的Rockchip软路由管理地址是:${{ github.event.inputs.custom_router_ip }}"
+          # 后续步骤会将该文件映射到路由器/etc/config/custom_router_ip.txt 以便用于开机脚本99-custom.sh读取用户设置的ip
+      
       - name: Validate PPPoE Inputs
         run: |
           if [[ "${{ inputs.enable_pppoe }}" == "yes" ]]; then
@@ -121,6 +142,7 @@ jobs:
           profiles="${{ github.event.inputs.profile }}"
           include_docker="${{ github.event.inputs.include_docker }}"
           rootfs_partsize="${{ github.event.inputs.rootfs_partsize }}"
+          luci_version="${{ github.event.inputs.luci_version }}"
           
           IFS=',' read -r -a profile_array <<< "$profiles"
           
@@ -141,16 +163,33 @@ jobs:
               -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
               -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
               -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
-              immortalwrt/imagebuilder:rockchip-armv8-openwrt-24.10.2 /bin/bash /home/build/immortalwrt/build.sh
+              immortalwrt/imagebuilder:rockchip-armv8-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
           done
     
+      - name: Create info
+        run: |
+          cat > ${{ github.workspace }}/router-info.md <<EOF
+          ## 📡 路由器后台信息
+
+          - ✳️ **软路由型号**: ${{ github.event.inputs.profile }}
+          - 🏠 **后台地址**: ${{ github.event.inputs.custom_router_ip }}
+          - 👤 **用户名**: root
+          - 🔑 **密码**: 无
+          EOF
+
+          if [ "${{ github.event.inputs.include_docker }}" == "yes" ]; then
+            extra_content="#### 默认带docker"
+            echo -e "\n$extra_content" >> ${{ github.workspace }}/router-info.md
+          else
+            echo -e "\n#### 不带docker" >> ${{ github.workspace }}/router-info.md
+          fi
 
       - name: Upload ImmortWrt as release assets
         uses: softprops/action-gh-release@v2.2.1
         with:
           tag_name: Autobuild
           name: ImmortWrt-Rockchip
-          body_path: ${{ github.workspace }}/info.md
+          body_path: ${{ github.workspace }}/router-info.md
           files: |
             ${{ github.workspace }}/bin/targets/rockchip/armv8/*.img.gz
           token: ${{ secrets.GITHUB_TOKEN }}

@@ -37,6 +37,10 @@ on:
         description: '设置软件包大小 单位(MB)'
         required: true
         default: '1024'
+      custom_router_ip:
+        description: "请设置软路由的管理地址(注意仅对多网口软路由有效) 格式:192.168.x.1 或 10.x.x.1"
+        required: true
+        default: "192.168.100.1"
       enable_store:
         description: "集成 store 商店"
         required: false
@@ -76,6 +80,13 @@ jobs:
 
       - name: Set executable permissions
         run: chmod +x ${{ github.workspace }}/rockchip/build23.sh
+      
+      - name: Save Custom Router IP into OpenWrt files
+        run: |
+          mkdir -p "${{ github.workspace }}/custom"
+          echo "${{ github.event.inputs.custom_router_ip }}" > "${{ github.workspace }}/custom/custom_router_ip.txt"
+          echo "您设置的Rockchip软路由管理地址是:${{ github.event.inputs.custom_router_ip }}"
+          # 后续步骤会将该文件映射到路由器/etc/config/custom_router_ip.txt 以便用于开机脚本99-custom.sh读取用户设置的ip
 
       - name: Validate PPPoE Inputs
         run: |
@@ -123,13 +134,30 @@ jobs:
               immortalwrt/imagebuilder:rockchip-armv8-openwrt-23.05.4 /bin/bash /home/build/immortalwrt/build.sh
           done
 
+      - name: Create info
+        run: |
+          cat > ${{ github.workspace }}/router-info.md <<EOF
+          ## 📡 路由器后台信息
+
+          - ✳️ **软路由型号**: ${{ github.event.inputs.profile }}
+          - 🏠 **后台地址**: ${{ github.event.inputs.custom_router_ip }}
+          - 👤 **用户名**: root
+          - 🔑 **密码**: 无
+          EOF
+
+          if [ "${{ github.event.inputs.include_docker }}" == "yes" ]; then
+            extra_content="#### 默认带docker"
+            echo -e "\n$extra_content" >> ${{ github.workspace }}/router-info.md
+          else
+            echo -e "\n#### 不带docker" >> ${{ github.workspace }}/router-info.md
+          fi
 
       - name: Upload ImmortWrt as release assets
         uses: softprops/action-gh-release@v2.2.1
         with:
           tag_name: Autobuild-23.05.4
           name: ImmortWrt-Rockchip
-          body_path: ${{ github.workspace }}/info.md
+          body_path: ${{ github.workspace }}/router-info.md
           files: |
             ${{ github.workspace }}/bin/targets/rockchip/armv8/*.img.gz
           token: ${{ secrets.GITHUB_TOKEN }}
