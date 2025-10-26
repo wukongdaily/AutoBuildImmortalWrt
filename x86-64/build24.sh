@@ -59,6 +59,13 @@ PACKAGES="$PACKAGES luci-app-openclash"
 PACKAGES="$PACKAGES luci-i18n-homeproxy-zh-cn"
 PACKAGES="$PACKAGES openssh-sftp-server"
 PACKAGES="$PACKAGES luci-i18n-samba4-zh-cn"
+PACKAGES="$PACKAGES luci-i18n-cifs-mount-zh-cn"
+PACKAGES="$PACKAGES kmod-usb-net"
+PACKAGES="$PACKAGES kmod-usb-net-cdc-ether"
+PACKAGES="$PACKAGES kmod-usb-net-rndis"
+PACKAGES="$PACKAGES usbutils"
+PACKAGES="$PACKAGES luci-i18n-zerotier-zh-cn"
+PACKAGES="$PACKAGES luci-i18n-ddns-zh-cn"
 # 文件管理器
 PACKAGES="$PACKAGES luci-i18n-filemanager-zh-cn"
 # 静态文件服务器dufs(推荐)
