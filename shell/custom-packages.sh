@@ -50,3 +50,8 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES easytier luci-app-easytier"
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES webdav2 luci-app-unishare"
 # Frpc客户端
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-frpc luci-i18n-frpc-zh-cn"
+# FileBrowser文件管理
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-filebrowser luci-i18n-filebrowser-zh-cn"
+# 禁用网络共享
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES -luci-i18n-samba4 -luci-i18n-samba4-zh-cn -luci-app-dufs -luci-i18n-dufs-zh-cn"
+
