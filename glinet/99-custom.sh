@@ -8,8 +8,6 @@ uci set firewall.@zone[1].input='ACCEPT'
 uci add dhcp domain
 uci set "dhcp.@domain[-1].name=time.android.com"
 uci set "dhcp.@domain[-1].ip=203.107.6.88"
-uci set system.@system[0].hostname='iStoreOS'
-uci commit system
 # 检查配置文件是否存在
 SETTINGS_FILE="/etc/config/pppoe-settings"
 if [ ! -f "$SETTINGS_FILE" ]; then
