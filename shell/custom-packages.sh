@@ -24,7 +24,7 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-tailscale luci-i18n-tailscale-zh-cn"
 # 分区扩容 by sirpdboy 
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-partexp luci-i18n-partexp-zh-cn"
 # 酷猫主题 by sirpdboy 
-#CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-theme-kucat"
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-theme-kucat"
 # 进阶设置 by sirpdboy 
 # 当luci-app-advancedplus插件开启时 需排除冲突项 luci-app-argon-config和luci-i18n-argon-config-zh-cn 减号代表排除
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-advancedplus luci-i18n-advancedplus-zh-cn -luci-app-argon-config -luci-i18n-argon-config-zh-cn"
@@ -53,6 +53,9 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-frpc luci-i18n-frpc-zh-cn"
 # FileBrowser文件管理
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-filebrowser luci-i18n-filebrowser-zh-cn"
 # 禁用网络共享
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES -luci-i18n-samba4 -luci-i18n-samba4-zh-cn -luci-app-dufs -luci-i18n-dufs-zh-cn"
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES -luci-app-samba4 -luci-i18n-samba4-zh-cn -luci-app-dufs -luci-i18n-dufs-zh-cn"
 # WoL网络唤醒
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-wol luci-i18n-wol-zh-cn"
+# uHTTPd Web服务器管理
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-uhttpd luci-i18n-uhttpd-zh-cn"
+
