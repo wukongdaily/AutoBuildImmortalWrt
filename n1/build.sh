@@ -40,7 +40,6 @@ PACKAGES="$PACKAGES luci-i18n-upnp-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-frpc-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-nps-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-openvpn-server-zh-cn"
-PACKAGES="$PACKAGES luci-i18n-openvpn-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-vsftpd-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-pppoe-server-zh-cn"
 # 文件管理器
