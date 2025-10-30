@@ -46,6 +46,7 @@ PACKAGES="$PACKAGES luci-i18n-p910nd-zh-cn"
 PACKAGES="$PACKAGES kmod-lp"
 PACKAGES="$PACKAGES kmod-usb-printer"
 PACKAGES="$PACKAGES luci-i18n-timewol-zh-cn"
+PACKAGES="$PACKAGES luci-i18n-wol-zh-cn"
 # 文件管理器
 PACKAGES="$PACKAGES luci-i18n-filemanager-zh-cn"
 # 静态文件服务器dufs(推荐)
