@@ -28,6 +28,25 @@ if [ -f "$IP_VALUE_FILE" ]; then
     echo "custom router ip is $CUSTOM_IP" >> $LOGFILE
 fi
 
+# 设置 2.4GHz Wi-Fi (radio0)
+uci set wireless.radio0.disabled=0              # 启用 2.4GHz 无线
+uci set wireless.radio0.country=CN              # 设置地区为中国
+uci set wireless.radio0.txpower=20              # 设置发射功率为 20dBm
+uci set wireless.default_radio0.ssid="GLiNet-Jasmine"  # 设置 SSID
+uci set wireless.default_radio0.key="12345678"  # 设置密码
+uci set wireless.default_radio0.encryption="psk2"  # 使用 WPA2-PSK 加密
+
+# 设置 5GHz Wi-Fi (radio1)
+uci set wireless.radio1.disabled=0              # 启用 5GHz 无线
+uci set wireless.radio1.country=CN              # 设置地区为中国
+uci set wireless.radio1.txpower=20              # 设置发射功率为 20dBm
+uci set wireless.default_radio1.ssid="GLiNet-Jasmine"  # 设置 SSID
+uci set wireless.default_radio1.key="12345678"  # 设置密码
+uci set wireless.default_radio1.encryption="psk2"  # 使用 WPA2-PSK 加密
+
+# 提交配置并重启无线服务
+uci commit wireless
+wifi reload
 
 # 判断是否启用 PPPoE
 echo "print enable_pppoe value=== $enable_pppoe" >> $LOGFILE
