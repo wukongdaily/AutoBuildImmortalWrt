@@ -7,7 +7,7 @@
 # 考虑到istore商店的集成与否 属于高频操作 故 目前已将集成store的操作放置在 工作流的UI 选项 用户自行勾选 则集成  不勾选则不集成 以减少修改此文件的次数
 
 # 首页和网络向导
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-quickstart-zh-cn"
+# CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-quickstart-zh-cn"
 # 去广告adghome
 # CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-adguardhome"
 # 代理相关
@@ -58,8 +58,8 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES -luci-app-samba4 -luci-i18n-samba4-zh-cn -luci
 # WoL网络唤醒
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-wol luci-i18n-wol-zh-cn"
 # uHTTPd Web服务器管理
-# CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-uhttpd luci-i18n-uhttpd-zh-cn"
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-uhttpd luci-i18n-uhttpd-zh-cn"
 # nginx web-ui
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-nginx luci-ssl-nginx"
+# CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-nginx luci-ssl-nginx"
 # vmware tools
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES open-vm-tools"
