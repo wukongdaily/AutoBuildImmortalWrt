@@ -57,6 +57,8 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-filebrowser luci-i18n-filebrowser-zh-
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES -luci-app-samba4 -luci-i18n-samba4-zh-cn -luci-app-dufs -luci-i18n-dufs-zh-cn"
 # WoL网络唤醒
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-wol luci-i18n-wol-zh-cn"
+# UPnP 通用即插即用
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-upnp luci-i18n-upnp-zh-cn"
 # uHTTPd Web服务器管理
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-uhttpd luci-i18n-uhttpd-zh-cn"
 # nginx web-ui
