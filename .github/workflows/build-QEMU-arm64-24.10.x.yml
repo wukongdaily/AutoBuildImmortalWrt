@@ -105,9 +105,10 @@ jobs:
               -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
               immortalwrt/imagebuilder:armsr-armv8-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
           done
-      - name: Generate Firmware SHA-256
+      - name: Copy Firmware to workspace
         run: |
           cp ${{ github.workspace }}/bin/targets/armsr/armv8/*.qcow2 ${{ github.workspace }}
+          cp ${{ github.workspace }}/bin/targets/armsr/armv8/*.vmdk ${{ github.workspace }}
 
       - name: Upload ImmortWrt as release assets
         uses: softprops/action-gh-release@v2.2.1
@@ -116,7 +117,8 @@ jobs:
           name: ImmortWrt-QEMU-armsr-armv8-24.10.x
           body_path: ${{ github.workspace }}/armsr-armv8/info.md
           files: |
-            ${{ github.workspace }}/*.qcow2
+            ${{ github.workspace }}/*.qcow2 
+            ${{ github.workspace }}/*.vmdk
           token: ${{ secrets.GITHUB_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
