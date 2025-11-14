@@ -5,28 +5,44 @@
 
 ## 🤔 这是什么？
 它是一个工作流。可快速构建 带docker且支持自定义固件大小的 immortalWrt
-> 1、支持自定义固件大小 默认1GB <br>
-> 2、支持可选预安装docker（可选）<br>
+> 1、支持自定义固件大小 默认1GB 不建议设置过大 推荐1G-2G 更大需求可通过自定义插件里的扩容插件自行扩容<br>
+> 2、支持可选预安装docker（可选）支持在UI上勾选是否集成商店<br>
 > 3、支持按需增加[第三方软件](https://github.com/wukongdaily/store/blob/master/README.md)  如何集成 https://github.com/wukongdaily/AutoBuildImmortalWrt/discussions/209 <br>
 > 4、点击这里查看👉🏻[全部支持的机型列表](https://github.com/wukongdaily/AutoBuildImmortalWrt/blob/master/SUPPORT.md) 👈🏻<br>
-> 5、在UI上 新增luci版本的可选项，默认最新版24.10.3 https://github.com/wukongdaily/AutoBuildImmortalWrt/discussions/426
+> 5、在UI上 新增luci版本的可选项，默认最新版24.10.4 https://github.com/wukongdaily/AutoBuildImmortalWrt/discussions/426<br>
+> 6、支持设置管理地址的ip 比如192.168.100.1 这里强调 这项功能仅针对多网口机型 单网口的逻辑还是自动获取ip模式（dhcp）无固定ip<br>
+> 7、对于[插件追新的用户 建议前往run项目 下载run后 ](https://github.com/wukongdaily/RunFilesBuilder/discussions/41)用命令sh xx.run 覆盖安装 <br>
 
 ## [基本用法步骤](https://github.com/wukongdaily/AutoBuildImmortalWrt/wiki) 👈🏻
 1、fork本项目<br>
 2、在fork后的项目中 点击【action】 找到需要的工作流后 run-workflow<br>
 
-## 虚拟机建议用哪条工作流？
+## 虚拟机建议用哪条工作流？下图↓
 <img width="30%" height="30%" alt="image" src="https://github.com/user-attachments/assets/743027e0-584a-4842-bfb3-0dff22de9101" /> <br>
 虚拟机用户建议直接构建ISO镜像 此过程分2个阶段 阶段一构建固件imm 阶段二将其封装iso格式的安装器 总计耗时大约7-8分钟  <br>
 ISO在虚拟机引导后 跑码结束后，在命令行输入 `ddd` 按提示 完成虚拟磁盘的写入（安装immortalwrt到虚拟磁盘）<br>
 这样做也比较灵活 避免了格式转换和解压 同时还可以指定安装某个磁盘 而安装后的磁盘剩余空间也能加以利用。<br>
 详细的解说 可以参考我的另一个项目 [img-installer](https://github.com/wukongdaily/armbian-installer) 
 
-## 虚拟机用户使用的教学⬇️ 
+## 虚拟机用户使用的教学⬇️ ISO 
 [![操作步骤](https://img.shields.io/badge/YouTube-123456?logo=youtube&labelColor=ff0000)](https://www.youtube.com/watch?v=ftSE3wSJi64) [![Bilibili](https://img.shields.io/badge/Bilibili-123456?logo=bilibili&logoColor=fff&labelColor=fb7299)](https://www.bilibili.com/video/BV1enxMzwEUe/)
 
+## 物理机如何使用ISO格式的安装器(本项目独有)
+- Windows 建议将ISO拷贝到制作好的[Ventoy](https://www.ventoy.net/cn/index.html)<br>
+  <img width="303" height="90" alt="image" src="https://github.com/user-attachments/assets/34d73e24-3100-4c0d-a904-5f114d867793" />
+
+- macOS 使用[balenaEtcher](https://etcher.balena.io/) 将ISO 刻录到U盘即可<br>
+  <img width="285" height="188" alt="image" src="https://github.com/user-attachments/assets/cd09be82-2670-404c-8878-c2782b3c8374" />
+
+- 将制作好的U盘提前插在软路由 然后启动后 按Del 或者F12、F11、F7等 使U盘成为第一启动盘
+
+  <img width="50%" alt="image" src="https://github.com/user-attachments/assets/a1ba38d9-305c-41dd-8441-9e61c3dcae1d" /> <br>
+- 启动后在命令行输入 ddd 按提示 完成硬盘的写入 硬盘剩余空间你还可以自动分配<br>
+- ISO安装器原理 点这里查看 https://github.com/wukongdaily/img-installer
+- 这是一个值得推广的方法 真心希望你能吸收、学会 费了很大心思的。没错、从今往后 [任何OpenWrt都有安装器了](https://github.com/wukongdaily/img-installer)
+
 ## 如何查询imm仓库内有哪些插件
-https://mirrors.sjtug.sjtu.edu.cn/immortalwrt/releases/24.10.2/packages/x86_64/luci/
+https://mirrors.sjtug.sjtu.edu.cn/immortalwrt/releases/24.10.4/packages/x86_64/luci/
 ## 如何查询imm仓库外目前可以集成哪些插件
 https://github.com/wukongdaily/store
 > 具体方法 https://github.com/wukongdaily/AutoBuildImmortalWrt/discussions/209
@@ -66,7 +82,7 @@ https://www.youtube.com/watch?v=7i6BQeitUtE
 - ### [一键生成docker离线镜像] 🆕
 - https://github.com/wukongdaily/DockerTarBuilder<br>
 - ### [OpenWrt/Armbian IMG安装器ISO] 🆕
-- https://github.com/wukongdaily/armbian-installer
+- https://github.com/wukongdaily/img-installer
 
 
 ## ❤️如何构建docker版ImmortalWrt（建议收藏）⬇️
@@ -77,6 +93,8 @@ https://wkdaily.cpolar.cn/15
 ### https://github.com/ophub/amlogic-s9xxx-openwrt
 ### https://github.com/sirpdboy
 ### https://github.com/wukongdaily/ib-overlay
+### 高级卸载插件出处 by VedioTalk https://xz.vumstar.com
+### 新增极光主题 来自 https://github.com/eamonxg/luci-theme-aurora
 
 ## ❤️赞助作者 ⬇️⬇️
 
