@@ -112,14 +112,16 @@ jobs:
         run: |
           echo "BUILD_DATE=$(date +'%Y-%m-%d %H:%M')" >> $GITHUB_ENV
           echo "BUILD_DATE_SHORT=$(date +'%Y%m%d')" >> $GITHUB_ENV
-      - name: Rename firmware with date
+      - name: Detect firmware file
         working-directory: ${{ github.workspace }}/bin/targets/x86/64
         run: |
-          for f in *squashfs-combined-efi.img.gz; do
-          new_name="${f%.img.gz}-${BUILD_DATE_SHORT}.img.gz"
-          mv "$f" "$new_name"
-          echo "Renamed: $f → $new_name"
-          done
+          FIRMWARE=$(ls *squashfs-combined-efi.img.gz | head -n 1)
+          echo "FIRMWARE=$FIRMWARE" >> $GITHUB_ENV
+          BASE=${FIRMWARE%.img.gz}
+          echo "FIRMWARE_DATE_NAME=${BASE}-${BUILD_DATE_SHORT}.img.gz" >> $GITHUB_ENV
+          echo "Found firmware: $FIRMWARE"
+          echo "Will upload as: $FIRMWARE_DATE_NAME"
+
       - name: Create info
         run: |
           cat > ${{ github.workspace }}/router-info.md <<EOF
@@ -147,7 +149,7 @@ jobs:
           tag_name: Autobuild-x86-64
           body_path: ${{ github.workspace }}/router-info.md
           files: |
-            ${{ github.workspace }}/bin/targets/x86/64/*squashfs-combined-efi.img.gz
+            ${{ github.workspace }}/bin/targets/x86/64/${{ env.FIRMWARE }}#${{ env.FIRMWARE_DATE_NAME }}
           token: ${{ secrets.GITHUB_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
