@@ -113,10 +113,12 @@ jobs:
           echo "BUILD_DATE=$(date +'%Y-%m-%d %H:%M')" >> $GITHUB_ENV
           echo "BUILD_DATE_SHORT=$(date +'%Y%m%d')" >> $GITHUB_ENV
       - name: Rename firmware with date
+        working-directory: ${{ github.workspace }}/bin/targets/x86/64
         run: |
-          cd ${{ github.workspace }}/bin/targets/x86/64
           for f in *squashfs-combined-efi.img.gz; do
-            mv "$f" "${f%.img.gz}-${BUILD_DATE_SHORT}.img.gz"
+          new_name="${f%.img.gz}-${BUILD_DATE_SHORT}.img.gz"
+          mv "$f" "$new_name"
+          echo "Renamed: $f → $new_name"
           done
       - name: Create info
         run: |
