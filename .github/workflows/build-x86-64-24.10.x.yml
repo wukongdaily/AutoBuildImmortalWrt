@@ -108,7 +108,16 @@ jobs:
             -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
           immortalwrt/imagebuilder:x86-64-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
           
-
+      - name: Set build date
+        run: |
+          echo "BUILD_DATE=$(date +'%Y-%m-%d %H:%M')" >> $GITHUB_ENV
+          echo "BUILD_DATE_SHORT=$(date +'%Y%m%d')" >> $GITHUB_ENV
+      - name: Rename firmware with date
+        run: |
+          cd ${{ github.workspace }}/bin/targets/x86/64
+          for f in *squashfs-combined-efi.img.gz; do
+            mv "$f" "${f%.img.gz}-${BUILD_DATE_SHORT}.img.gz"
+          done
       - name: Create info
         run: |
           cat > ${{ github.workspace }}/router-info.md <<EOF
@@ -120,6 +129,7 @@ jobs:
           - 🏠 **后台地址**: ${{ github.event.inputs.custom_router_ip }}
           - 👤 **用户名**: root
           - 🔑 **密码**: 无
+          - ⏱ **构建时间**: ${BUILD_DATE}
           EOF
 
           if [ "${{ github.event.inputs.include_docker }}" == "yes" ]; then
