@@ -1,10 +1,9 @@
 #!/bin/sh
-# Disable hardware TC offload on physical NICs
+# Disable hardware TC offload on physical NICs (eth0-eth3)
 
 IFACES="eth0 eth1 eth2 eth3"
 
 for IFACE in $IFACES; do
-    [ "$INTERFACE" = "$IFACE" ] || continue
     ethtool -K "$IFACE" hw-tc-offload off 2>/dev/null
 done
 
