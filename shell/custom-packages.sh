@@ -21,6 +21,19 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-passwall2"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-passwall2-zh-cn"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-nikki-zh-cn"
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-nekobox"
+# passwall2补充依赖
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES \
+  tuic-client \
+  naiveproxy \
+  hysteria \
+  shadowsocksr-libev-ssr-local \
+  shadowsocksr-libev-ssr-redir \
+  shadowsocksr-libev-ssr-server \
+"
+#DDNS
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-ddns-go"
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-ddns-go-zh-cn"
+
 # 同样是代理相关 但以下2个属于imm仓库内的软件 一般在build24.sh中已经集成 你也可以在此处调整它的去留 若去除组件则使用减号- 若添加则 不使用减号 或者 不处理
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES -luci-app-openclash"
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES -luci-i18n-homeproxy-zh-cn"
