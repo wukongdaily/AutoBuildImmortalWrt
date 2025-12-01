@@ -17,7 +17,7 @@ start() {
         echo 1 > /sys/module/intel_idle/parameters/max_cstate 2>/dev/null
     fi
 
-    for cpu in /sys/devices/system/cpu/cpu[0-9]* 2>/dev/null; do
+    for cpu in /sys/devices/system/cpu/cpu[0-9]* ; do
         for s in 2 3 4 5 6 7 8 9; do
             p="$cpu/cpuidle/state${s}/disable"
             [ -w "$p" ] && echo 1 > "$p" 2>/dev/null
@@ -26,7 +26,7 @@ start() {
 
     # 关闭所有物理网口的 hw-tc-offload
     if command -v ethtool >/dev/null 2>&1; then
-        for iface in /sys/class/net/eth* 2>/dev/null; do
+        for iface in /sys/class/net/eth* ; do
             dev=$(basename "$iface")
             if ethtool -k "$dev" 2>/dev/null | grep -q 'hw-tc-offload: on'; then
                 ethtool --offload "$dev" hw-tc-offload off 2>/dev/null
