@@ -40,6 +40,14 @@ start() {
         echo 1 > /sys/module/intel_idle/parameters/max_cstate 2>/dev/null
     fi
 
+    #   state2 及以上全部 disable 掉
+    for cpu in /sys/devices/system/cpu/cpu[0-9]*; do
+        for s in 2 3 4 5 6 7 8 9; do
+            p="$cpu/cpuidle/state${s}/disable"
+            [ -w "$p" ] && echo 1 > "$p" 2>/dev/null
+        done
+    done
+
     # 2) 将时钟源切到 acpi_pm（你目前稳定使用的配置）
     CS_PATH=/sys/devices/system/clocksource/clocksource0
     if [ -r "$CS_PATH/current_clocksource" ] && \
