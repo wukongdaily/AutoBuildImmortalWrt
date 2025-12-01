@@ -1,8 +1,8 @@
 #!/bin/sh
 # 90-e3845.sh - E3845 平台自定义优化（一次性执行）
 # 作用：
-#   1. 禁用网卡 HW TC offload（防止 hwtc 异常）
-#   2. 创建 /etc/init.d/e3845-tune，用于：
+#   1. 禁用网卡 HW TC offload
+#   2. 创建 /etc/init.d/e3845-tune：
 #        - 限制 C-State
 #        - 将时钟源切到 acpi_pm
 #        - 启动时自动禁用 Flow Offload 模块
@@ -10,14 +10,16 @@
 # 1) 生成 /etc/hotplug.d/net/10-disable-hwtc
 cat <<'EOF' >/etc/hotplug.d/net/10-disable-hwtc
 #!/bin/sh
-# 自动关闭所有网口的硬件流量控制 (hardware tc offload)
+# 自动关闭所有物理网口的硬件流量控制 (hw-tc-offload)
 
-[ "$ACTION" = "ifup" ] || exit 0
-[ -n "$DEVICE" ] || exit 0
+command -v ethtool >/dev/null 2>&1 || exit 0
 
-if command -v ethtool >/dev/null 2>&1; then
-    ethtool --offload "$DEVICE" hw-tc-offload off 2>/dev/null
-fi
+for iface in /sys/class/net/eth*; do
+    dev=$(basename "$iface")
+    if ethtool -k "$dev" 2>/dev/null | grep -q 'hw-tc-offload: on'; then
+        ethtool --offload "$dev" hw-tc-offload off 2>/dev/null
+    fi
+done
 
 exit 0
 EOF
@@ -32,7 +34,7 @@ START=99
 STOP=10
 
 start() {
-    # 1) 限制 intel_idle C-State，配合当前 BIOS 设置
+    # 1) 限制 intel_idle C-State
     if [ -f /sys/devices/system/cpu/intel_idle/max_cstate ]; then
         echo 1 > /sys/devices/system/cpu/intel_idle/max_cstate 2>/dev/null
     fi
@@ -48,7 +50,7 @@ start() {
         done
     done
 
-    # 2) 将时钟源切到 acpi_pm（你目前稳定使用的配置）
+    # 2) 将时钟源切到 acpi_pm
     CS_PATH=/sys/devices/system/clocksource/clocksource0
     if [ -r "$CS_PATH/current_clocksource" ] && \
        [ -w "$CS_PATH/current_clocksource" ]; then
@@ -56,8 +58,7 @@ start() {
         [ "$cur_cs" != "acpi_pm" ] && echo acpi_pm > "$CS_PATH/current_clocksource" 2>/dev/null
     fi
 
-    # 3) 禁用 Flow Offload 模块，避免随机重启
-    #    顺序：nft_flow_offload -> nf_flow_table_inet -> nf_flow_table
+    # 3) 禁用 Flow Offload 模块
     for m in nft_flow_offload nf_flow_table_inet nf_flow_table; do
         if lsmod | grep -q "^$m"; then
             rmmod "$m" 2>/dev/null
@@ -66,7 +67,6 @@ start() {
 }
 
 stop() {
-    # 不做任何回滚操作，保持内核状态稳定
     return 0
 }
 EOF
