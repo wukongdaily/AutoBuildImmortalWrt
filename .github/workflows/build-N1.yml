@@ -121,7 +121,7 @@ on:
         default: "1024"
         type: choice
         options:
-          - '2048'
+          - '1024'
       builder_name:
         description: "设置打包作者的名称"
         required: true
