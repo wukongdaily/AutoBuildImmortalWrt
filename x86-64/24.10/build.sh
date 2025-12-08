@@ -87,7 +87,7 @@ if [ "$INCLUDE_DOCKER" = "yes" ]; then
     echo "Adding package: luci-i18n-dockerman-zh-cn"
 fi
 
- 若构建openclash 则添加内核
+ #若构建openclash 则添加内核
 if echo "$PACKAGES" | grep -q "luci-app-openclash"; then
     echo "✅ 已选择 luci-app-openclash，添加 openclash core"
     mkdir -p files/etc/openclash/core
