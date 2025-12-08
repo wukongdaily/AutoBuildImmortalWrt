@@ -21,6 +21,7 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-passwall2"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-passwall2-zh-cn"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-nikki-zh-cn"
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-nekobox"
+#CUSTOM_PACKAGES="$CUSTOM_PACKAGES momo luci-app-momo luci-i18n-momo-zh-cn"
 # passwall2补充依赖
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES \
   tuic-client \
@@ -30,7 +31,7 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES \
   shadowsocksr-libev-ssr-redir \
   shadowsocksr-libev-ssr-server \
 "
-#DDNS
+# ddns-go
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-ddns-go"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-ddns-go-zh-cn"
 
