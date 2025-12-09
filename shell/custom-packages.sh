@@ -5,7 +5,7 @@
 
 # 各位注意 如果你构建的固件是硬路由 此文件的注释要酌情考虑是否打开 因为硬路由的闪存空间有限 若构建出来过大或者构建失败 记得调整本文件的注释
 # 考虑到istore商店的集成与否 属于高频操作 故 目前已将集成store的操作放置在 工作流的UI 选项 用户自行勾选 则集成  不勾选则不集成 以减少修改此文件的次数
-
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-ipsec-vpnd luci-i18n-ipsec-vpnd-zh-cn"
 # 首页和网络向导
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-quickstart-zh-cn"
 # 高级卸载 by YT Vedio Talk
