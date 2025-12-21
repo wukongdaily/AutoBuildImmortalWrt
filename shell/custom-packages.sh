@@ -13,7 +13,7 @@
 # 极光主题 by github eamonxg
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-theme-aurora"
 # 去广告adghome
-#CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-adguardhome"
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-adguardhome"
 # 代理相关
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-passwall-zh-cn"
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-ssr-plus"
@@ -36,7 +36,7 @@
 # 网络测速 by sirpdboy 
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-netspeedtest luci-i18n-netspeedtest-zh-cn"
 # MosDNS
-#CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-mosdns luci-i18n-mosdns-zh-cn"
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-mosdns luci-i18n-mosdns-zh-cn"
 # Turbo ACC 网络加速
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-turboacc"
 # 应用过滤 openappfilter.com
