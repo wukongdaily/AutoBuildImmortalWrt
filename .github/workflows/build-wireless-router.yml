@@ -45,22 +45,20 @@
           - jdcloud_re-cp-03
           - xiaomi_mi-router-ax3000t
           - xiaomi_mi-router-ax3000t-ubootmod
-          - 
-小米米路由器WR30UU-Boot改版
-          - 
-小米红米路由器AX6000
+          - 小米米路由器WR30UU-Boot改版
+          - 小米红米路由器AX6000
           - 小米红米路由器AX6000原厂
           - xiaomi_redmi-router-ax6000-ubootmod
-          - qnap_301w
+          - 
 
           - 红米AX6-原厂
           - 小米红米路由器AX6S
           - 光谱SAX1V1K
-          - tplink_eap660hd-v1
-          - xiaomi_ax3600
-          - xiaomi_ax3600-stock
+          - 普联EAP660HD-V1
+          - 小米AX3600
+          - 小米AX3600-库存
 
-小米_ax9000-库存
+小米_AX9000-库存
           - 移动_a10-库存
           - 移动_a10-ubootmod
           - 移动_rax3000m
@@ -77,15 +75,15 @@
           - cmcc_a10
           - acelink_ew-7886cax
           - acer_predator-w6
-          - acer_predator-w6d
-          - acer_vero-w6m
-          - arcadyan_mozart
-          - asus_rt-ax52
-          - asus_rt-ax59u
-          - asus_tuf-ax4200
-          - asus_tuf-ax6000
-          - bananapi_bpi-r3
-          - bananapi_bpi-r3-mini
+宏基掠夺者-w6d
+宏基vero-w6m
+          - 阿尔卡迪安莫扎特
+          - 华硕rt-ax52
+          - 华硕rt-ax59u
+          - 华硕tuf-ax4200
+          - 华硕tuf-ax6000
+          - 香蕉派bpi-r3
+
           - bananapi_bpi-r4
           - bananapi_bpi-r4-poe
           - cetron_ct3003
