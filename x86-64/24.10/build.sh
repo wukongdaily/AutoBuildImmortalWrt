@@ -43,17 +43,41 @@ fi
 echo "$(date '+%Y-%m-%d %H:%M:%S') - 开始构建固件..."
 
 # ============= imm仓库内的插件==============
-# 定义所需安装的包列表 - 精简版（基础组件 + Passwall + AdGuardHome）
+# 定义所需安装的包列表 - 丰富基础组件版本
 PACKAGES=""
-# 基础系统工具
-PACKAGES="$PACKAGES curl"
+
+# ========== 基础系统工具 ==========
+PACKAGES="$PACKAGES curl wget"
+PACKAGES="$PACKAGES htop nano vim-full"
+PACKAGES="$PACKAGES openssh-sftp-server"
+
+# ========== LuCI 界面与主题 ==========
+PACKAGES="$PACKAGES luci-theme-argon"
+PACKAGES="$PACKAGES luci-app-argon-config"
+PACKAGES="$PACKAGES luci-i18n-argon-config-zh-cn"
+
+# ========== 网络管理 ==========
 PACKAGES="$PACKAGES luci-i18n-firewall-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-package-manager-zh-cn"
+
+# ========== 终端与访问 ==========
 PACKAGES="$PACKAGES luci-i18n-ttyd-zh-cn"
-PACKAGES="$PACKAGES openssh-sftp-server"
-# 用户指定插件
+
+# ========== 存储管理 ==========
+PACKAGES="$PACKAGES luci-i18n-diskman-zh-cn"
+PACKAGES="$PACKAGES luci-i18n-samba4-zh-cn"
+
+# ========== 文件管理 ==========
+PACKAGES="$PACKAGES luci-i18n-filemanager-zh-cn"
+PACKAGES="$PACKAGES luci-i18n-dufs-zh-cn"
+
+# ========== 系统监控 ==========
+PACKAGES="$PACKAGES luci-i18n-statistics-zh-cn"
+PACKAGES="$PACKAGES luci-i18n-nlbwmon-zh-cn"
+
+# ========== 用户指定插件（仅这两个）==========
 PACKAGES="$PACKAGES luci-i18n-passwall-zh-cn"
-# AdGuardHome 将从第三方包添加
+# AdGuardHome 将从第三方包添加（custom-packages.sh）
 # ======== shell/custom-packages.sh =======
 # 合并imm仓库以外的第三方插件
 PACKAGES="$PACKAGES $CUSTOM_PACKAGES"
