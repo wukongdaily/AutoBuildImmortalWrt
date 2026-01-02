@@ -1,4 +1,4 @@
-name: build-RaspBerryPi-24.10.2
+name: build-RaspBerryPi-24.10.x
 
 on:
   workflow_dispatch:
@@ -14,6 +14,17 @@ on:
           - rpi-4
           - rpi-5
         default: rpi-4
+      luci_version:
+        description: "选择luci版本"
+        required: false
+        default: "24.10.4"
+        type: choice
+        options:
+          - 24.10.0
+          - 24.10.1
+          - 24.10.2
+          - 24.10.3
+          - 24.10.4
       enable_store:
         description: "集成 store 商店"
         required: false
@@ -58,25 +69,27 @@ jobs:
       
       - name: Build raspberrypi ImmortalWrt 24.10.2
         run: |
+          luci_version="${{ github.event.inputs.luci_version }}"
           profiles="${{ github.event.inputs.profile }}"
           if [ "$profiles" = "rpi" ]; then
-            tag=bcm27xx-bcm2708-openwrt-24.10.2
+            tag=bcm27xx-bcm2708-openwrt-${luci_version}
             echo "cpu=bcm2708" >> $GITHUB_ENV
           elif [ "$profiles" = "rpi-2" ]; then
-            tag=bcm27xx-bcm2709-openwrt-24.10.2
+            tag=bcm27xx-bcm2709-openwrt-${luci_version}
             echo "cpu=bcm2709" >> $GITHUB_ENV
           elif [ "$profiles" = "rpi-3" ]; then
-            tag=bcm27xx-bcm2710-openwrt-24.10.2
+            tag=bcm27xx-bcm2710-openwrt-${luci_version}
             echo "cpu=bcm2710" >> $GITHUB_ENV
           elif [ "$profiles" = "rpi-4" ]; then
-            tag=bcm27xx-bcm2711-openwrt-24.10.2
+            tag=bcm27xx-bcm2711-openwrt-${luci_version}
             echo "cpu=bcm2711" >> $GITHUB_ENV
           elif [ "$profiles" = "rpi-5" ]; then
-            tag=bcm27xx-bcm2712-openwrt-24.10.2
+            tag=bcm27xx-bcm2712-openwrt-${luci_version}
             echo "cpu=bcm2712" >> $GITHUB_ENV
           fi
           include_docker="${{ github.event.inputs.include_docker }}"
           size="${{ github.event.inputs.size }}"
+          
           IFS=',' read -r -a profile_array <<< "$profiles"
           for profile in "${profile_array[@]}"; do
             echo "Building for profile: $profile"

@@ -2,6 +2,17 @@ name: Build boxs by ophub
 on:
   workflow_dispatch:
     inputs:
+      luci_version:
+        description: "选择luci版本"
+        required: false
+        default: "24.10.4"
+        type: choice
+        options:
+          - 24.10.0
+          - 24.10.1
+          - 24.10.2
+          - 24.10.3
+          - 24.10.4
       openwrt_kernel:
         description: "选择构建的内核 当高版本内核没有时 系统会自动挑选匹配的内核。比如radxa e52c 即便你选择了6.1.y 可能最终构建还是5.10.160"
         required: false
@@ -245,6 +256,7 @@ jobs:
           profiles="generic"
           include_docker="${{ github.event.inputs.include_docker }}"
           rootfs_partsize="${{ github.event.inputs.rootfs_partsize }}"
+          luci_version="${{ github.event.inputs.luci_version }}"
           
           IFS=',' read -r -a profile_array <<< "$profiles"
           
@@ -263,13 +275,14 @@ jobs:
               -e PROFILE=$profile \
               -e INCLUDE_DOCKER=$include_docker \
               -e ROOTFS_PARTSIZE=$rootfs_partsize \
-              immortalwrt/imagebuilder:armsr-armv8-openwrt-24.10.2 /bin/bash /home/build/immortalwrt/build.sh
+              immortalwrt/imagebuilder:armsr-armv8-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
           done
           
       - name: Download prebuilt rootfs.tar.gz
         if: ${{ github.event.inputs.skip_imagebuilder == 'true' }}
         run: |
           echo "📦 正在下载预构建 rootfs"
+          echo "PREBUILT_LUCI_VERSION=24.10.2" >> $GITHUB_ENV
           mkdir -p bin/targets/armsr/armv8
           curl -L -o bin/targets/armsr/armv8/openwrt-armvirt-64-default-rootfs.tar.gz \
             https://github.com/wukongdaily/AutoBuildImmortalWrt/releases/download/rootfs/immortalwrt-24.10.2-armsr-armv8-generic-rootfs.tar.gz
@@ -300,6 +313,8 @@ jobs:
         id: rename
         run: |
           MODEL=${{ inputs.openwrt_board }}
+          LUCI_VERSION="${{ github.event.inputs.luci_version }}"
+
           for FILE in ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz; do
             echo "Processing file: $FILE"
             FILENAME=$(basename "$FILE")
@@ -308,7 +323,14 @@ jobs:
               echo "Skipped: Could not extract kernel version from $FILENAME"
               continue
             fi
-            NEW_NAME="immortalwrt-24.10.2-$MODEL-btrfs-$KERNEL_VERSION.img.gz"
+            
+            if [ -n "$PREBUILT_LUCI_VERSION" ]; then
+              echo "PREBUILT_LUCI_VERSION is not empty: $PREBUILT_LUCI_VERSION"
+              NEW_NAME="immortalwrt-${PREBUILT_LUCI_VERSION}-${MODEL}-btrfs-${KERNEL_VERSION}.img.gz"
+            else
+              NEW_NAME="immortalwrt-${LUCI_VERSION}-${MODEL}-btrfs-${KERNEL_VERSION}.img.gz"
+            fi
+
             mv "$FILE" "${{ env.PACKAGED_OUTPUTPATH }}/$NEW_NAME"
             echo "Renamed to: $NEW_NAME"
           done

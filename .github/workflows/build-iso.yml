@@ -8,6 +8,17 @@ name: build ISO
 on:
   workflow_dispatch:
     inputs:
+      luci_version:
+        description: "选择luci版本"
+        required: false
+        default: "24.10.4"
+        type: choice
+        options:
+          - 24.10.0
+          - 24.10.1
+          - 24.10.2
+          - 24.10.3
+          - 24.10.4
       profile:
         description: '请输入要编译固件大小 单位(MB)'
         required: true
@@ -73,6 +84,7 @@ jobs:
         run: |
           profiles="${{ github.event.inputs.profile }}"
           include_docker="${{ github.event.inputs.include_docker }}"
+          luci_version="${{ github.event.inputs.luci_version }}"
           IFS=',' read -r -a profile_array <<< "$profiles"
           
           for profile in "${profile_array[@]}"; do
@@ -89,7 +101,7 @@ jobs:
               -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
               -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
               -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
-              immortalwrt/imagebuilder:x86-64-openwrt-24.10.2 /bin/bash /home/build/immortalwrt/build.sh
+              immortalwrt/imagebuilder:x86-64-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
           done
 
       - name: ✅ 复制固件到根目录
