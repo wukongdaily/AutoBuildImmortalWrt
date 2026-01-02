@@ -151,7 +151,7 @@ on:
           - wavlink_wl-wn586x3
           - yuncore_ax835
           - zbtlink_zbt-z8102ax
-          - zbtlink_zbt-z8102ax-v2-512mb
+          - zbtlink_zbt-z8102ax-v2
           - zbtlink_zbt-z8103ax
           - zyxel_ex5601-t0-stock
           - zyxel_ex5601-t0-ubootmod
