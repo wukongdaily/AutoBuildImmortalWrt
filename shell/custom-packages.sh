@@ -55,3 +55,6 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-turboacc"
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES webdav2 luci-app-unishare"
 # IPSec VPN 服务器
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-ipsec-vpnd-zh-cn"
+# Bandix流量监控 by timsaya
+#CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-bandix luci-i18n-bandix-zh-cn"
+
