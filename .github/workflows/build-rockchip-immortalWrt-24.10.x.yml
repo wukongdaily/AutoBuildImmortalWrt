@@ -97,9 +97,11 @@ on:
       pppoe_account:
         description: "宽带账号 (若启用PPPoE)"
         required: false
+        default: '071900263467'
       pppoe_password:
         description: "宽带密码 (若启用PPPoE)"
         required: false
+        default: '123456' 
 
 jobs:
   build:
