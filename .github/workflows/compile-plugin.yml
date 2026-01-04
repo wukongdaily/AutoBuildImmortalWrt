@@ -22,8 +22,11 @@ jobs:
 
       - name: Setup OpenWrt SDK
         run: |
-          # 1. 设置 SDK 下载地址 (ImmortalWrt 24.10.4 Rockchip/ARMv8)
-          # 注意：后缀已修正为 .tar.zst
+          # 1. 安装必要的编译依赖 (修复 python3-pyelftools 报错)
+          sudo apt-get update
+          sudo apt-get install -y zstd python3-pyelftools
+          
+          # 2. 设置 SDK 下载地址 (ImmortalWrt 24.10.4 Rockchip/ARMv8)
           SDK_URL="https://downloads.immortalwrt.org/releases/24.10.4/targets/rockchip/armv8/immortalwrt-sdk-24.10.4-rockchip-armv8_gcc-13.3.0_musl.Linux-x86_64.tar.zst"
           
           echo "⬇️ 正在下载 SDK..."
@@ -31,15 +34,14 @@ jobs:
           
           echo "📦 正在解压 SDK..."
           # 使用 zstd 解压
-          sudo apt-get install -y zstd
           tar -I zstd -xvf sdk.tar.zst
           
-          # 2. 自动寻找解压出来的目录名并重命名为 sdk
+          # 3. 自动寻找解压出来的目录名并重命名为 sdk
           SDK_DIR=$(find . -maxdepth 1 -type d -name "immortalwrt-sdk-*" | head -n 1)
           echo "Found SDK dir: $SDK_DIR"
           mv "$SDK_DIR" sdk
           
-          # 3. 进入目录
+          # 4. 进入目录
           cd sdk
           
           echo "🔄 更新 Feeds (依赖源)..."
@@ -65,6 +67,7 @@ jobs:
           
           echo "🛠 开始编译..."
           # V=s 输出详细日志
+          # IGNORE_ERRORS=m 尝试忽略非关键依赖错误
           make package/my-package/compile V=s
 
       - name: Find and Organize IPKs
