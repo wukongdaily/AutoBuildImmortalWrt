@@ -90,9 +90,6 @@ if [ "$INCLUDE_DOCKER" = "yes" ]; then
     echo "Adding package: luci-i18n-dockerman-zh-cn"
 fi
 
-# 6. 文件管理器 (保留原逻辑)
-PACKAGES="$PACKAGES luci-i18n-filemanager-zh-cn"
-
 # 7. 注入 custom-packages.sh 中的内容
 PACKAGES="$PACKAGES $CUSTOM_PACKAGES"
 
