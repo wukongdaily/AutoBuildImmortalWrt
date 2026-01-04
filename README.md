@@ -5,7 +5,7 @@
 
 ## 简介
 
-为 **FriendlyElec NanoPi R4S（rockchip/armv8）** 自动构建 **ImmortalWrt 24.10.4 固件**，支持自定义固件大小、预装 Docker、第三方插件以及可选 ISO 安装器。[conversation_history:1]
+为 **FriendlyElec NanoPi R4S（rockchip/armv8）** 自动构建 **ImmortalWrt 24.10.4 固件**，支持自定义固件大小、预装 Docker
 
 ## 当前环境
 
