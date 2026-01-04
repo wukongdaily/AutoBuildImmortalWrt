@@ -6,7 +6,7 @@ on:
       repo_url:
         description: "插件源码的 GitHub 地址"
         required: true
-        default: "https://github.com/aige168/aige168" # 这里填你想编译的仓库地址
+        default: "https://github.com/aige168/luci-app-accesscontrol"
       branch:
         description: "分支 (通常是 main 或 master)"
         required: true
@@ -22,17 +22,19 @@ jobs:
 
       - name: Setup OpenWrt SDK
         run: |
-          # 1. 设置 SDK 下载地址 (使用 ImmortalWrt 24.10.4 Rockchip/ARMv8 版本)
-          SDK_URL="https://downloads.immortalwrt.org/releases/24.10.4/targets/rockchip/armv8/immortalwrt-sdk-24.10.4-rockchip-armv8_gcc-13.3.0_musl.Linux-x86_64.tar.xz"
+          # 1. 设置 SDK 下载地址 (ImmortalWrt 24.10.4 Rockchip/ARMv8)
+          # 注意：后缀已修正为 .tar.zst
+          SDK_URL="https://downloads.immortalwrt.org/releases/24.10.4/targets/rockchip/armv8/immortalwrt-sdk-24.10.4-rockchip-armv8_gcc-13.3.0_musl.Linux-x86_64.tar.zst"
           
           echo "⬇️ 正在下载 SDK..."
-          wget -q "$SDK_URL" -O sdk.tar.xz
+          wget -q "$SDK_URL" -O sdk.tar.zst
           
           echo "📦 正在解压 SDK..."
-          tar -xvf sdk.tar.xz
+          # 使用 zstd 解压
+          sudo apt-get install -y zstd
+          tar -I zstd -xvf sdk.tar.zst
           
           # 2. 自动寻找解压出来的目录名并重命名为 sdk
-          # 因为解压出来的名字太长且包含编译器版本，用 find 查找最稳妥
           SDK_DIR=$(find . -maxdepth 1 -type d -name "immortalwrt-sdk-*" | head -n 1)
           echo "Found SDK dir: $SDK_DIR"
           mv "$SDK_DIR" sdk
@@ -41,7 +43,6 @@ jobs:
           cd sdk
           
           echo "🔄 更新 Feeds (依赖源)..."
-          # 更新并安装所有 feeds，确保编译时能找到依赖（如 luci-base, json 等）
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
@@ -59,12 +60,11 @@ jobs:
         run: |
           cd sdk
           
-          # 生成配置文件 (让 SDK 识别新加入的包)
+          # 生成配置文件
           make defconfig
           
           echo "🛠 开始编译..."
-          # V=s 输出详细日志，如果出错方便排查
-          # -j$(nproc) 使用多核编译加快速度
+          # V=s 输出详细日志
           make package/my-package/compile V=s
 
       - name: Find and Organize IPKs
