@@ -7,13 +7,6 @@
 
 为 **FriendlyElec NanoPi R4S（rockchip/armv8）** 自动构建 **ImmortalWrt 24.10.4 固件**，支持自定义固件大小、预装 Docker
 
-## 当前环境
-
-- 设备：NanoPi R4S  
-- 架构：ARMv8 / rockchip/armv8  
-- 固件：ImmortalWrt 24.10.4 + LuCI 24.10 分支  
-- 内核：6.6.110[conversation_history:1]
-
 ## 使用方式
 
 1. Fork 本仓库到自己的 GitHub  
@@ -25,9 +18,5 @@
 
 - 多网口设备：  
   - WAN：默认 DHCP  
-  - LAN：默认 `192.168.100.1`，提供 DHCP  
-- 如与现有网络冲突，可在配置中修改默认管理 IP。[conversation_history:1]
-
-## 防火墙建议
-
-首次调试完成后，建议在 LuCI 中将 WAN 入站规则改为「拒绝」，提升公网暴露时的安全性。
+  - LAN：默认 `192.168.1.1`，提供 DHCP  
+- 如与现有网络冲突，可在配置中修改默认管理 IP。
