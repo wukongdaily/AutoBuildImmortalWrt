@@ -6,7 +6,7 @@ on:
       repo_url:
         description: "插件源码的 GitHub 地址"
         required: true
-        default: "https://github.com/aige168/luci-app-accesscontrol"
+        default: "https://github.com/aige168/aige168"
       branch:
         description: "分支 (通常是 main 或 master)"
         required: true
@@ -22,7 +22,7 @@ jobs:
 
       - name: Setup OpenWrt SDK
         run: |
-          # 1. 安装必要的编译依赖 (修复 python3-pyelftools 报错)
+          # 1. 安装必要的编译依赖
           sudo apt-get update
           sudo apt-get install -y zstd python3-pyelftools
           
@@ -33,7 +33,6 @@ jobs:
           wget -q "$SDK_URL" -O sdk.tar.zst
           
           echo "📦 正在解压 SDK..."
-          # 使用 zstd 解压
           tar -I zstd -xvf sdk.tar.zst
           
           # 3. 自动寻找解压出来的目录名并重命名为 sdk
@@ -57,6 +56,16 @@ jobs:
           cd my-package
           echo "🔀 切换分支到 ${{ inputs.branch }}..."
           git checkout ${{ inputs.branch }} || echo "分支不存在，尝试默认分支"
+          
+          echo "🔧 修复 Makefile 路径问题 (关键步骤)..."
+          # 许多旧插件的 Makefile 写死了 ../../luci.mk，导致在 package 目录编译失败
+          # 我们将其替换为标准路径 $(TOPDIR)/feeds/luci/luci.mk
+          if [ -f Makefile ]; then
+            sed -i 's|\.\./\.\./luci.mk|$(TOPDIR)/feeds/luci/luci.mk|g' Makefile
+            echo "✅ Makefile 已修复"
+          else
+            echo "⚠️ 未找到 Makefile，可能克隆目录结构不对"
+          fi
 
       - name: Compile Package
         run: |
@@ -67,7 +76,6 @@ jobs:
           
           echo "🛠 开始编译..."
           # V=s 输出详细日志
-          # IGNORE_ERRORS=m 尝试忽略非关键依赖错误
           make package/my-package/compile V=s
 
       - name: Find and Organize IPKs
