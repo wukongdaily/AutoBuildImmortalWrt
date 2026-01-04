@@ -1,0 +1,28 @@
+name: Show Repository Structure (展示仓库结构)
+
+# 触发条件：当你 push 代码，或者手动点击运行按钮时触发
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch: # 允许在 GitHub Actions 界面手动触发
+
+jobs:
+  print-tree:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 第一步：检出代码（必须有这一步，否则工作目录是空的）
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 第二步：安装 tree 工具 (Ubuntu 环境默认可能不带，安装一下更稳妥)
+      - name: Install tree
+        run: sudo apt-get update && sudo apt-get install -y tree
+
+      # 第三步：打印结构
+      # -a: 显示所有文件（包括隐藏文件）
+      # -I: 忽略特定的文件夹（如 .git 或 node_modules，防止刷屏）
+      - name: Run tree command
+        run: |
+          echo "Current Directory: $(pwd)"
+          tree -a -I '.git|node_modules|dist'
