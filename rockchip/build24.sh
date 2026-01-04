@@ -49,38 +49,60 @@ fi
 echo "$(date '+%Y-%m-%d %H:%M:%S') - 开始构建固件..."
 echo "查看repositories.conf信息——————"
 cat repositories.conf
-# 定义所需安装的包列表 下列插件你都可以自行删减
+
+# =======================================================
+# 定义所需安装的包列表
+# =======================================================
 PACKAGES=""
-PACKAGES="$PACKAGES curl"
-PACKAGES="$PACKAGES openssh-sftp-server"
-PACKAGES="$PACKAGES luci-i18n-diskman-zh-cn"
+
+# 1. 基础必备
+PACKAGES="$PACKAGES curl openssh-sftp-server"
 PACKAGES="$PACKAGES luci-i18n-package-manager-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-firewall-zh-cn"
+
+# 2. 界面与主题
 PACKAGES="$PACKAGES luci-theme-argon"
-PACKAGES="$PACKAGES luci-app-argon-config"
-PACKAGES="$PACKAGES luci-i18n-argon-config-zh-cn"
-PACKAGES="$PACKAGES luci-i18n-ttyd-zh-cn"
-PACKAGES="$PACKAGES luci-i18n-passwall-zh-cn"
-PACKAGES="$PACKAGES luci-app-openclash"
-PACKAGES="$PACKAGES luci-i18n-homeproxy-zh-cn"
-# 判断是否需要编译 Docker 插件
+PACKAGES="$PACKAGES luci-app-argon-config luci-i18n-argon-config-zh-cn"
+
+# 3. 你需要的具体插件 (官方库已验证)
+# 磁盘管理
+PACKAGES="$PACKAGES luci-app-diskman luci-i18n-diskman-zh-cn"
+# 硬盘休眠
+PACKAGES="$PACKAGES luci-app-hd-idle luci-i18n-hd-idle-zh-cn"
+# 网络共享 (Samba)
+PACKAGES="$PACKAGES luci-app-samba4 luci-i18n-samba4-zh-cn"
+# 下载工具 (Aria2)
+PACKAGES="$PACKAGES luci-app-aria2 luci-i18n-aria2-zh-cn"
+# 内网穿透 (Frpc)
+PACKAGES="$PACKAGES luci-app-frpc luci-i18n-frpc-zh-cn"
+# 应用列表 (OpenList)
+PACKAGES="$PACKAGES luci-app-openlist"
+# 上网控制 (原 accesscontrol，官方库名为 acl)
+PACKAGES="$PACKAGES luci-app-acl luci-i18n-acl-zh-cn"
+# 微信推送 (原 pushbot，官方库名为 wechatpush)
+PACKAGES="$PACKAGES luci-app-wechatpush luci-i18n-wechatpush-zh-cn"
+
+# 4. 第三方库插件 (wukongdaily库)
+# 广告屏蔽 (AdGuardHome)
+PACKAGES="$PACKAGES luci-app-adguardhome"
+
+# 5. Docker (可选，保留原逻辑)
 if [ "$INCLUDE_DOCKER" = "yes" ]; then
     PACKAGES="$PACKAGES luci-i18n-dockerman-zh-cn"
     echo "Adding package: luci-i18n-dockerman-zh-cn"
 fi
-# 文件管理器
+
+# 6. 文件管理器 (保留原逻辑)
 PACKAGES="$PACKAGES luci-i18n-filemanager-zh-cn"
-# 静态文件服务器dufs(推荐)
-PACKAGES="$PACKAGES luci-i18n-dufs-zh-cn"
-# ======== shell/custom-packages.sh =======
-# 合并imm仓库以外的第三方插件
+
+# 7. 注入 custom-packages.sh 中的内容
 PACKAGES="$PACKAGES $CUSTOM_PACKAGES"
 
 # 构建镜像
 echo "$(date '+%Y-%m-%d %H:%M:%S') - Building image with the following packages:"
 echo "$PACKAGES"
 
-# 若构建openclash 则添加内核
+# 若构建openclash 则添加内核 (因为上面移除了openclash，这里会自动跳过)
 if echo "$PACKAGES" | grep -q "luci-app-openclash"; then
     echo "✅ 已选择 luci-app-openclash，添加 openclash core"
     mkdir -p files/etc/openclash/core
@@ -92,7 +114,7 @@ if echo "$PACKAGES" | grep -q "luci-app-openclash"; then
     wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat -O files/etc/openclash/GeoIP.dat
     wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat -O files/etc/openclash/GeoSite.dat
 else
-    echo "⚪️ 未选择 luci-app-openclash"
+    echo "⚪️ 未选择 luci-app-openclash (跳过内核下载)"
 fi
 
 
