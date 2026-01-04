@@ -1,0 +1,64 @@
+name: Compile Single Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo_url:
+        description: "https://github.com/aige168/luci-app-accesscontrol"
+        required: true
+        default: "https://github.com/你的源码作者/aige168" # <--- 这里填默认地址，或者运行的时候填
+      branch:
+        description: "分支 (通常是 main 或 master)"
+        required: true
+        default: "main"
+
+jobs:
+  build_package:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup OpenWrt SDK
+        # 使用 ImmortalWrt 24.10 的 SDK 来编译，确保兼容
+        run: |
+          # 下载 Rockchip ARMv8 的 SDK
+          wget https://downloads.immortalwrt.org/releases/24.10.0/targets/rockchip/armv8/immortalwrt-sdk-24.10.0-rockchip-armv8_gcc-13.3.0_musl.Linux-x86_64.tar.xz
+          tar -xvf immortalwrt-sdk-*.tar.xz
+          mv immortalwrt-sdk-* sdk
+          cd sdk
+          
+          # 更新 feeds
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+
+      - name: Clone Source Code
+        run: |
+          cd sdk/package
+          # 克隆你填写的源码地址
+          git clone ${{ inputs.repo_url }} my-package
+          # 如果有分支要求，切换分支
+          cd my-package
+          git checkout ${{ inputs.branch }}
+
+      - name: Compile Package
+        run: |
+          cd sdk
+          # 让他自动配置
+          make defconfig
+          # 开始编译 (V=s 显示详细日志)
+          make package/my-package/compile V=s
+
+      - name: Find and Organize IPKs
+        run: |
+          mkdir -p output_ipks
+          # 在 bin 目录下寻找编译出来的 ipk 文件
+          find sdk/bin/ -name "*.ipk" -exec cp {} output_ipks/ \;
+          echo "编译出的文件如下："
+          ls -lh output_ipks/
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: compiled-ipk
+          path: output_ipks/
