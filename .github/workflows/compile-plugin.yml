@@ -6,7 +6,7 @@ on:
       repo_url:
         description: "插件源码的 GitHub 地址"
         required: true
-        default: "https://github.com/aige168/aige168"
+        default: "https://github.com/aige168/luci-app-accesscontrol"
       branch:
         description: "分支 (通常是 main 或 master)"
         required: true
