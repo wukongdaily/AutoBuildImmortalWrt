@@ -76,11 +76,9 @@ PACKAGES="$PACKAGES luci-app-aria2 luci-i18n-aria2-zh-cn"
 # 内网穿透 (Frpc)
 PACKAGES="$PACKAGES luci-app-frpc luci-i18n-frpc-zh-cn"
 # 应用列表 (OpenList)
-PACKAGES="$PACKAGES luci-app-openlist"
-# 上网控制 (原 accesscontrol，官方库名为 acl)
-PACKAGES="$PACKAGES luci-app-acl luci-i18n-acl-zh-cn"
-# 微信推送 (原 pushbot，官方库名为 wechatpush)
-PACKAGES="$PACKAGES luci-app-wechatpush luci-i18n-wechatpush-zh-cn"
+PACKAGES="$PACKAGES luci-i18n-openlist-zh-cn"
+# PassWall
+PACKAGES="$PACKAGES luci-i18n-passwall-zh-cn"
 
 # 4. 第三方库插件 (wukongdaily库)
 # 广告屏蔽 (AdGuardHome)
