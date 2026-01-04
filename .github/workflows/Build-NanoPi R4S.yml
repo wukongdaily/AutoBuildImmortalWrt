@@ -1,4 +1,4 @@
-name: build-rockchip-immortalWrt-24.10.x
+name: Build-NanoPi R4S
 
 on:
   workflow_dispatch:
