@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       repo_url:
-        description: "https://github.com/aige168/luci-app-accesscontrol"
+        description: "插件源码的 GitHub 地址"
         required: true
-        default: "https://github.com/你的源码作者/aige168" # <--- 这里填默认地址，或者运行的时候填
+        default: "https://github.com/aige168/aige168" # 这里填你想编译的仓库地址
       branch:
         description: "分支 (通常是 main 或 master)"
         required: true
@@ -15,46 +15,67 @@ on:
 jobs:
   build_package:
     runs-on: ubuntu-22.04
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
       - name: Setup OpenWrt SDK
-        # 使用 ImmortalWrt 24.10 的 SDK 来编译，确保兼容
         run: |
-          # 下载 Rockchip ARMv8 的 SDK
-          wget https://downloads.immortalwrt.org/releases/24.10.0/targets/rockchip/armv8/immortalwrt-sdk-24.10.0-rockchip-armv8_gcc-13.3.0_musl.Linux-x86_64.tar.xz
-          tar -xvf immortalwrt-sdk-*.tar.xz
-          mv immortalwrt-sdk-* sdk
+          # 1. 设置 SDK 下载地址 (使用 ImmortalWrt 24.10.4 Rockchip/ARMv8 版本)
+          SDK_URL="https://downloads.immortalwrt.org/releases/24.10.4/targets/rockchip/armv8/immortalwrt-sdk-24.10.4-rockchip-armv8_gcc-13.3.0_musl.Linux-x86_64.tar.xz"
+          
+          echo "⬇️ 正在下载 SDK..."
+          wget -q "$SDK_URL" -O sdk.tar.xz
+          
+          echo "📦 正在解压 SDK..."
+          tar -xvf sdk.tar.xz
+          
+          # 2. 自动寻找解压出来的目录名并重命名为 sdk
+          # 因为解压出来的名字太长且包含编译器版本，用 find 查找最稳妥
+          SDK_DIR=$(find . -maxdepth 1 -type d -name "immortalwrt-sdk-*" | head -n 1)
+          echo "Found SDK dir: $SDK_DIR"
+          mv "$SDK_DIR" sdk
+          
+          # 3. 进入目录
           cd sdk
           
-          # 更新 feeds
+          echo "🔄 更新 Feeds (依赖源)..."
+          # 更新并安装所有 feeds，确保编译时能找到依赖（如 luci-base, json 等）
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
       - name: Clone Source Code
         run: |
           cd sdk/package
-          # 克隆你填写的源码地址
+          echo "⬇️ 克隆插件源码..."
           git clone ${{ inputs.repo_url }} my-package
-          # 如果有分支要求，切换分支
+          
           cd my-package
-          git checkout ${{ inputs.branch }}
+          echo "🔀 切换分支到 ${{ inputs.branch }}..."
+          git checkout ${{ inputs.branch }} || echo "分支不存在，尝试默认分支"
 
       - name: Compile Package
         run: |
           cd sdk
-          # 让他自动配置
+          
+          # 生成配置文件 (让 SDK 识别新加入的包)
           make defconfig
-          # 开始编译 (V=s 显示详细日志)
+          
+          echo "🛠 开始编译..."
+          # V=s 输出详细日志，如果出错方便排查
+          # -j$(nproc) 使用多核编译加快速度
           make package/my-package/compile V=s
 
       - name: Find and Organize IPKs
         run: |
           mkdir -p output_ipks
-          # 在 bin 目录下寻找编译出来的 ipk 文件
+          
+          echo "🔎 正在搜寻编译好的 IPK 文件..."
+          # 在 bin 目录下查找所有生成的 ipk 文件
           find sdk/bin/ -name "*.ipk" -exec cp {} output_ipks/ \;
-          echo "编译出的文件如下："
+          
+          echo "✅ 成功提取以下文件："
           ls -lh output_ipks/
 
       - name: Upload Artifacts
