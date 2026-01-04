@@ -1,117 +1,78 @@
-# AutoBuildImmortalWrt
-[![GitHub](https://img.shields.io/github/license/wukongdaily/AutoBuildImmortalWrt.svg?label=LICENSE&logo=github&logoColor=%20)](https://github.com/wukongdaily/AutoBuildImmortalWrt/blob/master/LICENSE)
-![GitHub Stars](https://img.shields.io/github/stars/wukongdaily/AutoBuildImmortalWrt.svg?style=flat&logo=appveyor&label=Stars&logo=github)
-![GitHub Forks](https://img.shields.io/github/forks/wukongdaily/AutoBuildImmortalWrt.svg?style=flat&logo=appveyor&label=Forks&logo=github) [![Github](https://img.shields.io/badge/RELEASE:AutoBuildImmortalWrt-123456?logo=github&logoColor=fff&labelColor=green&style=flat)](https://github.com/wukongdaily/AutoBuildImmortalWrt/releases) [![Bilibili](https://img.shields.io/badge/Bilibili-123456?logo=bilibili&logoColor=fff&labelColor=fb7299)](https://www.bilibili.com/video/BV1EG6VYCER3) [![操作步骤](https://img.shields.io/badge/YouTube-123456?logo=youtube&labelColor=ff0000)](https://youtu.be/xIVtUwZR6U0)
+# AutoBuildImmortalWrt for NanoPi R4S
 
-## 🤔 这是什么？
-它是一个工作流。可快速构建 带docker且支持自定义固件大小的 immortalWrt
-> 1、支持自定义固件大小 默认1GB 不建议设置过大 推荐1G-2G 更大需求可通过自定义插件里的扩容插件自行扩容<br>
-> 2、支持可选预安装docker（可选）支持在UI上勾选是否集成商店<br>
-> 3、支持按需增加[第三方软件](https://github.com/wukongdaily/store/blob/master/README.md)  如何集成 https://github.com/wukongdaily/AutoBuildImmortalWrt/discussions/209 <br>
-> 4、点击这里查看👉🏻[全部支持的机型列表](https://github.com/wukongdaily/AutoBuildImmortalWrt/blob/master/SUPPORT.md) 👈🏻<br>
-> 5、在UI上 新增luci版本的可选项，默认最新版24.10.4 https://github.com/wukongdaily/AutoBuildImmortalWrt/discussions/426<br>
-> 6、支持设置管理地址的ip 比如192.168.100.1 这里强调 这项功能仅针对多网口机型 单网口的逻辑还是自动获取ip模式（dhcp）无固定ip<br>
-> 7、对于[插件追新的用户 建议前往run项目 下载run后 ](https://github.com/wukongdaily/RunFilesBuilder/discussions/41)用命令sh xx.run 覆盖安装 <br>
+[![LICENSE](https://img.shields.io/github/license/wukongdaily/AutoBuildImmortalWrt.svg?label=LICENSE&logo=github)](https://github.com/wukongdaily/AutoBuildImmortalWrt/blob/master/LICENSE)
+![GitHub Stars](https://img.shields.io/github/stars/wukongdaily/AutoBuildImmortalWrt.svg?style=flat&label=Stars)
+![GitHub Forks](https://img.shields.io/github/forks/wukongdaily/AutoBuildImmortalWrt.svg?style=flat&label=Forks)
+[![Release](https://img.shields.io/badge/Release-AutoBuildImmortalWrt-green)](https://github.com/wukongdaily/AutoBuildImmortalWrt/releases)
 
-## [基本用法步骤](https://github.com/wukongdaily/AutoBuildImmortalWrt/wiki) 👈🏻
-1、fork本项目<br>
-2、在fork后的项目中 点击【action】 找到需要的工作流后 run-workflow<br>
+## 💡 项目简介
 
-## 虚拟机建议用哪条工作流？下图↓
-<img width="30%" height="30%" alt="image" src="https://github.com/user-attachments/assets/743027e0-584a-4842-bfb3-0dff22de9101" /> <br>
-虚拟机用户建议直接构建ISO镜像 此过程分2个阶段 阶段一构建固件imm 阶段二将其封装iso格式的安装器 总计耗时大约7-8分钟  <br>
-ISO在虚拟机引导后 跑码结束后，在命令行输入 `ddd` 按提示 完成虚拟磁盘的写入（安装immortalwrt到虚拟磁盘）<br>
-这样做也比较灵活 避免了格式转换和解压 同时还可以指定安装某个磁盘 而安装后的磁盘剩余空间也能加以利用。<br>
-详细的解说 可以参考我的另一个项目 [img-installer](https://github.com/wukongdaily/armbian-installer) 
+本仓库用于为 **FriendlyElec NanoPi R4S（rockchip/armv8 平台）** 自动构建 **ImmortalWrt 固件**，当前主要面向 ImmortalWrt 24.10.4 与 LuCI 24.10 分支的使用场景。[conversation_history:1]  
+通过 GitHub Actions，一键完成固件编译、插件集成与（可选）ISO 安装器封装。
 
-## 虚拟机用户使用的教学⬇️ ISO 
-[![操作步骤](https://img.shields.io/badge/YouTube-123456?logo=youtube&labelColor=ff0000)](https://www.youtube.com/watch?v=ftSE3wSJi64) [![Bilibili](https://img.shields.io/badge/Bilibili-123456?logo=bilibili&logoColor=fff&labelColor=fb7299)](https://www.bilibili.com/video/BV1enxMzwEUe/)
+## 📦 设备与系统信息
 
-## 物理机如何使用ISO格式的安装器(本项目独有)
-- Windows 建议将ISO拷贝到制作好的[Ventoy](https://www.ventoy.net/cn/index.html)<br>
-  <img width="303" height="90" alt="image" src="https://github.com/user-attachments/assets/34d73e24-3100-4c0d-a904-5f114d867793" />
+- 设备型号：FriendlyElec NanoPi R4S（双网口软路由）  
+- 架构：ARMv8 六核 SoC（rockchip/armv8 目标平台）  
+- 固件版本：ImmortalWrt 24.10.4 / LuCI openwrt-24.10  
+- 内核版本：6.6.110  
 
-- macOS 使用[balenaEtcher](https://etcher.balena.io/) 将ISO 刻录到U盘即可<br>
-  <img width="285" height="188" alt="image" src="https://github.com/user-attachments/assets/cd09be82-2670-404c-8878-c2782b3c8374" />
+以上信息对应当前实际运行环境，方便后续固件构建时保持一致的平台与版本选择。[conversation_history:1]
 
-- 将制作好的U盘提前插在软路由 然后启动后 按Del 或者F12、F11、F7等 使U盘成为第一启动盘
+## ✨ 主要特性
 
-  <img width="50%" alt="image" src="https://github.com/user-attachments/assets/a1ba38d9-305c-41dd-8441-9e61c3dcae1d" /> <br>
-- 启动后在命令行输入 ddd 按提示 完成硬盘的写入 硬盘剩余空间你还可以自动分配<br>
-- ISO安装器原理 点这里查看 https://github.com/wukongdaily/img-installer
-- 这是一个值得推广的方法 真心希望你能吸收、学会 费了很大心思的。没错、从今往后 [任何OpenWrt都有安装器了](https://github.com/wukongdaily/img-installer)
+- 支持为 NanoPi R4S 定制构建 ImmortalWrt 固件  
+- 固件大小可自定义（默认约 1G，可根据需要调整）  
+- 可选预装 Docker 与应用商店，适合做软路由 + 轻量服务  
+- 支持集成第三方插件（通过自定义插件仓库）  
+- 可选不同版本的 LuCI 界面，默认使用最新版 24.10.x 分支  
+- 支持为虚拟机/物理机生成 ISO 安装器，方便快速安装或迁移
 
-## 如何查询imm仓库内有哪些插件
-https://mirrors.sjtug.sjtu.edu.cn/immortalwrt/releases/24.10.4/packages/x86_64/luci/
-## 如何查询imm仓库外目前可以集成哪些插件
-https://github.com/wukongdaily/store
-> 具体方法 https://github.com/wukongdaily/AutoBuildImmortalWrt/discussions/209
-## 【视频教程】如何集成第三方插件？
-https://www.youtube.com/watch?v=KN6AJYV1hBI <br>
-https://www.youtube.com/watch?v=7i6BQeitUtE
+## 🚀 基本使用步骤
 
-## 旁路由的用户必读
-近期不少用户修改配置文件中的默认ip地址，误认为这个工作流可以直接设置旁路ip。这是巨大的误解，这样设置就乱套了。<br>
-旁路的逻辑应该是单网口模式。根据下面的固件属性可知。单网口默认采取`dhcp模式`，用户应当自行在上一级路由器查看给imm路由器分配的ip地址。
-然后通过该ip来访问imm后台页面，在imm后台页面中，根据自己主路由的网段 自行配置旁路的ip地址。
+1. Fork 本仓库到自己的 GitHub 账号  
+2. 在自己的仓库中打开 **Actions**  
+3. 找到适用于 NanoPi R4S 的工作流（rockchip/armv8）  
+4. 按需求修改配置（固件大小、插件、Docker、Luci 版本等）  
+5. 点击 **Run workflow**，等待云端完成构建  
+6. 从构建产物中下载对应的固件或 ISO 安装器，刷入到 NanoPi R4S 使用
 
-## 正常路由模式必读
-所谓正常的路由模式 就是指多网口用户，多网口的意思就是2个或者2个以上网口的情况。<br>
-一般wan用于拨号或者自动获取ip <br>
-而其他lan一般是给其他设备分配dhcp<br>
-这种情况下 你可以修改路由器的默认ip  `192.168.100.1` 比如你可以修改为`192.168.80.1 ` 诸如此类。<br>
-没错，修改此ip 无非就是为了避免跟光猫或者跟家庭中的其他路由器网段冲突。大多数用户，无需更改。
+如需更详细的操作说明，可参考原项目 Wiki 或视频教程。
 
-## 该固件默认属性？(必读)
-- 该固件刷入【单网口设备】默认采用DHCP模式,自动获得ip。类似NAS的做法
-- 该固件刷入【多网口设备】默认WAN口采用DHCP模式，LAN 口ip为  `192.168.100.1` <br>其中eth0为WAN 其余网口均为LAN
-- 若用户在工作流中勾选了拨号信息 则WAN口模式为pppoe拨号模式。
-- 建议拨号用户使用之前重启一次光猫。
-- 综合上述特点，【单网口设备】应该先接路由器，先在上级路由器查看一下它的ip 再访问。
-- 上述特点 你都可以通过 `99-custom.sh` 配置和调整
+## 🌐 网络与使用说明（R4S）
 
-## 特别说明
-本项目构建的固件 为了易用性 wan口防火墙规则入站 是开启的，待首次调试完毕后，建议自行关闭。操作方法如下
-网络——防火墙—— wan 的入站 选择拒绝 然后保存并应用即可。更多讨论[ 请参考这个话题](https://github.com/wukongdaily/AutoBuildImmortalWrt/discussions/341)
-<img width="3860" height="870" alt="image" src="https://github.com/user-attachments/assets/d826bccd-f0df-4d4a-877d-b711b81fcf1a" />
-同时此项设置的相关代码详见 `files/etc/uci-defaults/99-custom.sh` 行首
+- R4S 属于多网口设备：  
+  - 默认 WAN 口：DHCP 自动获取上级 IP  
+  - 默认 LAN 口：`192.168.100.1`，提供 DHCP 给下级设备  
+- 如需避免与光猫或其它路由冲突，可在构建前或系统内修改默认管理 IP（例如改为 `192.168.80.1` 等）。  
+- 若选择 PPPoE 拨号，建议在使用前重启光猫，以避免旧会话占用。
 
-## ❤️其它GitHub Action项目推荐🌟 （建议收藏）⬇️
-- ### [一键生成run插件] 🆕
-- https://github.com/wukongdaily/RunFilesBuilder<br>
-- ### [一键生成docker离线镜像] 🆕
-- https://github.com/wukongdaily/DockerTarBuilder<br>
-- ### [OpenWrt/Armbian IMG安装器ISO] 🆕
-- https://github.com/wukongdaily/img-installer
+## 🔒 防火墙与安全
 
+为了便于首次调试，本固件默认 WAN 入站规则是开启的。  
+建议调试完成后在 LuCI 中关闭 WAN 入站：
 
-## ❤️如何构建docker版ImmortalWrt（建议收藏）⬇️
-https://wkdaily.cpolar.cn/15
-# 🌟鸣谢
-### https://github.com/immortalwrt
-### https://github.com/ophub/flippy-openwrt-actions
-### https://github.com/ophub/amlogic-s9xxx-openwrt
-### https://github.com/sirpdboy
-### https://github.com/wukongdaily/ib-overlay
-### 高级卸载插件出处 by VedioTalk https://xz.vumstar.com
-### 新增极光主题 来自 https://github.com/eamonxg/luci-theme-aurora
-### 新增Bandix流量监控 来自 https://github.com/timsaya/luci-app-bandix
+> 网络 → 防火墙 → 区域：WAN → 入站规则改为 “拒绝” → 保存并应用
 
-## ❤️赞助作者 ⬇️⬇️
+这样可以降低暴露在公网时的安全风险。
 
-[![点击这里赞助我](https://img.shields.io/badge/点击这里赞助我-支持作者的项目-orange?logo=github)](https://wkdaily.cpolar.cn/01)
+## 📹 教程与相关项目
 
+- 固件构建与插件集成视频教程  
+- ISO 安装器原理与用法：参见 img-installer 项目  
+- 插件列表与扩展说明：参见第三方插件仓库与讨论区
 
+（可根据自己实际常用链接补充具体地址）
 
+## ❤️ 鸣谢与引用
 
-<details>
-<summary><h2>🍭相关引用</h2></summary>
+本项目构建流程与部分配置参考并感谢以下项目与作者（仅示例，可按需增删）：
 
-#### 🍭引用和项目参考的仓库
-- https://github.com/wukongdaily/RunFilesBuilder
-- https://github.com/wukongdaily/store
-- https://github.com/xiaorouji/openwrt-passwall
-- https://github.com/xiaorouji/openwrt-passwall2
-- https://github.com/sirpdboy/luci-theme-kucat
-- https://github.com/AdguardTeam/AdGuardHome
-- https://github.com/kiddin9/kwrt-packages
+- ImmortalWrt 项目及相关维护者  
+- 各类 NanoPi R4S / rockchip 平台 OpenWrt/ImmortalWrt 构建相关仓库  
+- 主题、插件与工具作者
+
+## ☕ 支持与反馈
+
+如果本项目对你有帮助，欢迎 Star、本地备份或分享给其他 NanoPi R4S 用户。  
+如有问题或建议，可通过 Issues / Discussions 提交反馈。
