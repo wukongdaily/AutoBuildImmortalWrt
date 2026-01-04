@@ -79,6 +79,8 @@ PACKAGES="$PACKAGES luci-app-frpc luci-i18n-frpc-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-openlist-zh-cn"
 # PassWall
 PACKAGES="$PACKAGES luci-i18n-passwall-zh-cn"
+# 添加 CPU 频率调节的中文语言包
+PACKAGES="$PACKAGES luci-i18n-cpufreq-zh-cn"
 
 # 4. 第三方库插件 (wukongdaily库)
 # 广告屏蔽 (AdGuardHome)
