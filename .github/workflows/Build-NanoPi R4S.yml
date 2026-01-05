@@ -125,23 +125,46 @@ jobs:
 
       - name: Extract Metadata
         run: |
-          # 定义制品目录路径 (根据 Rockchip 平台的生成路径)
+          # 定义制品目录路径
           TARGET_DIR="${{ github.workspace }}/bin/targets/rockchip/armv8"
-          JSON_FILE="$TARGET_DIR/profiles.json"
           
-          if [ -f "$JSON_FILE" ]; then
-            # 使用 jq 提取固件版本和内核版本
-            FW_VER=$(jq -r '.version_number // "未知版本"' "$JSON_FILE")
-            K_VER=$(jq -r '.kernel_version // "未知内核"' "$JSON_FILE")
-          else
-            # 兜底：如果文件不存在，使用输入参数或标注未知
-            FW_VER="${{ github.event.inputs.luci_version }}"
-            K_VER="未知"
+          # 1. 提取固件版本
+          # 优先从 version.buildinfo 读取
+          if [ -f "$TARGET_DIR/version.buildinfo" ]; then
+            FW_VER=$(grep "DISTRIB_RELEASE" "$TARGET_DIR/version.buildinfo" | cut -d"'" -f2)
+          # 其次尝试 profiles.json
+          elif [ -f "$TARGET_DIR/profiles.json" ]; then
+            FW_VER=$(jq -r '.version_number // empty' "$TARGET_DIR/profiles.json")
+          fi
+          # 兜底
+          if [ -z "$FW_VER" ]; then FW_VER="${{ github.event.inputs.luci_version }}"; fi
+
+          # 2. 提取内核版本 (改为从 Manifest 文件提取，这比 JSON 更准确)
+          # 查找生成的 manifest 文件 (通常文件名包含版本信息)
+          MANIFEST_FILE=$(find "$TARGET_DIR" -name "*.manifest" | head -n 1)
+          
+          if [ -n "$MANIFEST_FILE" ]; then
+            # manifest 格式: "包名 - 版本 - 描述"
+            # 查找以 "kernel - " 开头的行，取第3列版本号，并去掉横杠后的后缀
+            K_VER=$(grep -m 1 "^kernel - " "$MANIFEST_FILE" | awk '{print $3}' | cut -d'-' -f1)
           fi
           
+          # 如果 Manifest 没找到，尝试从 Packages 文件提取
+          if [ -z "$K_VER" ]; then
+            PACKAGES_FILE=$(find "${{ github.workspace }}/bin" -name "Packages" -type f -print -quit)
+            if [ -f "$PACKAGES_FILE" ]; then
+               K_VER=$(grep -A 1 "Package: kernel$" "$PACKAGES_FILE" | grep "Version:" | awk '{print $2}' | cut -d'-' -f1)
+            fi
+          fi
+
+          # 最后的兜底
+          if [ -z "$K_VER" ]; then K_VER="未知"; fi
+          
+          # 写入环境变量
           echo "FW_VERSION=$FW_VER" >> $GITHUB_ENV
           echo "KERNEL_VERSION=$K_VER" >> $GITHUB_ENV
-          echo "✅ 成功提取：固件 $FW_VER, 内核 $K_VER"
+          
+          echo "✅ 提取结果 -> 固件版本: $FW_VER | 内核版本: $K_VER"
         
       - name: Create info
         run: |
