@@ -163,7 +163,6 @@ jobs:
 
           - 💿 **固件版本**: ${{ env.FW_VERSION }}
           - 🐧 **内核版本**: ${{ env.KERNEL_VERSION }}
-          - ✳️ **软路由型号**: ${{ github.event.inputs.profile }}
           - 🏠 **后台地址**: ${{ github.event.inputs.custom_router_ip }}
           - 👤 **用户名**: root
           - 🔑 **密码**: 无
