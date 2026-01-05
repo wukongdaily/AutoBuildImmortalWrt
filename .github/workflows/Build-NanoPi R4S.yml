@@ -125,7 +125,6 @@ jobs:
 
       - name: Extract Metadata
         run: |
-          # 定义制品目录路径
           TARGET_DIR="${{ github.workspace }}/bin/targets/rockchip/armv8"
           
           # 1. 提取固件版本
@@ -136,37 +135,35 @@ jobs:
           fi
           if [ -z "$FW_VER" ]; then FW_VER="${{ github.event.inputs.luci_version }}"; fi
 
-          # 2. 提取内核版本 (已修复逻辑，过滤掉 ~ 后面的哈希)
+          # 2. 提取内核版本 (过滤掉 ~ 后面的哈希)
           MANIFEST_FILE=$(find "$TARGET_DIR" -name "*.manifest" | head -n 1)
-          
           if [ -n "$MANIFEST_FILE" ]; then
-            # 逻辑：取第3列 -> 按 ~ 截取第一段 -> 按 - 截取第一段
             K_VER=$(grep -m 1 "^kernel - " "$MANIFEST_FILE" | awk '{print $3}' | cut -d'~' -f1 | cut -d'-' -f1)
           fi
           
-          # 兜底：从 Packages 提取
           if [ -z "$K_VER" ]; then
             PACKAGES_FILE=$(find "${{ github.workspace }}/bin" -name "Packages" -type f -print -quit)
             if [ -f "$PACKAGES_FILE" ]; then
                K_VER=$(grep -A 1 "Package: kernel$" "$PACKAGES_FILE" | grep "Version:" | awk '{print $2}' | cut -d'~' -f1 | cut -d'-' -f1)
             fi
           fi
-
           if [ -z "$K_VER" ]; then K_VER="未知"; fi
           
           echo "FW_VERSION=$FW_VER" >> $GITHUB_ENV
           echo "KERNEL_VERSION=$K_VER" >> $GITHUB_ENV
           
-          echo "✅ 提取结果 -> 固件版本: $FW_VER | 内核版本: $K_VER"
+          # 3. 生成发布所需的日期标签
+          # 格式示例: 2024.10.05-2301 (年月日-时分)
+          echo "RELEASE_TAG=$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_ENV
         
       - name: Create info
         run: |
           cat > ${{ github.workspace }}/router-info.md <<EOF
           ## 📡 路由器后台信息
-          
-          - ✳️ **软路由型号**: ${{ github.event.inputs.profile }}
+
           - 💿 **固件版本**: ${{ env.FW_VERSION }}
           - 🐧 **内核版本**: ${{ env.KERNEL_VERSION }}
+          - ✳️ **软路由型号**: ${{ github.event.inputs.profile }}
           - 🏠 **后台地址**: ${{ github.event.inputs.custom_router_ip }}
           - 👤 **用户名**: root
           - 🔑 **密码**: 无
@@ -185,8 +182,10 @@ jobs:
       - name: Upload ImmortWrt as release assets
         uses: softprops/action-gh-release@v2.2.1
         with:
-          tag_name: Autobuild
-          name: ImmortWrt-Rockchip
+          # 使用动态生成的标签 (例如 2024.05.20-1200)
+          tag_name: v${{ env.RELEASE_TAG }}
+          # 发布的标题也加上日期
+          name: NanoPi R4S ${{ env.RELEASE_TAG }}
           body_path: ${{ github.workspace }}/router-info.md
           files: |
             ${{ github.workspace }}/bin/targets/rockchip/armv8/*.img.gz
