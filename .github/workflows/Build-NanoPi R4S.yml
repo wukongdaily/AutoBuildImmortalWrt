@@ -73,7 +73,6 @@ jobs:
           mkdir -p "${{ github.workspace }}/custom"
           echo "${{ github.event.inputs.custom_router_ip }}" > "${{ github.workspace }}/custom/custom_router_ip.txt"
           echo "您设置的Rockchip软路由管理地址是:${{ github.event.inputs.custom_router_ip }}"
-          # 后续步骤会将该文件映射到路由器/etc/config/custom_router_ip.txt 以便用于开机脚本99-custom.sh读取用户设置的ip
       
       - name: Validate PPPoE Inputs
         run: |
@@ -99,7 +98,6 @@ jobs:
           else
             echo "❎ 未启用 luci-app-store"
           fi
-          
 
       - name: Building Rockchip ImmortalWrt
         run: |
@@ -124,13 +122,34 @@ jobs:
               -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
               -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
           immortalwrt/imagebuilder:rockchip-armv8-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
+
+      - name: Extract Metadata
+        run: |
+          # 定义制品目录路径 (根据 Rockchip 平台的生成路径)
+          TARGET_DIR="${{ github.workspace }}/bin/targets/rockchip/armv8"
+          JSON_FILE="$TARGET_DIR/profiles.json"
+          
+          if [ -f "$JSON_FILE" ]; then
+            # 使用 jq 提取固件版本和内核版本
+            FW_VER=$(jq -r '.version_number // "未知版本"' "$JSON_FILE")
+            K_VER=$(jq -r '.kernel_version // "未知内核"' "$JSON_FILE")
+          else
+            # 兜底：如果文件不存在，使用输入参数或标注未知
+            FW_VER="${{ github.event.inputs.luci_version }}"
+            K_VER="未知"
+          fi
+          
+          echo "FW_VERSION=$FW_VER" >> $GITHUB_ENV
+          echo "KERNEL_VERSION=$K_VER" >> $GITHUB_ENV
+          echo "✅ 成功提取：固件 $FW_VER, 内核 $K_VER"
         
-    
       - name: Create info
         run: |
           cat > ${{ github.workspace }}/router-info.md <<EOF
           ## 📡 路由器后台信息
 
+          - 💿 **固件版本**: ${{ env.FW_VERSION }}
+          - 🐧 **内核版本**: ${{ env.KERNEL_VERSION }}
           - ✳️ **软路由型号**: ${{ github.event.inputs.profile }}
           - 🏠 **后台地址**: ${{ github.event.inputs.custom_router_ip }}
           - 👤 **用户名**: root
@@ -138,10 +157,13 @@ jobs:
           EOF
 
           if [ "${{ github.event.inputs.include_docker }}" == "yes" ]; then
-            extra_content="#### 默认带docker"
-            echo -e "\n$extra_content" >> ${{ github.workspace }}/router-info.md
+            echo -e "\n- 🐳 **内置 Docker**: 是" >> ${{ github.workspace }}/router-info.md
           else
-            echo -e "\n#### 不带docker" >> ${{ github.workspace }}/router-info.md
+            echo -e "\n- 🐳 **内置 Docker**: 否" >> ${{ github.workspace }}/router-info.md
+          fi
+          
+          if [ "${{ github.event.inputs.enable_store }}" == "true" ]; then
+            echo "- 🏪 **应用商店**: 已集成" >> ${{ github.workspace }}/router-info.md
           fi
 
       - name: Upload ImmortWrt as release assets
