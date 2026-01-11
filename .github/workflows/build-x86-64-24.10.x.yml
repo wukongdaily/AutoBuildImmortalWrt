@@ -106,7 +106,7 @@ jobs:
             -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
             -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
             -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
-          immortalwrt/imagebuilder:x86-64-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
+          immortalwrt/imagebuilder:x86-legacy-openwrt-25.12 /bin/bash /home/build/immortalwrt/build.sh
           
 
       - name: Create info
