@@ -96,6 +96,7 @@ https://wkdaily.cpolar.cn/15
 ### 高级卸载插件出处 by VedioTalk https://xz.vumstar.com
 ### 新增极光主题 来自 https://github.com/eamonxg/luci-theme-aurora
 ### 新增Bandix流量监控 来自 https://github.com/timsaya/luci-app-bandix
+### 新增rtp2httpd 来自https://github.com/stackia/rtp2httpd
 
 ## ❤️赞助作者 ⬇️⬇️
 
