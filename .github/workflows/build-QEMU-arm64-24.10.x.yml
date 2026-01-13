@@ -119,6 +119,6 @@ jobs:
           files: |
             ${{ github.workspace }}/*.qcow2 
             ${{ github.workspace }}/*.vmdk
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
