@@ -22,7 +22,7 @@ jobs:
 
       - name: 删除指定天数前的已完成运行
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
           KEEP_DAYS: ${{ github.event.inputs.keep_days }}
         run: |
           : "${KEEP_DAYS:=1}"
