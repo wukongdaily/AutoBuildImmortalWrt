@@ -159,7 +159,7 @@ on:
       builder_name:
         description: "设置打包作者的名称"
         required: true
-        default: 'wukongdaily'
+        default: ''
 
 jobs:
   build:
@@ -275,4 +275,4 @@ jobs:
           files: |
             ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
