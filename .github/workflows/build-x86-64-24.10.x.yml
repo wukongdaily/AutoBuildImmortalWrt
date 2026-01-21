@@ -39,17 +39,17 @@ on:
       enable_pppoe:
         description: "是否配置PPPoE拨号信息?"
         required: true
-        default: 'yes'
+        default: 'no'
         type: choice
         options:
         - 'yes'
         - 'no'
       pppoe_account:
         description: "宽带账号 (若启用PPPoE)"
-        required: true
+        required: false
       pppoe_password:
         description: "宽带密码 (若启用PPPoE)"
-        required: true
+        required: false
 
 jobs:
   build:
