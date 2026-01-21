@@ -74,7 +74,7 @@ PACKAGES="$PACKAGES luci-app-samba4 luci-i18n-samba4-zh-cn"
 # 下载工具 (Aria2)
 PACKAGES="$PACKAGES luci-app-aria2 luci-i18n-aria2-zh-cn"
 # 内网穿透 (Frpc)
-PACKAGES="$PACKAGES luci-app-frpc luci-i18n-frpc-zh-cn"
+# PACKAGES="$PACKAGES luci-app-frpc luci-i18n-frpc-zh-cn"
 # 应用列表 (OpenList)
 PACKAGES="$PACKAGES luci-i18n-openlist-zh-cn"
 # PassWall
