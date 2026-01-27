@@ -11,7 +11,7 @@
 > 3、支持按需增加[第三方软件](https://github.com/wukongdaily/store/blob/master/README.md)  如何集成 https://github.com/wukongdaily/AutoBuildImmortalWrt/discussions/209 <br>
 > 4、点击这里查看👉🏻[全部支持的机型列表](https://github.com/wukongdaily/AutoBuildImmortalWrt/blob/master/SUPPORT.md) 👈🏻<br>
 > 5、在UI上 新增luci版本的可选项，默认最新版24.10.4 https://github.com/wukongdaily/AutoBuildImmortalWrt/discussions/426<br>
-> 6、支持设置管理地址的ip 比如192.168.100.1 这里强调 这项功能仅针对多网口机型 单网口的逻辑还是自动获取ip模式（dhcp）无固定ip<br>
+> 6、支持设置管理地址的ip 比如192.168.1.254 这里强调 这项功能仅针对多网口机型 单网口的逻辑还是自动获取ip模式（dhcp）无固定ip<br>
 > 7、对于[插件追新的用户 建议前往run项目 下载run后 ](https://github.com/wukongdaily/RunFilesBuilder/discussions/41)用命令sh xx.run 覆盖安装 <br>
 
 ## [基本用法步骤](https://github.com/wukongdaily/AutoBuildImmortalWrt/wiki) 👈🏻
@@ -60,12 +60,12 @@ https://www.youtube.com/watch?v=7i6BQeitUtE
 所谓正常的路由模式 就是指多网口用户，多网口的意思就是2个或者2个以上网口的情况。<br>
 一般wan用于拨号或者自动获取ip <br>
 而其他lan一般是给其他设备分配dhcp<br>
-这种情况下 你可以修改路由器的默认ip  `192.168.100.1` 比如你可以修改为`192.168.80.1 ` 诸如此类。<br>
+这种情况下 你可以修改路由器的默认ip  `192.168.1.254` 比如你可以修改为`192.168.80.1 ` 诸如此类。<br>
 没错，修改此ip 无非就是为了避免跟光猫或者跟家庭中的其他路由器网段冲突。大多数用户，无需更改。
 
 ## 该固件默认属性？(必读)
 - 该固件刷入【单网口设备】默认采用DHCP模式,自动获得ip。类似NAS的做法
-- 该固件刷入【多网口设备】默认WAN口采用DHCP模式，LAN 口ip为  `192.168.100.1` <br>其中eth0为WAN 其余网口均为LAN
+- 该固件刷入【多网口设备】默认WAN口采用DHCP模式，LAN 口ip为  `192.168.1.254` <br>其中eth0为WAN 其余网口均为LAN
 - 若用户在工作流中勾选了拨号信息 则WAN口模式为pppoe拨号模式。
 - 建议拨号用户使用之前重启一次光猫。
 - 综合上述特点，【单网口设备】应该先接路由器，先在上级路由器查看一下它的ip 再访问。
