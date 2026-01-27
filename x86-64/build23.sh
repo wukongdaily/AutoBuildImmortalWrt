@@ -26,7 +26,7 @@ else
   # ============= 同步第三方插件库==============
   # 正在同步第三方软件仓库
   echo "🔄 正在同步第三方软件仓库 Cloning run file repo..."
-  git clone --depth=1 https://github.com/wukongdaily/store.git /tmp/store-run-repo
+  git clone --depth=1 https://github.com/goovoz/store.git /tmp/store-run-repo
 
   # 拷贝 run/x86 下所有 run 文件和ipk文件 到 extra-packages 目录
   mkdir -p /home/build/immortalwrt/extra-packages
