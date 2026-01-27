@@ -51,9 +51,9 @@ case "$board_name" in
         echo "Using $board_name mapping: WAN=$wan_ifname LAN=$lan_ifnames" >>"$LOGFILE"
         ;;
     *)
-        # 默认第一个接口为WAN，其余为LAN
-        wan_ifname=$(echo "$ifnames" | awk '{print $1}')
-        lan_ifnames=$(echo "$ifnames" | cut -d ' ' -f2-)
+        # 默认最后一个接口为WAN，其余为LAN
+        wan_ifname=$(echo "$ifnames" | awk '{print $NF}')
+        lan_ifnames=$(echo "$ifnames" | awk '{for(i=1;i<NF;i++) printf $i" "; if(NF>1) print ""}')
         echo "Using default mapping: WAN=$wan_ifname LAN=$lan_ifnames" >>"$LOGFILE"
         ;;
 esac
