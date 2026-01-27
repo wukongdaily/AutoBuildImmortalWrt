@@ -59,7 +59,7 @@ PACKAGES="$PACKAGES luci-i18n-ttyd-zh-cn"
 #PACKAGES="$PACKAGES luci-i18n-homeproxy-zh-cn"
 PACKAGES="$PACKAGES openssh-sftp-server"
 #PACKAGES="$PACKAGES luci-i18n-samba4-zh-cn"
-PACKAGES="$PACKAGES luci-app-daed"
+#PACKAGES="$PACKAGES luci-app-daed"
 PACKAGES="$PACKAGES luci-app-zerotier"
 PACKAGES="$PACKAGES luci-app-openvpn-server"
 # 文件管理器
