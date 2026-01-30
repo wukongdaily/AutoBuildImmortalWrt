@@ -1,6 +1,8 @@
 name: Build-NanoPi R4S
 
 on:
+  schedule:
+    - cron: '0 16 * * 6' # 每周六 16:00 UTC (北京时间 00:00) 执行
   workflow_dispatch:
     inputs:
       luci_version:
