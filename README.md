@@ -1,3 +1,4 @@
+# [新手指导](https://github.com/wukongdaily/AutoBuildImmortalWrt/wiki) 👈🏻
 # AutoBuildImmortalWrt
 [![GitHub](https://img.shields.io/github/license/wukongdaily/AutoBuildImmortalWrt.svg?label=LICENSE&logo=github&logoColor=%20)](https://github.com/wukongdaily/AutoBuildImmortalWrt/blob/master/LICENSE)
 ![GitHub Stars](https://img.shields.io/github/stars/wukongdaily/AutoBuildImmortalWrt.svg?style=flat&logo=appveyor&label=Stars&logo=github)
@@ -95,6 +96,8 @@ https://wkdaily.cpolar.cn/15
 ### https://github.com/wukongdaily/ib-overlay
 ### 高级卸载插件出处 by VedioTalk https://xz.vumstar.com
 ### 新增极光主题 来自 https://github.com/eamonxg/luci-theme-aurora
+### 新增Bandix流量监控 来自 https://github.com/timsaya/luci-app-bandix
+### 新增rtp2httpd 来自https://github.com/stackia/rtp2httpd
 
 ## ❤️赞助作者 ⬇️⬇️
 
