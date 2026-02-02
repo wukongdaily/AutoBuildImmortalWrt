@@ -1,0 +1,47 @@
+name: Build x86-64 ImmortalWrt 24.10
+
+on:
+  push:
+    branches:
+      - YuHan          # 只要你推送代码到 YuHan 分支，就会自动触发
+    paths:
+      - 'x86-64/**'    # 只有当相关目录变动时才触发，节省资源
+  workflow_dispatch:   # 保留手动触发按钮
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Pull ImageBuilder
+      run: |
+        docker pull immortalwrt/imagebuilder:x86-64-openwrt-24.10
+
+    - name: Prepare Build Environment
+      run: |
+        # 创建一个干净的中间目录 ib
+        mkdir -p ib
+        # 核心：将配置文件放入 ib 并改名为标准 .config
+        cp x86-64/imm.config ib/.config
+        cp x86-64/24.10/build.sh ib/build.sh
+        chmod +x ib/build.sh
+        # 复制自定义文件（如果有的话）
+        if [ -d "files" ]; then cp -r files ib/; fi
+
+    - name: Build Firmware
+      run: |
+        # 这里的逻辑是解决 kernel-. Stop 报错的关键
+        docker run --rm \
+          -v ${{ github.workspace }}/ib:/home/build/custom_files \
+          -w /home/build/immortalwrt \
+          immortalwrt/imagebuilder:x86-64-openwrt-24.10 \
+          bash -c "cp /home/build/custom_files/.config .config && bash /home/build/custom_files/build.sh"
+
+    - name: Upload Firmware
+      uses: actions/upload-artifact@v4
+      with:
+        name: x86-64-firmware
+        path: ib/bin/targets  # 注意：ImageBuilder 编译后的文件通常在这里
