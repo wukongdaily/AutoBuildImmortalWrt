@@ -1,38 +1,29 @@
-name: Build x86-64 ImmortalWrt 24.10
+#!/bin/bash
+set -e
 
-on:
-  workflow_dispatch:
+echo "=============================="
+echo "  Han 专属 x86-64 构建脚本"
+echo "=============================="
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+# 24.10 x86-64 的默认 PROFILE 通常是 generic
+PROFILE="generic"
+INCLUDE_DOCKER="${INCLUDE_DOCKER:-yes}"
 
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+# 打印一下当前的配置，方便在日志里确认
+echo "当前构建配置："
+echo "  PROFILE        = $PROFILE"
+echo "  INCLUDE_DOCKER = $INCLUDE_DOCKER"
 
-    - name: Pull ImageBuilder
-      run: |
-        docker pull immortalwrt/imagebuilder:x86-64-openwrt-24.10
+# 整合软件包
+EXTRA_PACKAGES=""
+if [ "$INCLUDE_DOCKER" = "yes" ]; then
+    EXTRA_PACKAGES="$EXTRA_PACKAGES docker dockerd docker-compose luci-app-dockerman"
+fi
 
-    - name: Prepare Build Environment
-      run: |
-        mkdir -p ib
-        cp x86-64/imm.config ib/.config
-        cp x86-64/24.10/build.sh ib/build.sh
-        chmod +x ib/build.sh
-        cp -r files ib/files
+# 核心构建命令
+# 注意：files 目录现在在 /home/build/custom_files/files
+make image PROFILE="$PROFILE" \
+    FILES="/home/build/custom_files/files" \
+    PACKAGES="$EXTRA_PACKAGES"
 
-    - name: Build Firmware
-      run: |
-        docker run --rm \
-          -v ${{ github.workspace }}/ib:/home/build/immortalwrt/common_ib \
-          -w /home/build/immortalwrt \
-          immortalwrt/imagebuilder:x86-64-openwrt-24.10 \
-          bash -c "cp common_ib/.config .config && bash common_ib/build.sh"
-
-    - name: Upload Firmware
-      uses: actions/upload-artifact@v4
-      with:
-        name: x86-64-firmware
-        path: ib/bin/targets
+echo "构建完成！"
