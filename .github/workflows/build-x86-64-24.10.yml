@@ -25,7 +25,7 @@ jobs:
           bash build.sh
 
     - name: Upload Firmware
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: x86-64-firmware
         path: bin/targets/x86/64/
