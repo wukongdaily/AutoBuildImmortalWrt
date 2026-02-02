@@ -13,7 +13,7 @@ jobs:
 
     - name: Set up ImageBuilder
       run: |
-        docker pull immortalwrt/imagebuilder:x86-64-24.10
+        docker pull immortalwrt/imagebuilder:x86-64-openwrt-24.10
 
     - name: Build Firmware
       run: |
