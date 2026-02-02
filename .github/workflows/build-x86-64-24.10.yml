@@ -26,11 +26,10 @@ jobs:
     - name: Build Firmware
       run: |
         docker run --rm \
-          -v ${{ github.workspace }}/ib/.config:/home/build/immortalwrt/.config \
-          -v ${{ github.workspace }}/ib/build.sh:/home/build/immortalwrt/build.sh \
-          -v ${{ github.workspace }}/ib/files:/home/build/immortalwrt/files \
+          -v ${{ github.workspace }}/ib:/home/build/immortalwrt/common_ib \
+          -w /home/build/immortalwrt \
           immortalwrt/imagebuilder:x86-64-openwrt-24.10 \
-          bash build.sh
+          bash -c "cp common_ib/.config .config && bash common_ib/build.sh"
 
     - name: Upload Firmware
       uses: actions/upload-artifact@v4
