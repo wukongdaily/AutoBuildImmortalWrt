@@ -5,40 +5,36 @@ echo "=============================="
 echo "  Han 专属 x86-64 构建脚本"
 echo "=============================="
 
-PROFILE="${PROFILE:-generic}"
+# 1. 修正 PROFILE 指向。对于 x86-64，Image Builder 默认通常是 generic
+PROFILE="generic" 
 INCLUDE_DOCKER="${INCLUDE_DOCKER:-yes}"
 ENABLE_PPPOE="${ENABLE_PPPOE:-no}"
-PPPOE_ACCOUNT="${PPPOE_ACCOUNT:-}"
-PPPOE_PASSWORD="${PPPOE_PASSWORD:-}"
+
+# --- 核心修复开始 ---
+# 2. 这里的路径必须指向你上一级的 imm.config
+# 因为 Docker 运行脚本时，当前目录是 x86-64/24.10/
+if [ -f "../imm.config" ]; then
+    echo "检测到配置文件: ../imm.config，正在注入..."
+    cp ../imm.config .config
+else
+    echo "错误: 找不到配置文件 ../imm.config，请检查路径！"
+    exit 1
+fi
+# --- 核心修复结束 ---
 
 echo "当前构建配置："
 echo "  PROFILE        = $PROFILE"
 echo "  INCLUDE_DOCKER = $INCLUDE_DOCKER"
-echo "  ENABLE_PPPOE   = $ENABLE_PPPOE"
 echo ""
 
-# 载入 .config
-cp .config .config.bak
-
+# 定义额外包
 EXTRA_PACKAGES=""
-
 if [ "$INCLUDE_DOCKER" = "yes" ]; then
     EXTRA_PACKAGES="$EXTRA_PACKAGES docker dockerd docker-compose luci-app-dockerman"
 fi
 
-if [ "$ENABLE_PPPOE" = "yes" ]; then
-    EXTRA_PACKAGES="$EXTRA_PACKAGES ppp ppp-mod-pppoe"
-
-    mkdir -p files/etc/uci-defaults
-    cat > files/etc/uci-defaults/99-pppoe.sh <<EOF
-uci set network.wan=interface
-uci set network.wan.proto='pppoe'
-uci set network.wan.username='$PPPOE_ACCOUNT'
-uci set network.wan.password='$PPPOE_PASSWORD'
-uci commit network
-EOF
-fi
-
+# 执行构建
+# 注意：Image Builder 的命令是 make image，PACKAGES 参数会叠加在 .config 之上
 make image PROFILE="$PROFILE" \
     FILES="files" \
     PACKAGES="$EXTRA_PACKAGES"
