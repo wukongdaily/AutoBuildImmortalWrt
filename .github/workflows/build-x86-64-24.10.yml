@@ -26,7 +26,9 @@ jobs:
     - name: Build Firmware
       run: |
         docker run --rm \
-          -v ${{ github.workspace }}/ib:/home/build/immortalwrt \
+          -v ${{ github.workspace }}/ib/.config:/home/build/immortalwrt/.config \
+          -v ${{ github.workspace }}/ib/build.sh:/home/build/immortalwrt/build.sh \
+          -v ${{ github.workspace }}/ib/files:/home/build/immortalwrt/files \
           immortalwrt/imagebuilder:x86-64-openwrt-24.10 \
           bash build.sh
 
