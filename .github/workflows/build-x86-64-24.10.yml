@@ -21,7 +21,7 @@ jobs:
           -v ${{ github.workspace }}/x86-64/24.10:/home/build/immortalwrt \
           -v ${{ github.workspace }}/files:/home/build/immortalwrt/files \
           -v ${{ github.workspace }}/x86-64/imm.config:/home/build/immortalwrt/.config \
-          immortalwrt/imagebuilder:x86-64-24.10 \
+          immortalwrt/imagebuilder:x86-64-openwrt-24.10 \
           bash build.sh
 
     - name: Upload Firmware
