@@ -1,3 +1,0 @@
-config mosdns 'config'
-    option enable '1'
-    option listen '127.0.0.1:5335'

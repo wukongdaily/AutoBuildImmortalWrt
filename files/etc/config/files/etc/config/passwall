@@ -1,3 +1,0 @@
-config global_forwarding
-    option tproxy '1'
-    option dns_mode 'disabled'

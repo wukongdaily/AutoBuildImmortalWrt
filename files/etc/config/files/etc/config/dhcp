@@ -1,3 +1,0 @@
-config dhcp 'lan'
-    option interface 'lan'
-    option ignore '1'
