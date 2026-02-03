@@ -85,13 +85,13 @@ on:
         default: true
 
       skip_imagebuilder:
-        description: "跳过 ImageBuilder，使用预构建 rootfs"
+        description: "跳过 ImageBuilder"
         required: false
         default: false
         type: boolean
 
       replace_banner:
-        description: "替换为 ImmortalWrt banner"
+        description: "替换 banner"
         required: false
         default: false
         type: boolean
@@ -127,56 +127,43 @@ jobs:
         run: |
           if [ "${{ github.event.inputs.enable_store }}" == "true" ]; then
             echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-store"' >> shell/custom-packages.sh
-            echo "已追加 luci-app-store"
-          else
-            echo "未启用 luci-app-store"
           fi
 
-      - name: 处理是否替换 banner 信息
+      - name: Replace banner
         if: ${{ github.event.inputs.skip_imagebuilder == 'false' && github.event.inputs.replace_banner == 'true' }}
         run: cp n1/99-banner.sh files/etc/uci-defaults/
 
-      - name: Building N1 ImmortalWrt rootfs (BypassRouter)
+      - name: Build rootfs
         if: ${{ github.event.inputs.skip_imagebuilder != 'true' }}
         run: |
-          echo "使用 ImageBuilder 构建 N1 旁路由 rootfs"
           profiles="generic"
           include_docker="${{ github.event.inputs.include_docker }}"
           rootfs_partsize="${{ github.event.inputs.rootfs_partsize }}"
           luci_version="${{ github.event.inputs.luci_version }}"
 
-          IFS=',' read -r -a profile_array <<< "$profiles"
+          docker run --rm -i \
+            --user root \
+            -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
+            -v "${{ github.workspace }}/files/etc/uci-defaults:/home/build/immortalwrt/files/etc/uci-defaults" \
+            -v "${{ github.workspace }}/arch/arch.conf:/home/build/immortalwrt/files/etc/opkg/arch.conf" \
+            -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
+            -v "${{ github.workspace }}/n1/banner:/home/build/immortalwrt/files/mnt/banner" \
+            -v "${{ github.workspace }}/n1/imm.proxy.config:/home/build/immortalwrt/.config" \
+            -v "${{ github.workspace }}/n1/build.sh:/home/build/immortalwrt/build.sh" \
+            -e PROFILE=generic \
+            -e INCLUDE_DOCKER=$include_docker \
+            -e ROOTFS_PARTSIZE=$rootfs_partsize \
+            immortalwrt/imagebuilder:armsr-armv8-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
 
-          for profile in "${profile_array[@]}"; do
-            docker run --rm -i \
-              --user root \
-              -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
-              -v "${{ github.workspace }}/files/etc/uci-defaults:/home/build/immortalwrt/files/etc/uci-defaults" \
-              -v "${{ github.workspace }}/arch/arch.conf:/home/build/immortalwrt/files/etc/opkg/arch.conf" \
-              -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
-              -v "${{ github.workspace }}/n1/banner:/home/build/immortalwrt/files/mnt/banner" \
-              -v "${{ github.workspace }}/n1/imm.proxy.config:/home/build/immortalwrt/.config" \
-              -v "${{ github.workspace }}/n1/build.sh:/home/build/immortalwrt/build.sh" \
-              -e PROFILE=$profile \
-              -e INCLUDE_DOCKER=$include_docker \
-              -e ROOTFS_PARTSIZE=$rootfs_partsize \
-              immortalwrt/imagebuilder:armsr-armv8-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
-          done
-
-      - name: 查找rootfs.tar.gz所在路径
+      - name: Find rootfs
         id: find_rootfs
         run: |
           ROOTFS_FILE=$(find bin/targets/armsr/armv8/ -type f -name "*rootfs.tar.gz" | head -n1)
-          echo "Found: $ROOTFS_FILE"
-          if [ ! -f "$ROOTFS_FILE" ]; then
-            echo "找不到 rootfs.tar.gz 文件"
-            exit 1
-          fi
           echo "file=$ROOTFS_FILE" >> $GITHUB_OUTPUT
 
-      - name: Package armsr-armv8 as ImmortalWrt for N1 (BypassRouter)
+      - name: Package firmware
         uses: wukongdaily/flippy-openwrt-actions@master
-        if: ${{ steps.find_rootfs.outputs.file != '' && !cancelled() }}
+        if: ${{ steps.find_rootfs.outputs.file != '' }}
         env:
           OPENWRT_ARMVIRT: ${{ steps.find_rootfs.outputs.file }}
           PACKAGE_SOC: s905d
@@ -184,23 +171,19 @@ jobs:
           KERNEL_AUTO_LATEST: false
           WHOAMI: ${{ inputs.builder_name }}
 
-      - name: Rename .img.gz file (YuHan BypassRouter)
-        id: rename
+      - name: Rename firmware
         run: |
           FILE=$(ls ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz | head -n1)
-          echo "Image file is: $FILE"
           FILENAME=$(basename "$FILE")
           KERNEL_VERSION=$(echo "$FILENAME" | grep -oP 'k\d+\.\d+\.\d+')
           LUCI_VERSION="${{ github.event.inputs.luci_version }}"
-
           mv "$FILE" "${{ env.PACKAGED_OUTPUTPATH }}/YuHan-$LUCI_VERSION-N1-BypassRouter-$KERNEL_VERSION.img.gz"
 
-      - name: Upload firmware to GitHub Releases
+      - name: Upload firmware
         uses: softprops/action-gh-release@v2.2.1
         with:
           tag_name: phicomm-n1-bypassrouter
           name: YuHan ImmortalWrt for Phicomm N1 (BypassRouter)
-          body_path: ${{ github.workspace }}/n1/info.md
           files: |
             ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz
         env:
