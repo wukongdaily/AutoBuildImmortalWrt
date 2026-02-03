@@ -1,4 +1,4 @@
-name: build-N1-Minimal
+name: build-N1-Minimal-Final
 
 on:
   workflow_dispatch:
@@ -11,7 +11,6 @@ on:
         options:
           - 6.6.93
           - 6.1.146
-          - 5.15.189
       builder_name:
         description: "打包作者名称"
         required: true
@@ -25,57 +24,49 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Preparing environment
+      - name: Preparing workspace
         run: |
-          # 宿主机预授权：赋予 n1 文件夹下所有内容最高权限
-          sudo chmod -R 777 ${{ github.workspace }}/n1
           mkdir -p bin
+          # 现场生成一个最干净的 .config 文件，只定义架构，不预设插件
+          echo "CONFIG_TARGET_armsr=y" > n1-pure.config
+          echo "CONFIG_TARGET_armsr_armv8=y" >> n1-pure.config
+          echo "CONFIG_TARGET_armsr_armv8_DEVICE_generic=y" >> n1-pure.config
 
-      - name: Building N1 rootfs (ImageBuilder)
+      - name: Building N1 rootfs
         run: |
-          echo "开始使用 Docker ImageBuilder 构建 rootfs..."
-          
-          # 【旁路由精简版包清单】
-          # 前面加 '-' 表示强制不安装，防止被依赖项带入
+          # 定义精简插件包：只保留旁路由核心功能
+          # 明确剔除会导致下载失败的超级大包
           packages="curl fdisk luci-i18n-firewall-zh-cn luci-theme-argon \
           luci-app-passwall luci-i18n-passwall-zh-cn \
           luci-app-mosdns luci-i18n-mosdns-zh-cn \
           luci-app-docker docker-compose \
           luci-app-amlogic luci-i18n-amlogic-zh-cn \
-          luci-app-ttyd luci-i18n-ttyd-zh-cn \
           -luci-app-openclash -luci-app-adguardhome -luci-app-homeproxy -perlbase-base"
           
           docker run --rm -i \
             --user root \
             -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
-            -v "${{ github.workspace }}/n1:/home/build/immortalwrt/n1" \
-            -v "${{ github.workspace }}/n1/imm.config:/home/build/immortalwrt/.config" \
+            -v "${{ github.workspace }}/n1-pure.config:/home/build/immortalwrt/.config" \
             -e PROFILE="generic" \
             -e PACKAGES="$packages" \
             -e ROOTFS_PARTSIZE="1024" \
             immortalwrt/imagebuilder:armsr-armv8-openwrt-24.10.4 /bin/bash -c "
-              # Docker 内部授权并增加超时设置
-              chmod +x /home/build/immortalwrt/n1/build.sh
-              echo 'option timeout 30' >> /home/build/immortalwrt/repositories.conf
-              # 执行编译脚本
-              /home/build/immortalwrt/n1/build.sh
+              # 使用腾讯云镜像源，彻底避开 wget 8 错误
+              sed -i 's/downloads.immortalwrt.org/mirrors.cloud.tencent.com\/immortalwrt/g' /home/build/immortalwrt/repositories.conf
+              # 直接调用官方 make image 指令，不再通过外部脚本，确保精简
+              make image PROFILE=\$PROFILE PACKAGES=\"\$PACKAGES\" FILES=\"files\" ROOTFS_PARTSIZE=\$ROOTFS_PARTSIZE
             "
 
-      - name: Find rootfs.tar.gz file
+      - name: Find rootfs
         id: find_rootfs
         run: |
-          # 自动寻找编译出来的 rootfs 文件，不依赖固定路径
           ROOTFS_FILE=$(find bin/targets/armsr/armv8/ -type f -name "*rootfs.tar.gz" | head -n1)
-          if [ -z "$ROOTFS_FILE" ]; then
-            echo "错误：未在 bin 目录下发现 rootfs 文件"
-            exit 1
-          fi
-          echo "Found rootfs at: $ROOTFS_FILE"
+          if [ -z "$ROOTFS_FILE" ]; then echo "Rootfs not found"; exit 1; fi
           echo "file=$ROOTFS_FILE" >> $GITHUB_OUTPUT
 
-      - name: Package for Phicomm N1 (Flippy)
+      - name: Package for N1
         uses: wukongdaily/flippy-openwrt-actions@master
-        if: ${{ steps.find_rootfs.outputs.file != '' && !cancelled() }}
+        if: ${{ steps.find_rootfs.outputs.file != '' }}
         env:
           OPENWRT_ARMVIRT: ${{ steps.find_rootfs.outputs.file }}
           PACKAGE_SOC: s905d
@@ -83,23 +74,11 @@ jobs:
           KERNEL_AUTO_LATEST: false
           WHOAMI: ${{ github.event.inputs.builder_name }}
 
-      - name: Rename and Move Output
-        if: success()
-        run: |
-          mkdir -p final_out
-          cp ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz final_out/
-          echo "打包完成"
-
       - name: Upload to Release
         uses: softprops/action-gh-release@v2
-        if: success()
         with:
           tag_name: n1-mini-pure-${{ github.run_id }}
-          name: N1-Mini旁路由精简版 (内核 ${{ github.event.inputs.openwrt_kernel }})
-          body: |
-            N1 专用固件 - 旁路由精简版
-            - 集成 Docker + PassWall + MosDNS
-            - 移除了冗余插件，体积更小，运行更稳
-          files: final_out/*.img.gz
+          name: N1-旁路由精简版-${{ github.event.inputs.openwrt_kernel }}
+          files: ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
