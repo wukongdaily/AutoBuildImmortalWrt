@@ -1,4 +1,5 @@
 name: build-N1
+
 on:
   workflow_dispatch:
     inputs:
@@ -13,6 +14,7 @@ on:
           - 24.10.2
           - 24.10.3
           - 24.10.4
+
       openwrt_kernel:
         description: "选择构建的内核(斐讯N1)"
         required: false
@@ -108,7 +110,7 @@ on:
           - 6.12.37
           - 6.12.39
           - 6.12.40
-          - 6.12.41                    
+          - 6.12.41
           - 6.12.42
           - 6.12.43
           - 6.12.44
@@ -123,47 +125,52 @@ on:
           - 6.12.54
           - 6.12.55
           - 6.12.56
-          - 6.12.57		
-          
+          - 6.12.57
+
       include_docker:
-        description: |
-          是否编译 Docker 插件
+        description: "是否编译 Docker 插件"
         required: true
         default: 'no'
         type: choice
         options:
           - 'yes'
           - 'no'
+
       enable_store:
         description: "集成 store 商店"
         required: false
         type: boolean
         default: true
+
       skip_imagebuilder:
-        description: "直接使用底包快速构建固件, 忽略自定义插件 ----（跳过 ImageBuilder）"
+        description: "跳过 ImageBuilder，使用预构建 rootfs"
         required: false
         default: false
         type: boolean
+
       replace_banner:
-        description: '替换为ImmortalWrt的banner信息'
+        description: "替换为 ImmortalWrt banner"
         required: false
         default: false
         type: boolean
+
       rootfs_partsize:
-        description: '软件包大小1G固定'
+        description: "rootfs 大小"
         required: true
         default: "1024"
         type: choice
         options:
           - '1024'
+
       builder_name:
-        description: "设置打包作者的名称"
+        description: "打包作者名称"
         required: true
         default: 'wukongdaily'
 
 jobs:
   build:
     runs-on: ubuntu-22.04
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -173,36 +180,32 @@ jobs:
 
       - name: Debug workspace contents
         run: ls -R
-      
+
       - name: Enable Store integration
         run: |
           if [ "${{ github.event.inputs.enable_store }}" == "true" ]; then
             echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-store"' >> shell/custom-packages.sh
-            echo "✅ 已追加 luci-app-store"
+            echo "已追加 luci-app-store"
           else
-            echo "❎ 未启用 luci-app-store"
+            echo "未启用 luci-app-store"
           fi
 
       - name: 处理是否替换 banner 信息
         if: ${{ github.event.inputs.skip_imagebuilder == 'false' && github.event.inputs.replace_banner == 'true' }}
-        run: |
-          # 使用ImageBuilder构建 且用户勾选了替换banner时
-          cp n1/99-banner.sh files/etc/uci-defaults/
-      
+        run: cp n1/99-banner.sh files/etc/uci-defaults/
+
       - name: Building N1 ImmortalWrt rootfs
         if: ${{ github.event.inputs.skip_imagebuilder != 'true' }}
         run: |
-          echo "✅ 使用 ImageBuilder 构建 rootfs"
+          echo "使用 ImageBuilder 构建 rootfs"
           profiles="generic"
           include_docker="${{ github.event.inputs.include_docker }}"
           rootfs_partsize="${{ github.event.inputs.rootfs_partsize }}"
           luci_version="${{ github.event.inputs.luci_version }}"
-          
+
           IFS=',' read -r -a profile_array <<< "$profiles"
-          
+
           for profile in "${profile_array[@]}"; do
-            echo "Building for profile: $profile"
-            
             docker run --rm -i \
               --user root \
               -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
@@ -217,11 +220,10 @@ jobs:
               -e ROOTFS_PARTSIZE=$rootfs_partsize \
               immortalwrt/imagebuilder:armsr-armv8-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
           done
-          
+
       - name: Download prebuilt rootfs.tar.gz
         if: ${{ github.event.inputs.skip_imagebuilder == 'true' }}
         run: |
-          echo "📦 正在下载预构建 rootfs"
           echo "PREBUILT_LUCI_VERSION=24.10.2" >> $GITHUB_ENV
           mkdir -p bin/targets/armsr/armv8
           curl -L -o bin/targets/armsr/armv8/openwrt-armvirt-64-default-rootfs.tar.gz \
@@ -231,16 +233,16 @@ jobs:
         id: find_rootfs
         run: |
           ROOTFS_FILE=$(find bin/targets/armsr/armv8/ -type f -name "*rootfs.tar.gz" | head -n1)
-          echo "✅ Found: $ROOTFS_FILE"
+          echo "Found: $ROOTFS_FILE"
           if [ ! -f "$ROOTFS_FILE" ]; then
-            echo "❌ 找不到 rootfs.tar.gz 文件"
+            echo "找不到 rootfs.tar.gz 文件"
             exit 1
           fi
           echo "file=$ROOTFS_FILE" >> $GITHUB_OUTPUT
 
       - name: Package armsr-armv8 as ImmortalWrt for N1
         uses: wukongdaily/flippy-openwrt-actions@master
-        if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
+        if: ${{ steps.find_rootfs.outputs.file != '' && !cancelled() }}
         env:
           OPENWRT_ARMVIRT: ${{ steps.find_rootfs.outputs.file }}
           PACKAGE_SOC: s905d
@@ -259,12 +261,10 @@ jobs:
           LUCI_VERSION="${{ github.event.inputs.luci_version }}"
 
           if [ -n "$PREBUILT_LUCI_VERSION" ]; then
-             echo "PREBUILT_LUCI_VERSION is not empty: $PREBUILT_LUCI_VERSION"
              mv "$FILE" "${{ env.PACKAGED_OUTPUTPATH }}/immortalwrt-$PREBUILT_LUCI_VERSION-phicomm-n1-btrfs-$KERNEL_VERSION.img.gz"
           else
              mv "$FILE" "${{ env.PACKAGED_OUTPUTPATH }}/immortalwrt-$LUCI_VERSION-phicomm-n1-btrfs-$KERNEL_VERSION.img.gz"
           fi
-
 
       - name: Upload firmware to GitHub Releases
         uses: softprops/action-gh-release@v2.2.1
