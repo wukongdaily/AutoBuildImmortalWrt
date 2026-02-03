@@ -191,6 +191,24 @@ jobs:
         if: ${{ github.event.inputs.skip_imagebuilder == 'false' && github.event.inputs.replace_banner == 'true' }}
         run: cp n1/99-banner.sh files/etc/uci-defaults/
 
+      - name: Clean extra-packages (keep only Passwall2 / MosDNS / TurboACC / Docker)
+        run: |
+          echo "清理 run 包，只保留旁路由需要的插件"
+          mkdir -p extra-packages-clean
+          for f in extra-packages/*.run; do
+            case "$f" in
+              *passwall2*|*mosdns*|*turboacc*|*docker*)
+                echo "保留: $f"
+                cp "$f" extra-packages-clean/
+                ;;
+              *)
+                echo "删除: $f"
+                ;;
+            esac
+          done
+          rm -rf extra-packages
+          mv extra-packages-clean extra-packages
+
       - name: Building N1 ImmortalWrt rootfs
         if: ${{ github.event.inputs.skip_imagebuilder != 'true' }}
         run: |
