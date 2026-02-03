@@ -19,15 +19,6 @@ on:
         options:
           - 6.6.93
           - 6.1.146
-          - 5.15.189
-      include_docker:
-        description: "是否编译 Docker 插件"
-        required: true
-        default: 'yes'
-        type: choice
-        options:
-          - 'yes'
-          - 'no'
       builder_name:
         description: "打包作者名称"
         required: true
@@ -44,20 +35,15 @@ jobs:
       - name: Set executable permissions
         run: chmod +x ${{ github.workspace }}/n1/build.sh
 
-      - name: Enable Store integration
-        run: |
-          mkdir -p shell
-          echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-store"' >> shell/custom-packages.sh
-
       - name: Building N1 ImmortalWrt rootfs
         run: |
           echo "使用 ImageBuilder 构建 rootfs"
-          # 精简后的包清单：仅保留旁路由核心 + Docker + PassWall + MosDNS
-          # 删除了：OpenClash, Samba, Perl, Filebrowser, Homeproxy (避免冲突)
+          
+          # 【精简后的旁路由包表】去掉了所有不必要的 Perl 依赖和冗余魔法
+          # 只保留：Docker、PassWall、MosDNS、磁盘管理和 N1 写入工具
           packages="curl fdisk luci-i18n-firewall-zh-cn luci-theme-argon luci-app-passwall luci-i18n-passwall-zh-cn luci-app-mosdns luci-i18n-mosdns-zh-cn luci-app-docker docker-compose luci-app-amlogic luci-i18n-amlogic-zh-cn luci-app-ttyd luci-i18n-ttyd-zh-cn luci-app-diskman luci-i18n-diskman-zh-cn"
           
           luci_version="${{ github.event.inputs.luci_version }}"
-          include_docker="${{ github.event.inputs.include_docker }}"
 
           docker run --rm -i \
             --user root \
@@ -70,19 +56,15 @@ jobs:
             -v "${{ github.workspace }}/n1/build.sh:/home/build/immortalwrt/build.sh" \
             -e PROFILE="generic" \
             -e PACKAGES="$packages" \
-            -e INCLUDE_DOCKER=$include_docker \
+            -e INCLUDE_DOCKER="yes" \
             -e ROOTFS_PARTSIZE="1024" \
-            immortalwrt/imagebuilder:armsr-armv8-openwrt-${luci_version} /bin/bash -c "
-              # 使用腾讯云镜像源加速下载，防止 wget 8 错误
-              sed -i 's/downloads.immortalwrt.org/mirrors.cloud.tencent.com\/immortalwrt/g' /home/build/immortalwrt/repositories.conf
-              /home/build/immortalwrt/build.sh
-            "
+            immortalwrt/imagebuilder:armsr-armv8-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
 
       - name: 查找rootfs.tar.gz所在路径
         id: find_rootfs
         run: |
           ROOTFS_FILE=$(find bin/targets/armsr/armv8/ -type f -name "*rootfs.tar.gz" | head -n1)
-          echo "Found: $ROOTFS_FILE"
+          if [ -z "$ROOTFS_FILE" ]; then echo "未找到 rootfs 文件"; exit 1; fi
           echo "file=$ROOTFS_FILE" >> $GITHUB_OUTPUT
 
       - name: Package for N1
@@ -98,8 +80,8 @@ jobs:
       - name: Upload firmware to Releases
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: n1-firmware-${{ github.run_id }}
-          name: N1 旁路由精简版 (内核 ${{ github.event.inputs.openwrt_kernel }})
+          tag_name: n1-mini-${{ github.run_id }}
+          name: N1-旁路由精简版-${{ github.event.inputs.openwrt_kernel }}
           files: ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
