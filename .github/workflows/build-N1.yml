@@ -9,163 +9,29 @@ on:
         default: "24.10.4"
         type: choice
         options:
-          - 24.10.0
-          - 24.10.1
-          - 24.10.2
-          - 24.10.3
           - 24.10.4
-
+          - 24.10.2
       openwrt_kernel:
         description: "选择构建的内核(斐讯N1)"
         required: false
         default: "6.6.93"
         type: choice
         options:
-          - 5.4.291
-          - 5.10.235
-          - 5.15.189
-          - 6.1.121
-          - 6.1.122
-          - 6.1.123
-          - 6.1.124
-          - 6.1.126
-          - 6.1.127
-          - 6.1.128
-          - 6.1.129
-          - 6.1.130
-          - 6.1.131
-          - 6.1.132
-          - 6.1.133
-          - 6.1.134
-          - 6.1.135
-          - 6.1.136
-          - 6.1.138
-          - 6.1.139
-          - 6.1.140
-          - 6.1.141
-          - 6.1.142
-          - 6.1.144
-          - 6.1.146
-          - 6.6.67
-          - 6.6.68
-          - 6.6.69
-          - 6.6.70
-          - 6.6.71
-          - 6.6.72
-          - 6.6.74
-          - 6.6.76
-          - 6.6.79
-          - 6.6.80
-          - 6.6.81
-          - 6.6.83
-          - 6.6.84
-          - 6.6.85
-          - 6.6.86
-          - 6.6.87
-          - 6.6.88
-          - 6.6.89
-          - 6.6.90
-          - 6.6.91
-          - 6.6.92
           - 6.6.93
-          - 6.6.94
-          - 6.6.95
-          - 6.6.97
-          - 6.6.99
-          - 6.6.100
-          - 6.6.101
-          - 6.6.102
-          - 6.6.103
-          - 6.6.104
-          - 6.6.105
-          - 6.6.107
-          - 6.6.108
-          - 6.6.109
-          - 6.6.110
-          - 6.6.111
-          - 6.6.112
-          - 6.6.113
-          - 6.6.114
-          - 6.6.115
-          - 6.6.116
-          - 6.12.16
-          - 6.12.17
-          - 6.12.18
-          - 6.12.19
-          - 6.12.20
-          - 6.12.21
-          - 6.12.22
-          - 6.12.23
-          - 6.12.24
-          - 6.12.25
-          - 6.12.26
-          - 6.12.28
-          - 6.12.29
-          - 6.12.30
-          - 6.12.31
-          - 6.12.32
-          - 6.12.33
-          - 6.12.34
-          - 6.12.35
-          - 6.12.37
-          - 6.12.39
-          - 6.12.40
-          - 6.12.41
-          - 6.12.42
-          - 6.12.43
-          - 6.12.44
-          - 6.12.45
-          - 6.12.46
-          - 6.12.48
-          - 6.12.49
-          - 6.12.50
-          - 6.12.51
-          - 6.12.52
-          - 6.12.53
-          - 6.12.54
-          - 6.12.55
-          - 6.12.56
-          - 6.12.57
-
+          - 6.1.146
+          - 5.15.189
       include_docker:
         description: "是否编译 Docker 插件"
         required: true
-        default: 'no'
+        default: 'yes'
         type: choice
         options:
           - 'yes'
           - 'no'
-
-      enable_store:
-        description: "集成 store 商店"
-        required: false
-        type: boolean
-        default: true
-
-      skip_imagebuilder:
-        description: "跳过 ImageBuilder，使用预构建 rootfs"
-        required: false
-        default: false
-        type: boolean
-
-      replace_banner:
-        description: "替换为 ImmortalWrt banner"
-        required: false
-        default: false
-        type: boolean
-
-      rootfs_partsize:
-        description: "rootfs 大小"
-        required: true
-        default: "1024"
-        type: choice
-        options:
-          - '1024'
-
       builder_name:
         description: "打包作者名称"
         required: true
-        default: 'wukongdaily'
+        default: 'YuGang'
 
 jobs:
   build:
@@ -178,101 +44,62 @@ jobs:
       - name: Set executable permissions
         run: chmod +x ${{ github.workspace }}/n1/build.sh
 
-      - name: Debug workspace contents
-        run: ls -R
-
       - name: Enable Store integration
         run: |
-          if [ "${{ github.event.inputs.enable_store }}" == "true" ]; then
-            echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-store"' >> shell/custom-packages.sh
-            echo "已追加 luci-app-store"
-          else
-            echo "未启用 luci-app-store"
-          fi
-
-      - name: 处理是否替换 banner 信息
-        if: ${{ github.event.inputs.skip_imagebuilder == 'false' && github.event.inputs.replace_banner == 'true' }}
-        run: cp n1/99-banner.sh files/etc/uci-defaults/
+          mkdir -p shell
+          echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-store"' >> shell/custom-packages.sh
 
       - name: Building N1 ImmortalWrt rootfs
-        if: ${{ github.event.inputs.skip_imagebuilder != 'true' }}
         run: |
           echo "使用 ImageBuilder 构建 rootfs"
-          profiles="generic"
-          include_docker="${{ github.event.inputs.include_docker }}"
-          rootfs_partsize="${{ github.event.inputs.rootfs_partsize }}"
+          # 精简后的包清单：仅保留旁路由核心 + Docker + PassWall + MosDNS
+          # 删除了：OpenClash, Samba, Perl, Filebrowser, Homeproxy (避免冲突)
+          packages="curl fdisk luci-i18n-firewall-zh-cn luci-theme-argon luci-app-passwall luci-i18n-passwall-zh-cn luci-app-mosdns luci-i18n-mosdns-zh-cn luci-app-docker docker-compose luci-app-amlogic luci-i18n-amlogic-zh-cn luci-app-ttyd luci-i18n-ttyd-zh-cn luci-app-diskman luci-i18n-diskman-zh-cn"
+          
           luci_version="${{ github.event.inputs.luci_version }}"
+          include_docker="${{ github.event.inputs.include_docker }}"
 
-          IFS=',' read -r -a profile_array <<< "$profiles"
-
-          for profile in "${profile_array[@]}"; do
-            docker run --rm -i \
-              --user root \
-              -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
-              -v "${{ github.workspace }}/files/etc/uci-defaults:/home/build/immortalwrt/files/etc/uci-defaults" \
-              -v "${{ github.workspace }}/arch/arch.conf:/home/build/immortalwrt/files/etc/opkg/arch.conf" \
-              -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
-              -v "${{ github.workspace }}/n1/banner:/home/build/immortalwrt/files/mnt/banner" \
-              -v "${{ github.workspace }}/n1/imm.config:/home/build/immortalwrt/.config" \
-              -v "${{ github.workspace }}/n1/build.sh:/home/build/immortalwrt/build.sh" \
-              -e PROFILE=$profile \
-              -e INCLUDE_DOCKER=$include_docker \
-              -e ROOTFS_PARTSIZE=$rootfs_partsize \
-              immortalwrt/imagebuilder:armsr-armv8-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
-          done
-
-      - name: Download prebuilt rootfs.tar.gz
-        if: ${{ github.event.inputs.skip_imagebuilder == 'true' }}
-        run: |
-          echo "PREBUILT_LUCI_VERSION=24.10.2" >> $GITHUB_ENV
-          mkdir -p bin/targets/armsr/armv8
-          curl -L -o bin/targets/armsr/armv8/openwrt-armvirt-64-default-rootfs.tar.gz \
-            https://github.com/wukongdaily/AutoBuildImmortalWrt/releases/download/rootfs/immortalwrt-24.10.2-armsr-armv8-generic-rootfs.tar.gz
+          docker run --rm -i \
+            --user root \
+            -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
+            -v "${{ github.workspace }}/files/etc/uci-defaults:/home/build/immortalwrt/files/etc/uci-defaults" \
+            -v "${{ github.workspace }}/arch/arch.conf:/home/build/immortalwrt/files/etc/opkg/arch.conf" \
+            -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
+            -v "${{ github.workspace }}/n1/banner:/home/build/immortalwrt/files/mnt/banner" \
+            -v "${{ github.workspace }}/n1/imm.config:/home/build/immortalwrt/.config" \
+            -v "${{ github.workspace }}/n1/build.sh:/home/build/immortalwrt/build.sh" \
+            -e PROFILE="generic" \
+            -e PACKAGES="$packages" \
+            -e INCLUDE_DOCKER=$include_docker \
+            -e ROOTFS_PARTSIZE="1024" \
+            immortalwrt/imagebuilder:armsr-armv8-openwrt-${luci_version} /bin/bash -c "
+              # 使用腾讯云镜像源加速下载，防止 wget 8 错误
+              sed -i 's/downloads.immortalwrt.org/mirrors.cloud.tencent.com\/immortalwrt/g' /home/build/immortalwrt/repositories.conf
+              /home/build/immortalwrt/build.sh
+            "
 
       - name: 查找rootfs.tar.gz所在路径
         id: find_rootfs
         run: |
           ROOTFS_FILE=$(find bin/targets/armsr/armv8/ -type f -name "*rootfs.tar.gz" | head -n1)
           echo "Found: $ROOTFS_FILE"
-          if [ ! -f "$ROOTFS_FILE" ]; then
-            echo "找不到 rootfs.tar.gz 文件"
-            exit 1
-          fi
           echo "file=$ROOTFS_FILE" >> $GITHUB_OUTPUT
 
-      - name: Package armsr-armv8 as ImmortalWrt for N1
+      - name: Package for N1
         uses: wukongdaily/flippy-openwrt-actions@master
-        if: ${{ steps.find_rootfs.outputs.file != '' && !cancelled() }}
+        if: ${{ steps.find_rootfs.outputs.file != '' }}
         env:
           OPENWRT_ARMVIRT: ${{ steps.find_rootfs.outputs.file }}
           PACKAGE_SOC: s905d
-          KERNEL_VERSION_NAME: ${{ inputs.openwrt_kernel }}
+          KERNEL_VERSION_NAME: ${{ github.event.inputs.openwrt_kernel }}
           KERNEL_AUTO_LATEST: false
-          WHOAMI: ${{ inputs.builder_name }}
+          WHOAMI: ${{ github.event.inputs.builder_name }}
 
-      - name: Rename .img.gz file
-        id: rename
-        run: |
-          FILE=$(ls ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz | head -n1)
-          echo "Image file is: $FILE"
-          FILENAME=$(basename "$FILE")
-          echo "FILENAME=$FILENAME" >> $GITHUB_ENV
-          KERNEL_VERSION=$(echo "$FILENAME" | grep -oP 'k\d+\.\d+\.\d+')
-          LUCI_VERSION="${{ github.event.inputs.luci_version }}"
-
-          if [ -n "$PREBUILT_LUCI_VERSION" ]; then
-             mv "$FILE" "${{ env.PACKAGED_OUTPUTPATH }}/immortalwrt-$PREBUILT_LUCI_VERSION-phicomm-n1-btrfs-$KERNEL_VERSION.img.gz"
-          else
-             mv "$FILE" "${{ env.PACKAGED_OUTPUTPATH }}/immortalwrt-$LUCI_VERSION-phicomm-n1-btrfs-$KERNEL_VERSION.img.gz"
-          fi
-
-      - name: Upload firmware to GitHub Releases
-        uses: softprops/action-gh-release@v2.2.1
+      - name: Upload firmware to Releases
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: phicomm-n1
-          name: ImmortalWrt for Phicomm N1
-          body_path: ${{ github.workspace }}/n1/info.md
-          files: |
-            ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz
+          tag_name: n1-firmware-${{ github.run_id }}
+          name: N1 旁路由精简版 (内核 ${{ github.event.inputs.openwrt_kernel }})
+          files: ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
