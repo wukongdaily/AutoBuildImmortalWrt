@@ -4,15 +4,16 @@ on:
   workflow_dispatch:
     inputs:
       openwrt_kernel:
-        description: "内核版本(N1)"
+        description: "选择构建的内核(斐讯N1)"
         required: false
         default: "6.6.93"
         type: choice
         options:
           - 6.6.93
           - 6.1.146
+          - 5.15.189
       builder_name:
-        description: "作者"
+        description: "打包作者名称"
         required: true
         default: 'YuGang'
 
@@ -24,42 +25,57 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Building N1 rootfs
+      - name: Preparing environment
         run: |
-          # 核心插件表：Docker + Passwall + MosDNS + N1工具
-          # 在包名前加减号 '-' 代表强制不安装该包，防止 ImageBuilder 乱塞东西
+          # 宿主机预授权：赋予 n1 文件夹下所有内容最高权限
+          sudo chmod -R 777 ${{ github.workspace }}/n1
+          mkdir -p bin
+
+      - name: Building N1 rootfs (ImageBuilder)
+        run: |
+          echo "开始使用 Docker ImageBuilder 构建 rootfs..."
+          
+          # 【旁路由精简版包清单】
+          # 前面加 '-' 表示强制不安装，防止被依赖项带入
           packages="curl fdisk luci-i18n-firewall-zh-cn luci-theme-argon \
           luci-app-passwall luci-i18n-passwall-zh-cn \
           luci-app-mosdns luci-i18n-mosdns-zh-cn \
           luci-app-docker docker-compose \
           luci-app-amlogic luci-i18n-amlogic-zh-cn \
+          luci-app-ttyd luci-i18n-ttyd-zh-cn \
           -luci-app-openclash -luci-app-adguardhome -luci-app-homeproxy -perlbase-base"
           
           docker run --rm -i \
             --user root \
             -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
-            -v "${{ github.workspace }}/n1/build.sh:/home/build/immortalwrt/build.sh" \
+            -v "${{ github.workspace }}/n1:/home/build/immortalwrt/n1" \
             -v "${{ github.workspace }}/n1/imm.config:/home/build/immortalwrt/.config" \
             -e PROFILE="generic" \
             -e PACKAGES="$packages" \
             -e ROOTFS_PARTSIZE="1024" \
             immortalwrt/imagebuilder:armsr-armv8-openwrt-24.10.4 /bin/bash -c "
-              # 使用官方源但增加重试逻辑
+              # Docker 内部授权并增加超时设置
+              chmod +x /home/build/immortalwrt/n1/build.sh
               echo 'option timeout 30' >> /home/build/immortalwrt/repositories.conf
-              # 运行编译
-              /home/build/immortalwrt/build.sh
+              # 执行编译脚本
+              /home/build/immortalwrt/n1/build.sh
             "
 
-      - name: Find rootfs
+      - name: Find rootfs.tar.gz file
         id: find_rootfs
         run: |
+          # 自动寻找编译出来的 rootfs 文件，不依赖固定路径
           ROOTFS_FILE=$(find bin/targets/armsr/armv8/ -type f -name "*rootfs.tar.gz" | head -n1)
-          if [ -z "$ROOTFS_FILE" ]; then exit 1; fi
+          if [ -z "$ROOTFS_FILE" ]; then
+            echo "错误：未在 bin 目录下发现 rootfs 文件"
+            exit 1
+          fi
+          echo "Found rootfs at: $ROOTFS_FILE"
           echo "file=$ROOTFS_FILE" >> $GITHUB_OUTPUT
 
-      - name: Package for N1
+      - name: Package for Phicomm N1 (Flippy)
         uses: wukongdaily/flippy-openwrt-actions@master
-        if: ${{ steps.find_rootfs.outputs.file != '' }}
+        if: ${{ steps.find_rootfs.outputs.file != '' && !cancelled() }}
         env:
           OPENWRT_ARMVIRT: ${{ steps.find_rootfs.outputs.file }}
           PACKAGE_SOC: s905d
@@ -67,11 +83,23 @@ jobs:
           KERNEL_AUTO_LATEST: false
           WHOAMI: ${{ github.event.inputs.builder_name }}
 
+      - name: Rename and Move Output
+        if: success()
+        run: |
+          mkdir -p final_out
+          cp ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz final_out/
+          echo "打包完成"
+
       - name: Upload to Release
         uses: softprops/action-gh-release@v2
+        if: success()
         with:
-          tag_name: n1-mini-${{ github.run_id }}
-          name: N1-Mini-旁路由-${{ github.event.inputs.openwrt_kernel }}
-          files: ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz
+          tag_name: n1-mini-pure-${{ github.run_id }}
+          name: N1-Mini旁路由精简版 (内核 ${{ github.event.inputs.openwrt_kernel }})
+          body: |
+            N1 专用固件 - 旁路由精简版
+            - 集成 Docker + PassWall + MosDNS
+            - 移除了冗余插件，体积更小，运行更稳
+          files: final_out/*.img.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
