@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       openwrt_kernel:
-        description: "选择内核(斐讯N1)"
+        description: "选择构建的内核(斐讯N1)"
         required: false
         default: "6.6.93"
         type: choice
@@ -12,7 +12,7 @@ on:
           - 6.6.93
           - 6.1.146
       builder_name:
-        description: "作者名称"
+        description: "打包作者名称"
         required: true
         default: 'YuGang'
 
@@ -24,50 +24,50 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Preparing environment
+      - name: Preparing workspace
         run: |
           mkdir -p bin
-          # 宿主机授权
-          chmod -R 777 ${{ github.workspace }}/n1
+          # 确保权限
+          chmod -R 777 ${{ github.workspace }}
 
       - name: Building N1 rootfs
         run: |
-          # 核心插件：Docker, Passwall, MosDNS, N1工具
-          # 明确剔除大包：-luci-app-openclash -luci-app-adguardhome -perlbase-base
+          # 核心插件包清单：只包含旁路由核心 + Docker + Passwall + MosDNS
+          # 显式使用减号 '-' 排除掉容易报错的大包
           packages="curl fdisk luci-i18n-firewall-zh-cn luci-theme-argon \
           luci-app-passwall luci-i18n-passwall-zh-cn \
           luci-app-mosdns luci-i18n-mosdns-zh-cn \
           luci-app-docker docker-compose \
           luci-app-amlogic luci-i18n-amlogic-zh-cn \
           -luci-app-openclash -luci-app-adguardhome -perlbase-base"
-
+          
           docker run --rm -i \
             --user root \
             -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
-            -v "${{ github.workspace }}/files:/home/build/immortalwrt/files" \
-            -e PROFILE="generic" \
-            -e PACKAGES="$packages" \
             immortalwrt/imagebuilder:armsr-armv8-openwrt-24.10.4 /bin/bash -c "
-              # 1. 换源：使用腾讯云镜像源，极其稳定
-              sed -i 's/downloads.immortalwrt.org/mirrors.cloud.tencent.com\/immortalwrt/g' /home/build/immortalwrt/repositories.conf
-              
-              # 2. 强制指定内核版本文件 (修复刚才的 kernel Stop 报错)
-              echo 'CONFIG_TARGET_armsr=y' > .config
-              echo 'CONFIG_TARGET_armsr_armv8=y' >> .config
-              echo 'CONFIG_TARGET_armsr_armv8_DEVICE_generic=y' >> .config
+              # 1. 强制重置仓库配置，避免之前的错误干扰
+              echo 'src/gz openwrt_core https://downloads.immortalwrt.org/releases/24.10.4/targets/armsr/armv8/packages' > repositories.conf
+              echo 'src/gz openwrt_base https://downloads.immortalwrt.org/releases/24.10.4/packages/aarch64_generic/base' >> repositories.conf
+              echo 'src/gz openwrt_luci https://downloads.immortalwrt.org/releases/24.10.4/packages/aarch64_generic/luci' >> repositories.conf
+              echo 'src/gz openwrt_packages https://downloads.immortalwrt.org/releases/24.10.4/packages/aarch64_generic/packages' >> repositories.conf
+              echo 'src/gz openwrt_routing https://downloads.immortalwrt.org/releases/24.10.4/packages/aarch64_generic/routing' >> repositories.conf
 
-              # 3. 运行原生构建命令
-              make image PROFILE=\"\$PROFILE\" PACKAGES=\"\$PACKAGES\" ROOTFS_PARTSIZE=1024
+              # 2. 运行构建命令。注意这里不再挂载外部 .config，完全靠 ImageBuilder 默认配置
+              make image PROFILE=generic PACKAGES=\"$packages\" ROOTFS_PARTSIZE=1024
             "
 
-      - name: Find rootfs.tar.gz
+      - name: Find rootfs file
         id: find_rootfs
         run: |
           ROOTFS_FILE=$(find bin/targets/armsr/armv8/ -type f -name "*rootfs.tar.gz" | head -n1)
-          if [ -z "$ROOTFS_FILE" ]; then echo "未找到 rootfs"; exit 1; fi
+          if [ -z "$ROOTFS_FILE" ]; then 
+            echo "错误：未找到生成的 rootfs 文件"
+            exit 1 
+          fi
+          echo "Found: $ROOTFS_FILE"
           echo "file=$ROOTFS_FILE" >> $GITHUB_OUTPUT
 
-      - name: Package for N1 (Flippy)
+      - name: Package for N1
         uses: wukongdaily/flippy-openwrt-actions@master
         if: ${{ steps.find_rootfs.outputs.file != '' }}
         env:
@@ -80,7 +80,7 @@ jobs:
       - name: Upload to Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: n1-mini-v${{ github.run_number }}
+          tag_name: n1-pure-${{ github.run_number }}
           name: N1-旁路由精简版-${{ github.event.inputs.openwrt_kernel }}
           files: ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz
         env:
