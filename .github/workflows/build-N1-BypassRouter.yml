@@ -68,64 +68,6 @@ on:
           - 6.6.91
           - 6.6.92
           - 6.6.93
-          - 6.6.94
-          - 6.6.95
-          - 6.6.97
-          - 6.6.99
-          - 6.6.100
-          - 6.6.101
-          - 6.6.102
-          - 6.6.103
-          - 6.6.104
-          - 6.6.105
-          - 6.6.107
-          - 6.6.108
-          - 6.6.109
-          - 6.6.110
-          - 6.6.111
-          - 6.6.112
-          - 6.6.113
-          - 6.6.114
-          - 6.6.115
-          - 6.6.116
-          - 6.12.16
-          - 6.12.17
-          - 6.12.18
-          - 6.12.19
-          - 6.12.20
-          - 6.12.21
-          - 6.12.22
-          - 6.12.23
-          - 6.12.24
-          - 6.12.25
-          - 6.12.26
-          - 6.12.28
-          - 6.12.29
-          - 6.12.30
-          - 6.12.31
-          - 6.12.32
-          - 6.12.33
-          - 6.12.34
-          - 6.12.35
-          - 6.12.37
-          - 6.12.39
-          - 6.12.40
-          - 6.12.41
-          - 6.12.42
-          - 6.12.43
-          - 6.12.44
-          - 6.12.45
-          - 6.12.46
-          - 6.12.48
-          - 6.12.49
-          - 6.12.50
-          - 6.12.51
-          - 6.12.52
-          - 6.12.53
-          - 6.12.54
-          - 6.12.55
-          - 6.12.56
-          - 6.12.57
 
       include_docker:
         description: "是否编译 Docker 插件"
@@ -221,14 +163,6 @@ jobs:
               immortalwrt/imagebuilder:armsr-armv8-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
           done
 
-      - name: Download prebuilt rootfs.tar.gz
-        if: ${{ github.event.inputs.skip_imagebuilder == 'true' }}
-        run: |
-          echo "PREBUILT_LUCI_VERSION=24.10.2" >> $GITHUB_ENV
-          mkdir -p bin/targets/armsr/armv8
-          curl -L -o bin/targets/armsr/armv8/openwrt-armvirt-64-default-rootfs.tar.gz \
-            https://github.com/wukongdaily/AutoBuildImmortalWrt/releases/download/rootfs/immortalwrt-24.10.2-armsr-armv8-generic-rootfs.tar.gz
-
       - name: 查找rootfs.tar.gz所在路径
         id: find_rootfs
         run: |
@@ -256,15 +190,10 @@ jobs:
           FILE=$(ls ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz | head -n1)
           echo "Image file is: $FILE"
           FILENAME=$(basename "$FILE")
-          echo "FILENAME=$FILENAME" >> $GITHUB_ENV
           KERNEL_VERSION=$(echo "$FILENAME" | grep -oP 'k\d+\.\d+\.\d+')
           LUCI_VERSION="${{ github.event.inputs.luci_version }}"
 
-          if [ -n "$PREBUILT_LUCI_VERSION" ]; then
-             mv "$FILE" "${{ env.PACKAGED_OUTPUTPATH }}/YuHan-$PREBUILT_LUCI_VERSION-N1-BypassRouter-$KERNEL_VERSION.img.gz"
-          else
-             mv "$FILE" "${{ env.PACKAGED_OUTPUTPATH }}/YuHan-$LUCI_VERSION-N1-BypassRouter-$KERNEL_VERSION.img.gz"
-          fi
+          mv "$FILE" "${{ env.PACKAGED_OUTPUTPATH }}/YuHan-$LUCI_VERSION-N1-BypassRouter-$KERNEL_VERSION.img.gz"
 
       - name: Upload firmware to GitHub Releases
         uses: softprops/action-gh-release@v2.2.1
