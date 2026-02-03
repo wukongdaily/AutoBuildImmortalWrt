@@ -87,7 +87,6 @@ on:
           - 6.6.113
           - 6.6.114
           - 6.6.115
-          - 6.6.116
           - 6.12.16
           - 6.12.17
           - 6.12.18
@@ -176,7 +175,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set executable permissions
-        run: chmod +x ${{ github.workspace }}/n1/build.sh
+        run: chmod +x "${{ github.workspace }}/n1/build.sh"
 
       - name: Debug workspace contents
         run: ls -R
@@ -189,33 +188,43 @@ jobs:
 
       - name: Replace banner
         if: ${{ github.event.inputs.skip_imagebuilder == 'false' && github.event.inputs.replace_banner == 'true' }}
-        run: cp n1/99-banner.sh files/etc/uci-defaults/
+        run: |
+          mkdir -p files/etc/uci-defaults
+          cp n1/99-banner.sh files/etc/uci-defaults/
 
       - name: Clean extra-packages (keep only Passwall2 / MosDNS / TurboACC / Docker)
         run: |
           echo "清理 run 包，只保留旁路由需要的插件"
           mkdir -p extra-packages-clean
-          for f in extra-packages/*.run; do
-            case "$f" in
-              *passwall2*|*mosdns*|*turboacc*|*docker*)
-                echo "保留: $f"
-                cp "$f" extra-packages-clean/
-                ;;
-              *)
-                echo "删除: $f"
-                ;;
-            esac
-          done
-          rm -rf extra-packages
-          mv extra-packages-clean extra-packages
+          if ls extra-packages/*.run >/dev/null 2>&1; then
+            for f in extra-packages/*.run; do
+              case "$f" in
+                *passwall2*|*mosdns*|*turboacc*|*docker*)
+                  echo "保留: $f"
+                  cp "$f" extra-packages-clean/
+                  ;;
+                *)
+                  echo "删除: $f"
+                  ;;
+              esac
+            done
+            rm -rf extra-packages
+            mv extra-packages-clean extra-packages
+          else
+            echo "extra-packages 目录为空或不存在，跳过清理。"
+          fi
 
-      - name: Building N1 ImmortalWrt rootfs
+      - name: Building N1 ImmortalWrt rootfs (ImageBuilder)
         if: ${{ github.event.inputs.skip_imagebuilder != 'true' }}
         run: |
           profiles="generic"
           include_docker="${{ github.event.inputs.include_docker }}"
           rootfs_partsize="${{ github.event.inputs.rootfs_partsize }}"
           luci_version="${{ github.event.inputs.luci_version }}"
+
+          echo "Run profiles=\"${profiles}\""
+          echo "Building for profile: ${profiles}"
+          echo "Building for ROOTFS_PARTSIZE: ${rootfs_partsize}"
 
           docker run --rm -i \
             --user root \
@@ -226,9 +235,9 @@ jobs:
             -v "${{ github.workspace }}/n1/banner:/home/build/immortalwrt/files/mnt/banner" \
             -v "${{ github.workspace }}/n1/imm.config:/home/build/immortalwrt/.config" \
             -v "${{ github.workspace }}/n1/build.sh:/home/build/immortalwrt/build.sh" \
-            -e PROFILE=generic \
-            -e INCLUDE_DOCKER=$include_docker \
-            -e ROOTFS_PARTSIZE=$rootfs_partsize \
+            -e PROFILE="${profiles}" \
+            -e INCLUDE_DOCKER="${include_docker}" \
+            -e ROOTFS_PARTSIZE="${rootfs_partsize}" \
             immortalwrt/imagebuilder:armsr-armv8-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
 
       - name: Download prebuilt rootfs.tar.gz
@@ -244,6 +253,7 @@ jobs:
         run: |
           ROOTFS_FILE=$(find bin/targets/armsr/armv8/ -type f -name "*rootfs.tar.gz" | head -n1)
           echo "file=$ROOTFS_FILE" >> $GITHUB_OUTPUT
+          echo "Found rootfs: $ROOTFS_FILE"
 
       - name: Package armsr-armv8 as ImmortalWrt for N1
         uses: wukongdaily/flippy-openwrt-actions@master
@@ -251,19 +261,22 @@ jobs:
         env:
           OPENWRT_ARMVIRT: ${{ steps.find_rootfs.outputs.file }}
           PACKAGE_SOC: s905d
-          KERNEL_VERSION_NAME: ${{ inputs.openwrt_kernel }}
+          KERNEL_VERSION_NAME: ${{ github.event.inputs.openwrt_kernel }}
           KERNEL_AUTO_LATEST: false
-          WHOAMI: ${{ inputs.builder_name }}
+          WHOAMI: ${{ github.event.inputs.builder_name }}
 
       - name: Rename .img.gz file
         id: rename
         run: |
-          FILE=$(ls ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz | head -n1)
+          echo "PACKAGED_OUTPUTPATH=${PACKAGED_OUTPUTPATH}"
+          FILE=$(ls "${PACKAGED_OUTPUTPATH}"/*.img.gz | head -n1)
           FILENAME=$(basename "$FILE")
           KERNEL_VERSION=$(echo "$FILENAME" | grep -oP 'k\d+\.\d+\.\d+')
           LUCI_VERSION="${{ github.event.inputs.luci_version }}"
 
-          mv "$FILE" "${{ env.PACKAGED_OUTPUTPATH }}/YuHan-$LUCI_VERSION-N1-Custom-$KERNEL_VERSION.img.gz"
+          NEW_NAME="${PACKAGED_OUTPUTPATH}/YuHan-${LUCI_VERSION}-N1-Custom-${KERNEL_VERSION}.img.gz"
+          echo "Rename: $FILE -> $NEW_NAME"
+          mv "$FILE" "$NEW_NAME"
 
       - name: Upload firmware to GitHub Releases
         uses: softprops/action-gh-release@v2.2.1
