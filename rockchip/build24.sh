@@ -73,14 +73,10 @@ PACKAGES="$PACKAGES luci-app-hd-idle luci-i18n-hd-idle-zh-cn"
 PACKAGES="$PACKAGES luci-app-samba4 luci-i18n-samba4-zh-cn"
 # 下载工具 (Aria2)
 PACKAGES="$PACKAGES luci-app-aria2 luci-i18n-aria2-zh-cn"
-# 内网穿透 (Frpc)
-# PACKAGES="$PACKAGES luci-app-frpc luci-i18n-frpc-zh-cn"
 # 应用列表 (OpenList)
 PACKAGES="$PACKAGES luci-i18n-openlist-zh-cn"
 # PassWall
 PACKAGES="$PACKAGES luci-i18n-passwall-zh-cn"
-# 添加 CPU 频率调节的中文语言包
-PACKAGES="$PACKAGES luci-i18n-cpufreq-zh-cn"
 
 # 4. 第三方库插件 (wukongdaily库)
 # 广告屏蔽 (AdGuardHome)
