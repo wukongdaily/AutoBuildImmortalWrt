@@ -27,7 +27,7 @@ on:
       rootfs_partsize:
         description: '设置软件包大小 单位(MB)'
         required: true
-        default: '2048'
+        default: '1024'
       enable_store:
         description: "集成 store 商店"
         required: false
