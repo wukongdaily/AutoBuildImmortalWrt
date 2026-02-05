@@ -1,6 +1,8 @@
-name: build-rockchip-immortalWrt-24.10.x
+name: Build-NanoPi R4S
 
 on:
+  schedule:
+    - cron: '0 16 * * 6' # 每周六 16:00 UTC (北京时间 00:00) 执行
   workflow_dispatch:
     inputs:
       luci_version:
@@ -9,65 +11,19 @@ on:
         default: "24.10.4"
         type: choice
         options:
-          - 24.10.0
-          - 24.10.1
-          - 24.10.2
-          - 24.10.3
           - 24.10.4
       profile:
         type: choice
         description: |
           输入 软路由型号 可选值如下：
         options:
-          - ariaboard_photonicat
-          - armsom_sige3
-          - armsom_sige7
-          - cyber_cyber3588-aib
-          - ezpro_mrkaio-m68s
-          - firefly_roc-rk3328-cc
-          - firefly_roc-rk3568-pc
-          - friendlyarm_nanopc-t4
-          - friendlyarm_nanopc-t6
-          - friendlyarm_nanopi-r2c
-          - friendlyarm_nanopi-r2c-plus
-          - friendlyarm_nanopi-r2s
-          - friendlyarm_nanopi-r3s
           - friendlyarm_nanopi-r4s
-          - friendlyarm_nanopi-r4se
-          - friendlyarm_nanopi-r4s-enterprise
-          - friendlyarm_nanopi-r5c
-          - friendlyarm_nanopi-r5s
-          - friendlyarm_nanopi-r6c
-          - friendlyarm_nanopi-r6s
-          - huake_guangmiao-g4c
-          - lunzn_fastrhino-r66s
-          - lunzn_fastrhino-r68s
-          - lyt_t68m
-          - pine64_rock64
-          - pine64_rockpro64
-          - radxa_cm3_io
-          - radxa_e25
-          - radxa_rock-3a
-          - radxa_rock-3b
-          - radxa_rock-3c
-          - radxa_rock-5a
-          - radxa_rock-5b
-          - radxa_rock-pi-4a
-          - radxa_rock-pi-e
-          - radxa_rock-pi-s
-          - radxa_zero-3e
-          - radxa_zero-3w
-          - sinovoip_bpi-r2-pro
-          - xunlong_orangepi-5
-          - xunlong_orangepi-5-plus
-          - xunlong_orangepi-r1-plus
-          - xunlong_orangepi-r1-plus-lts
         required: true
-        default: 'friendlyarm_nanopi-r3s'
+        default: 'friendlyarm_nanopi-r4s'
       custom_router_ip:
         description: "请设置软路由的管理地址(注意仅对多网口软路由有效) 格式:192.168.x.1 或 10.x.x.1"
         required: true
-        default: "192.168.100.1"
+        default: "192.168.1.1"
       rootfs_partsize:
         description: '设置软件包大小 单位(MB)'
         required: true
@@ -76,7 +32,7 @@ on:
         description: "集成 store 商店"
         required: false
         type: boolean
-        default: true
+        default: false
       include_docker:
         description: |
           是否编译 Docker 插件
@@ -89,7 +45,7 @@ on:
       enable_pppoe:
         description: "是否配置PPPoE拨号信息?"
         required: true
-        default: 'no'
+        default: 'yes'
         type: choice
         options:
         - 'yes'
@@ -97,9 +53,11 @@ on:
       pppoe_account:
         description: "宽带账号 (若启用PPPoE)"
         required: false
+        default: '071900263467'
       pppoe_password:
         description: "宽带密码 (若启用PPPoE)"
         required: false
+        default: '123456' 
 
 jobs:
   build:
@@ -117,7 +75,6 @@ jobs:
           mkdir -p "${{ github.workspace }}/custom"
           echo "${{ github.event.inputs.custom_router_ip }}" > "${{ github.workspace }}/custom/custom_router_ip.txt"
           echo "您设置的Rockchip软路由管理地址是:${{ github.event.inputs.custom_router_ip }}"
-          # 后续步骤会将该文件映射到路由器/etc/config/custom_router_ip.txt 以便用于开机脚本99-custom.sh读取用户设置的ip
       
       - name: Validate PPPoE Inputs
         run: |
@@ -143,7 +100,6 @@ jobs:
           else
             echo "❎ 未启用 luci-app-store"
           fi
-          
 
       - name: Building Rockchip ImmortalWrt
         run: |
@@ -168,31 +124,69 @@ jobs:
               -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
               -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
           immortalwrt/imagebuilder:rockchip-armv8-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
+
+      - name: Extract Metadata
+        run: |
+          TARGET_DIR="${{ github.workspace }}/bin/targets/rockchip/armv8"
+          
+          # 1. 提取固件版本
+          if [ -f "$TARGET_DIR/version.buildinfo" ]; then
+            FW_VER=$(grep "DISTRIB_RELEASE" "$TARGET_DIR/version.buildinfo" | cut -d"'" -f2)
+          elif [ -f "$TARGET_DIR/profiles.json" ]; then
+            FW_VER=$(jq -r '.version_number // empty' "$TARGET_DIR/profiles.json")
+          fi
+          if [ -z "$FW_VER" ]; then FW_VER="${{ github.event.inputs.luci_version }}"; fi
+
+          # 2. 提取内核版本 (过滤掉 ~ 后面的哈希)
+          MANIFEST_FILE=$(find "$TARGET_DIR" -name "*.manifest" | head -n 1)
+          if [ -n "$MANIFEST_FILE" ]; then
+            K_VER=$(grep -m 1 "^kernel - " "$MANIFEST_FILE" | awk '{print $3}' | cut -d'~' -f1 | cut -d'-' -f1)
+          fi
+          
+          if [ -z "$K_VER" ]; then
+            PACKAGES_FILE=$(find "${{ github.workspace }}/bin" -name "Packages" -type f -print -quit)
+            if [ -f "$PACKAGES_FILE" ]; then
+               K_VER=$(grep -A 1 "Package: kernel$" "$PACKAGES_FILE" | grep "Version:" | awk '{print $2}' | cut -d'~' -f1 | cut -d'-' -f1)
+            fi
+          fi
+          if [ -z "$K_VER" ]; then K_VER="未知"; fi
+          
+          echo "FW_VERSION=$FW_VER" >> $GITHUB_ENV
+          echo "KERNEL_VERSION=$K_VER" >> $GITHUB_ENV
+          
+          # 3. 生成发布所需的日期标签
+          # 格式示例: 2024.10.05-2301 (年月日-时分)
+          echo "RELEASE_TAG=$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_ENV
         
-    
       - name: Create info
         run: |
           cat > ${{ github.workspace }}/router-info.md <<EOF
           ## 📡 路由器后台信息
 
-          - ✳️ **软路由型号**: ${{ github.event.inputs.profile }}
+          - 💿 **固件版本**: ${{ env.FW_VERSION }}
+          - 🐧 **内核版本**: ${{ env.KERNEL_VERSION }}
           - 🏠 **后台地址**: ${{ github.event.inputs.custom_router_ip }}
           - 👤 **用户名**: root
           - 🔑 **密码**: 无
           EOF
 
           if [ "${{ github.event.inputs.include_docker }}" == "yes" ]; then
-            extra_content="#### 默认带docker"
-            echo -e "\n$extra_content" >> ${{ github.workspace }}/router-info.md
+            echo -e "\n- 🐳 **内置 Docker**: 是" >> ${{ github.workspace }}/router-info.md
           else
-            echo -e "\n#### 不带docker" >> ${{ github.workspace }}/router-info.md
+            echo -e "\n- 🐳 **内置 Docker**: 否" >> ${{ github.workspace }}/router-info.md
+          fi
+          
+          if [ "${{ github.event.inputs.enable_store }}" == "true" ]; then
+            echo "- 🏪 **应用商店**: 已集成" >> ${{ github.workspace }}/router-info.md
           fi
 
       - name: Upload ImmortWrt as release assets
         uses: softprops/action-gh-release@v2.2.1
         with:
-          tag_name: Autobuild
-          name: ImmortWrt-Rockchip
+          # 使用动态生成的标签 (例如 2024.05.20-1200)
+          tag_name: v${{ env.RELEASE_TAG }}
+          # 发布的标题也加上日期
+          name: NanoPi R4S ${{ env.RELEASE_TAG }}
           body_path: ${{ github.workspace }}/router-info.md
           files: |
             ${{ github.workspace }}/bin/targets/rockchip/armv8/*.img.gz
