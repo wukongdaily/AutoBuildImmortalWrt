@@ -1,4 +1,19 @@
 #!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
+# 允许通过环境变量覆盖并行编译线程数（方便 CI 覆盖）
+: "${BUILD_JOBS:=$(nproc --all 2>/dev/null || echo 2)}"
+export MAKEFLAGS="-j${BUILD_JOBS}"
+
+log() { echo "$(date '+%Y-%m-%d %H:%M:%S') - $*"; }
+
+trap 'ret=$?; log "FATAL: script exited with code $ret"; exit $ret' ERR INT TERM
+
+log "Using BUILD_JOBS=${BUILD_JOBS}, MAKEFLAGS=${MAKEFLAGS}"
+
+# —— 下面继续原有脚本逻辑（不变） ——
+
 # Log file for debugging
 source shell/custom-packages.sh
 echo "第三方软件包: $CUSTOM_PACKAGES"
@@ -97,4 +112,4 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-echo "$(date '+%Y-%m-%d %H:%M:%S') - Build completed successfully."
+echo "$(date '+%Y-%m-%d %H:%M:%S') - Build completed successfully.",
