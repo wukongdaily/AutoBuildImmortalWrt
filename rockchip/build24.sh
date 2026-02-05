@@ -78,10 +78,6 @@ PACKAGES="$PACKAGES luci-i18n-openlist-zh-cn"
 # PassWall
 PACKAGES="$PACKAGES luci-i18n-passwall-zh-cn"
 
-# 4. 第三方库插件 (wukongdaily库)
-# 广告屏蔽 (AdGuardHome)
-PACKAGES="$PACKAGES luci-app-adguardhome"
-
 # 5. Docker (可选，保留原逻辑)
 if [ "$INCLUDE_DOCKER" = "yes" ]; then
     PACKAGES="$PACKAGES luci-i18n-dockerman-zh-cn"
