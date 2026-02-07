@@ -15,7 +15,7 @@
 # xiaomi_redmi-router-ax6000-stock ————原厂默认 bootloader（stock）版本
 # xiaomi_redmi-router-ax6000-ubootmod—————改装过 bootloader 的版本（ubootmod）
 
-name: Build Wireless Router ImmortalWrt 24.10.x
+name: Build Wireless Router ImmortalWrt 25.12
 
 on:
   workflow_dispatch:
