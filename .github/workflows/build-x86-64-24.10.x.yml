@@ -1,4 +1,4 @@
-name: build-x86-64-immortalwrt-24.10.x
+name: build-x86-64-immortalwrt-24.10
 
 on:
   workflow_dispatch:
@@ -15,9 +15,9 @@ on:
           - 24.10.3
           - 24.10.4
       custom_router_ip:
-        description: "请设置路由器的管理地址(仅对多网口路由器有效) 格式:192.168.x.1 或 10.x.x.1"
+        description: "请设置路由器的管理地址(仅对多网口路由器有效)"
         required: true
-        default: "192.168.100.1"
+        default: "192.168.8.88"
       profile:
         description: '请输入要编译固件大小 单位(MB)'
         required: true
@@ -28,8 +28,7 @@ on:
         type: boolean
         default: true
       include_docker:
-        description: |
-          是否编译 Docker 插件
+        description: "是否编译 Docker 插件"
         required: true
         default: 'yes'
         type: choice
@@ -42,8 +41,8 @@ on:
         default: 'no'
         type: choice
         options:
-        - 'yes'
-        - 'no'
+          - 'yes'
+          - 'no'
       pppoe_account:
         description: "宽带账号 (若启用PPPoE)"
         required: false
@@ -62,37 +61,32 @@ jobs:
       - name: Set executable permissions
         run: chmod +x ${{ github.workspace }}/x86-64/build24.sh
 
-      - name: Save Custom Router IP into OpenWrt files
+      - name: Save Custom Router IP
         run: |
           mkdir -p "${{ github.workspace }}/custom"
           echo "${{ github.event.inputs.custom_router_ip }}" > "${{ github.workspace }}/custom/custom_router_ip.txt"
-          echo "您设置的路由器管理地址是:${{ github.event.inputs.custom_router_ip }}"
-          # 后续步骤会将该文件映射到路由器/etc/config/custom_router_ip.txt 以便用于开机脚本99-custom.sh读取用户设置的ip
-      
+
       - name: Validate PPPoE Inputs
         run: |
           if [[ "${{ inputs.enable_pppoe }}" == "yes" ]]; then
             if [[ -z "${{ inputs.pppoe_account }}" || -z "${{ inputs.pppoe_password }}" ]]; then
-              echo "Error: PPPoE account and password must be provided when PPPoE is enabled!"
+              echo "Error: PPPoE account and password must be provided!"
               exit 1
             fi
           fi
-      
+
       - name: Enable Store integration
         run: |
           if [ "${{ github.event.inputs.enable_store }}" == "true" ]; then
             echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-store"' >> shell/custom-packages.sh
-            echo "✅ 已追加 luci-app-store"
-          else
-            echo "❎ 未启用 luci-app-store"
           fi
 
-      - name: Build ImmortalWrt-x86-64-efi
+      - name: Build ImmortalWrt x86-64 (EFI + Legacy)
         run: |
           profile="${{ github.event.inputs.profile }}"
           include_docker="${{ github.event.inputs.include_docker }}"
           luci_version="${{ github.event.inputs.luci_version }}"
-          echo "Building for profile: $profile"
+
           docker run --rm -i \
             --user root \
             -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
@@ -106,36 +100,31 @@ jobs:
             -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
             -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
             -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
-          immortalwrt/imagebuilder:x86-64-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
-          
+          immortalwrt/imagebuilder:x86-64-openwrt-${luci_version} \
+          /bin/bash /home/build/immortalwrt/build.sh
 
       - name: Create info
         run: |
           cat > ${{ github.workspace }}/router-info.md <<EOF
           ## 📡 路由器后台信息
-          <a href="https://wkdaily.cpolar.cn/archives/1">
-           <img src="https://img.shields.io/badge/若下载慢可套用国内加速站下载-FC7C0D?logo=github&logoColor=fff&labelColor=000&style=for-the-badge"/>
-          </a>
-          
-          - 🏠 **后台地址**: ${{ github.event.inputs.custom_router_ip }}
-          - 👤 **用户名**: root
-          - 🔑 **密码**: 无
+          - 🏠 后台地址: ${{ github.event.inputs.custom_router_ip }}
+          - 👤 用户名: root
+          - 🔑 密码: 无
           EOF
 
           if [ "${{ github.event.inputs.include_docker }}" == "yes" ]; then
-            extra_content="#### 默认带docker"
-            echo -e "\n$extra_content" >> ${{ github.workspace }}/router-info.md
+            echo "#### 默认带 Docker" >> ${{ github.workspace }}/router-info.md
           else
-            echo -e "\n#### 不带docker" >> ${{ github.workspace }}/router-info.md
+            echo "#### 不带 Docker" >> ${{ github.workspace }}/router-info.md
           fi
 
-      - name: Upload ImmortWrt as release assets
+      - name: Upload ImmortalWrt as release assets
         uses: softprops/action-gh-release@v2.2.1
         with:
           tag_name: Autobuild-x86-64
           body_path: ${{ github.workspace }}/router-info.md
           files: |
-            ${{ github.workspace }}/bin/targets/x86/64/*squashfs-combined-efi.img.gz
+            ${{ github.workspace }}/bin/targets/x86/64/*squashfs-combined*.img.gz
           token: ${{ secrets.GITHUB_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
