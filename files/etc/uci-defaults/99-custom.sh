@@ -7,7 +7,7 @@ echo "Starting 99-custom.sh at $(date)" >>$LOGFILE
 # 因为本项目中 单网口模式是dhcp模式 直接就能上网并且访问web界面 避免新手每次都要修改/etc/config/network中的静态ip
 # 当你刷机运行后 都调整好了 你完全可以在web页面自行关闭 wan口防火墙的入站数据
 # 具体操作方法：网络——防火墙 在wan的入站数据 下拉选项里选择 拒绝 保存并应用即可。
-uci set firewall.@zone[1].input='ACCEPT'
+uci set .@zone[1].input='ACCEPT'
 
 # 设置主机名映射，解决安卓原生 TV 无法联网的问题
 uci add dhcp domain
@@ -105,8 +105,8 @@ elif [ "$count" -gt 1 ]; then
         uci set network.lan.ipaddr=$CUSTOM_IP
         echo "custom router ip is $CUSTOM_IP" >> $LOGFILE
     else
-        uci set network.lan.ipaddr='192.168.100.1'
-        echo "default router ip is 192.168.100.1" >> $LOGFILE
+        uci set network.lan.ipaddr='192.168.6.1'
+        echo "default router ip is 192.168.6.1" >> $LOGFILE
     fi
 
     # PPPoE设置
@@ -132,23 +132,23 @@ fi
 # 方便各类docker容器的端口顺利通过防火墙 
 if command -v dockerd >/dev/null 2>&1; then
     echo "检测到 Docker，正在配置防火墙规则..."
-    FW_FILE="/etc/config/firewall"
+    FW_FILE="/etc/config/"
 
     # 删除所有名为 docker 的 zone
-    uci delete firewall.docker
+    uci delete .docker
 
     # 先获取所有 forwarding 索引，倒序排列删除
-    for idx in $(uci show firewall | grep "=forwarding" | cut -d[ -f2 | cut -d] -f1 | sort -rn); do
-        src=$(uci get firewall.@forwarding[$idx].src 2>/dev/null)
-        dest=$(uci get firewall.@forwarding[$idx].dest 2>/dev/null)
+    for idx in $(uci show  | grep "=forwarding" | cut -d[ -f2 | cut -d] -f1 | sort -rn); do
+        src=$(uci get .@forwarding[$idx].src 2>/dev/null)
+        dest=$(uci get .@forwarding[$idx].dest 2>/dev/null)
         echo "Checking forwarding index $idx: src=$src dest=$dest"
         if [ "$src" = "docker" ] || [ "$dest" = "docker" ]; then
             echo "Deleting forwarding @forwarding[$idx]"
-            uci delete firewall.@forwarding[$idx]
+            uci delete .@forwarding[$idx]
         fi
     done
     # 提交删除
-    uci commit firewall
+    uci commit 
     # 追加新的 zone + forwarding 配置
     cat <<EOF >>"$FW_FILE"
 
@@ -186,7 +186,6 @@ wlan_name0="OpenWrt_2.4G"
 wlan_name1="OpenWrt_5G"
 wlan_password="password"
 root_password="password"
-lan_ip_address="192.168.6.1"
 hostname="OpenWrt"
 # 记录潜在错误
 exec >/tmp/setup.log 2>&1
@@ -206,41 +205,21 @@ if [ -n "$wlan_name0" -a -n "$wlan_password" -a ${#wlan_password} -ge 8 ]; then
   uci set wireless.radio0.htmode='HT40'
   uci set wireless.radio0.channel='auto'
   uci set wireless.radio0.cell_density='0'
+  uci set wireless.radio0.country='CN'
   uci set wireless.default_radio0.ssid="$wlan_name0"
-  uci set wireless.default_radio0.encryption='sae-mixed'
+  uci set wireless.default_radio0.encryption='psk2'
   uci set wireless.default_radio0.key="$wlan_password"
 fi
 if [ -n "$wlan_name1" -a -n "$wlan_password" -a ${#wlan_password} -ge 8 ]; then
   uci set wireless.radio1.disabled='0'
-  uci set wireless.radio1.htmode='VHT80'
-  uci set wireless.radio1.channel='auto'
+  uci set wireless.radio1.htmode='HE160'
+  uci set wireless.radio1.channel='36'
+  uci set wireless.radio1.country='CN'
   uci set wireless.radio1.cell_density='0'
   uci set wireless.default_radio1.ssid="$wlan_name1"
-  uci set wireless.default_radio1.encryption='sae-mixed'
+  uci set wireless.default_radio1.encryption='psk2'
   uci set wireless.default_radio1.key="$wlan_password"
 fi
-# 添加10个5G Wi-Fi信号 (wifi1到wifi10)
-for i in $(seq 1 10); do
-  uci set wireless.wifi$i=wifi-iface
-  uci set wireless.wifi$i.device='radio1'
-  uci set wireless.wifi$i.mode='ap'
-  uci set wireless.wifi$i.ssid="wifi$i"
-  uci set wireless.wifi$i.encryption='psk-mixed'
-  uci set wireless.wifi$i.key='password'
-  uci set wireless.wifi$i.network="lan$i"
-  uci set wireless.wifi$i.htmode='VHT160'
-done
-# 添加10个2.4G Wi-Fi信号 (wifi11到wifi20)
-for i in $(seq 11 20); do
-  uci set wireless.wifi$i=wifi-iface
-  uci set wireless.wifi$i.device='radio0'
-  uci set wireless.wifi$i.mode='ap'
-  uci set wireless.wifi$i.ssid="wifi$i"
-  uci set wireless.wifi$i.encryption='psk-mixed'
-  uci set wireless.wifi$i.key='password'
-  uci set wireless.wifi$i.network="lan$i"
-  uci set wireless.wifi$i.htmode='HT40'
-done
 uci commit wireless
 # 设置主机名
 if [ -n "$hostname" ]; then
@@ -265,33 +244,33 @@ for i in $(seq 1 20); do
   uci set dhcp.lan$i.limit='150'
   uci set dhcp.lan$i.leasetime='12h'
   # 分配到LAN防火墙区域
-  uci add_list firewall.lan.network="lan"
+  uci add_list .@zone[0].network="lan"
 done
 uci commit network
 uci commit dhcp
-uci commit firewall
+uci commit 
 # 设置本机防火墙
-uci add firewall rule
-uci set firewall.@rule[-1].name='Allow_Local'
-uci set firewall.@rule[-1].family='ipv6'
-uci set firewall.@rule[-1].src='wan'
-uci set firewall.@rule[-1].dest_port='22 18080 18443'
-uci set firewall.@rule[-1].target='ACCEPT'
+uci add  rule
+uci set .@rule[-1].name='Allow_Local'
+uci set .@rule[-1].family='ipv6'
+uci set .@rule[-1].src='wan'
+uci set .@rule[-1].dest_port='22 18080 18443'
+uci set .@rule[-1].target='ACCEPT'
 # 设置WireGuard区域防火墙
-uci add firewall rule
-uci set firewall.@rule[-1].name='Allow_VPN'
-uci set firewall.@rule[-1].family='ipv6'
-uci set firewall.@rule[-1].src='wan'
-uci set firewall.@rule[-1].dest_port='52080'
-uci set firewall.@rule[-1].target='ACCEPT'
+uci add  rule
+uci set .@rule[-1].name='Allow_VPN'
+uci set .@rule[-1].family='ipv6'
+uci set .@rule[-1].src='wan'
+uci set .@rule[-1].dest_port='52080'
+uci set .@rule[-1].target='ACCEPT'
 # 设置LAN转发
-uci add firewall rule
-uci set firewall.@rule[-1].name='Allow_LAN'
-uci set firewall.@rule[-1].family='ipv6'
-uci set firewall.@rule[-1].src='wan'
-uci set firewall.@rule[-1].dest='lan'
-uci set firewall.@rule[-1].dest_port='22 8006 8069 9090 18080 18443'
-uci set firewall.@rule[-1].target='ACCEPT'
+uci add  rule
+uci set .@rule[-1].name='Allow_LAN'
+uci set .@rule[-1].family='ipv6'
+uci set .@rule[-1].src='wan'
+uci set .@rule[-1].dest='lan'
+uci set .@rule[-1].dest_port='22 8006 8069 9090 18080 18443'
+uci set .@rule[-1].target='ACCEPT'
 # 重启网络服务
 /etc/init.d/network restart
 # 重启无线网络服务
@@ -299,7 +278,7 @@ wifi up
 # 重启DHCP服务
 /etc/init.d/dnsmasq restart
 # 重启防火墙服务
-/etc/init.d/firewall restart
+/etc/init.d/ restart
 # 设置编译作者信息
 FILE_PATH="/etc/openwrt_release"
 NEW_DESCRIPTION="Packaged by iFengke"
