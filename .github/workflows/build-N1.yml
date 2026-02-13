@@ -5,7 +5,7 @@ on:
       luci_version:
         description: "选择luci版本"
         required: false
-        default: "24.10.4"
+        default: "24.10.5"
         type: choice
         options:
           - 24.10.0
@@ -13,6 +13,7 @@ on:
           - 24.10.2
           - 24.10.3
           - 24.10.4
+          - 24.10.5
       openwrt_kernel:
         description: "选择构建的内核(斐讯N1)"
         required: false
@@ -189,7 +190,7 @@ jobs:
           # 使用ImageBuilder构建 且用户勾选了替换banner时
           cp n1/99-banner.sh files/etc/uci-defaults/
       
-      - name: Building N1 ImmortalWrt rootfs
+      - name: Building N1 ImmortalWrt rootfs 24.10.x
         if: ${{ github.event.inputs.skip_imagebuilder != 'true' }}
         run: |
           echo "✅ 使用 ImageBuilder 构建 rootfs"

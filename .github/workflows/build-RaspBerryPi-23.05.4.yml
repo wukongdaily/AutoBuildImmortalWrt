@@ -8,8 +8,6 @@ on:
         description: "请选择路由器型号"
         required: true
         options:
-          - rpi
-          - rpi-2
           - rpi-3
           - rpi-4
           - rpi-5
@@ -65,12 +63,15 @@ jobs:
             tag=bcm27xx-bcm2709-openwrt-23.05.4
             echo "cpu=bcm2709" >> $GITHUB_ENV
           elif [ "$profiles" = "rpi-3" ]; then
+            ARCH=rpi3.conf
             tag=bcm27xx-bcm2710-openwrt-23.05.4
             echo "cpu=bcm2710" >> $GITHUB_ENV
           elif [ "$profiles" = "rpi-4" ]; then
+            ARCH=rpi4.conf
             tag=bcm27xx-bcm2711-openwrt-23.05.4
             echo "cpu=bcm2711" >> $GITHUB_ENV
           elif [ "$profiles" = "rpi-5" ]; then
+            ARCH=rpi5.conf
             tag=bcm27xx-bcm2712-openwrt-23.05.4
             echo "cpu=bcm2712" >> $GITHUB_ENV
           fi
@@ -84,7 +85,7 @@ jobs:
               --user root \
               -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
               -v "${{ github.workspace }}/files/etc/uci-defaults:/home/build/immortalwrt/files/etc/uci-defaults" \
-              -v "${{ github.workspace }}/arch/arch.conf:/home/build/immortalwrt/files/etc/opkg/arch.conf" \
+              -v "${{ github.workspace }}/arch/$ARCH:/home/build/immortalwrt/files/etc/opkg/arch.conf" \
               -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
               -v "${{ github.workspace }}/raspberrypi/23.05.4/build.sh:/home/build/openwrt/build.sh" \
               -e PROFILE=$profile \
