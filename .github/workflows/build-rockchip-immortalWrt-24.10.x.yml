@@ -6,7 +6,7 @@ on:
       luci_version:
         description: "选择luci版本"
         required: false
-        default: "24.10.4"
+        default: "24.10.5"
         type: choice
         options:
           - 24.10.0
@@ -14,11 +14,13 @@ on:
           - 24.10.2
           - 24.10.3
           - 24.10.4
+          - 24.10.5
       profile:
         type: choice
         description: |
           输入 软路由型号 可选值如下：
         options:
+          - linkease_easepi-r1
           - ariaboard_photonicat
           - armsom_sige3
           - armsom_sige7
@@ -145,7 +147,7 @@ jobs:
           fi
           
 
-      - name: Building Rockchip ImmortalWrt
+      - name: Building Rockchip ImmortalWrt 24.10.x
         run: |
           profile="${{ github.event.inputs.profile }}"
           include_docker="${{ github.event.inputs.include_docker }}"
