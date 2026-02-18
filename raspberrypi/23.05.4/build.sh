@@ -22,12 +22,39 @@ else
   # 解压并拷贝ipk到packages目录
   sh shell/prepare-packages.sh
   ls -lah /home/build/immortalwrt/packages/
-  # 添加架构优先级信息
-  sed -i '1i\
-  arch aarch64_generic 10\n\
-  arch aarch64_cortex-a53 15' repositories.conf
 fi
 
+LUCI_VERSION="${LUCI_VERSION:-23.05.4}"  # workflow 传入的luci版本，默认为24.10.4
+# 根据 PROFILE 选择 CPU_ARCH
+case "$PROFILE" in
+  rpi-3)
+    CPU_ARCH="aarch64_cortex-a53"
+    ;;
+  rpi-4)
+    CPU_ARCH="aarch64_cortex-a72"
+    ;;
+  rpi-5)
+    CPU_ARCH="aarch64_cortex-a76"
+    ;;
+  *)
+    CPU_ARCH="aarch64_generic"
+    ;;
+esac
+
+# 插入架构优先级
+sed -i "1i\
+arch aarch64_generic 10\n\
+arch $CPU_ARCH 15" repositories.conf
+
+# 修改树莓派 repositories.conf 仓库路径，使通用包使用 aarch64_generic，并动态填 LUCI_VERSION
+sed -i -E "s|(src/gz immortalwrt_base .*aarch64_cortex-a[0-9]+)/base|src/gz immortalwrt_base https://downloads.immortalwrt.org/releases/$LUCI_VERSION/packages/aarch64_generic/base|" repositories.conf
+sed -i -E "s|(src/gz immortalwrt_luci .*aarch64_cortex-a[0-9]+)/luci|src/gz immortalwrt_luci https://downloads.immortalwrt.org/releases/$LUCI_VERSION/packages/aarch64_generic/luci|" repositories.conf
+sed -i -E "s|(src/gz immortalwrt_packages .*aarch64_cortex-a[0-9]+)/packages|src/gz immortalwrt_packages https://downloads.immortalwrt.org/releases/$LUCI_VERSION/packages/aarch64_generic/packages|" repositories.conf
+sed -i -E "s|(src/gz immortalwrt_routing .*aarch64_cortex-a[0-9]+)/routing|src/gz immortalwrt_routing https://downloads.immortalwrt.org/releases/$LUCI_VERSION/packages/aarch64_generic/routing|" repositories.conf
+sed -i -E "s|(src/gz immortalwrt_telephony .*aarch64_cortex-a[0-9]+)/telephony|src/gz immortalwrt_telephony https://downloads.immortalwrt.org/releases/$LUCI_VERSION/packages/aarch64_generic/telephony|" repositories.conf
+echo "✅ repositories.conf updated for $PROFILE with generic fallback and LUCI_VERSION=$LUCI_VERSION"
+echo "Current repositories.conf content:"
+cat repositories.conf
 
 # 输出调试信息
 echo "$(date '+%Y-%m-%d %H:%M:%S') - Starting build process..."
