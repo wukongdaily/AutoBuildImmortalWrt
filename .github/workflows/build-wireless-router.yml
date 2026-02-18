@@ -109,18 +109,18 @@ on:
           - imou_lc-hx3001
           - keenetic_kn-3811
           - keenetic_kn-3911
-          - konka_komi-a31
-          - livinet_zr-3020
-          - livinet_zr-3020-ubootmod
+          - 康佳_komi-a31
+          - 利维内_zr-3020
+          - 利维内_zr-3020_ubootmod
           - mediatek_mt7981-rfb
           - mediatek_mt7986a-rfb-nand
           - mediatek_mt7986b-rfb
-          - mediatek_mt7988a-rfb
-          - mercusys_mr80x-v3
-          - mercusys_mr90x-v1
-          - mercusys_mr90x-v1-ubi
-          - netcore_n60
-          - netcore_n60-pro
+          - 联发科_mt7988a-rfb
+          - 美商易购_mr80x-v3
+          - 美商易购_mr90x-v1
+          - 美商易购_mr90x-v1-ubi
+          - 网芯_n60
+          - 网芯_n60-pro
           - netgear_wax220
           - netis_nx31
           - nokia_ea0326gmp
@@ -151,19 +151,20 @@ on:
           - wavlink_wl-wn586x3
           - yuncore_ax835
           - zbtlink_zbt-z8102ax
+          - zbtlink_zbt-z8102ax-v2
           - zbtlink_zbt-z8103ax
           - zyxel_ex5601-t0-stock
           - zyxel_ex5601-t0-ubootmod
           - zyxel_ex5700-telenor
           - zyxel_nwa50ax-pro
-          - arcadyan_aw1000
+          - 阿卡迪安_aw1000
           - asus_rt-ax89x
           - buffalo_wxr-5950ax12
           - cmcc_rm2-6
           - compex_wpq873
           - dynalink_dl-wrx36
           - edgecore_eap102
-          - edimax_cax1800
+          - 爱普泰克_cax1800
           - linksys_mx4200v1
           - linksys_mx4200v2
           - linksys_mx4300
