@@ -65,7 +65,7 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-ddns-go  luci-i18n-ddns-go-zh-cn luci
 # ========== 新增去重后的扩展包列表 ==========
 # 基础依赖与核心组件
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-base luci-i18n-base-zh-cn luci-compat luci-light luci-lua-runtime"
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-lib-base luci-lib-ip luci-lib-ipkg luci-lib-jsonc luci-lib-nixio luci-lib-taskd luci-lib-uqr luci-lib-xterm"
+#CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-lib-base luci-lib-ip luci-lib-ipkg luci-lib-jsonc luci-lib-nixio luci-lib-taskd luci-lib-uqr luci-lib-xterm"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES rpcd-mod-luci"
 
 # 系统模块
