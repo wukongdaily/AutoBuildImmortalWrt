@@ -72,7 +72,7 @@ jobs:
             echo "❎ 未启用 luci-app-store"
           fi
       
-      - name: Build sunxi-cortexa53 ImmpotalWrt 24.10.x
+      - name: Build sunxi-cortexa53 ImmpotalWrt ${{ github.event.inputs.luci_version }}
         run: |
           profiles="${{ github.event.inputs.profile }}"
           include_docker="${{ github.event.inputs.include_docker }}"
