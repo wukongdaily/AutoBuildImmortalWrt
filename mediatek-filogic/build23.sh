@@ -70,7 +70,6 @@ PACKAGES="$PACKAGES openssh-sftp-server"
 # 增加几个必备组件 方便用户安装iStore
 PACKAGES="$PACKAGES fdisk"
 PACKAGES="$PACKAGES script-utils"
-PACKAGES="$PACKAGES luci-i18n-samba4-zh-cn"
 # 第三方软件包 合并
 # ======== shell/custom-packages.sh =======
 PACKAGES="$PACKAGES $CUSTOM_PACKAGES"
