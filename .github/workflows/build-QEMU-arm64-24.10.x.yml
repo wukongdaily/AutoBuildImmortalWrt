@@ -10,7 +10,7 @@ on:
       luci_version:
         description: "选择luci版本"
         required: false
-        default: "24.10.4"
+        default: "24.10.5"
         type: choice
         options:
           - 24.10.0
@@ -18,6 +18,7 @@ on:
           - 24.10.2
           - 24.10.3
           - 24.10.4
+          - 24.10.5
       profile:
         type: choice
         description: |
@@ -79,7 +80,7 @@ jobs:
             fi
           fi
       
-      - name: Building armsr-armv8 QEMU ImmortalWrt
+      - name: Building armsr-armv8 QEMU ImmortalWrt 24.10.x
         run: |
           profiles="${{ github.event.inputs.profile }}"
           rootfs_partsize="${{ github.event.inputs.rootfs_partsize }}"

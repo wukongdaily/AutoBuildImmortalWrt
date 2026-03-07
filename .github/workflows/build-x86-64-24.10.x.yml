@@ -6,7 +6,7 @@ on:
       luci_version:
         description: "选择luci版本"
         required: false
-        default: "24.10.4"
+        default: "24.10.5"
         type: choice
         options:
           - 24.10.0
@@ -14,6 +14,7 @@ on:
           - 24.10.2
           - 24.10.3
           - 24.10.4
+          - 24.10.5
       custom_router_ip:
         description: "请设置路由器的管理地址(仅对多网口路由器有效) 格式:192.168.x.1 或 10.x.x.1"
         required: true
@@ -87,7 +88,7 @@ jobs:
             echo "❎ 未启用 luci-app-store"
           fi
 
-      - name: Build ImmortalWrt-x86-64-efi
+      - name: Build ImmortalWrt-x86-64-efi 24.10.x
         run: |
           profile="${{ github.event.inputs.profile }}"
           include_docker="${{ github.event.inputs.include_docker }}"
