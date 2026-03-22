@@ -8,16 +8,6 @@ echo "Include Docker: $INCLUDE_DOCKER"
 # yml 传入的固件大小 ROOTFS_PARTSIZE
 echo "Building for ROOTFS_PARTSIZE: $ROOTSIZE"
 
-OFFICIAL="https://downloads.immortalwrt.org"
-MIRROR="https://mirrors.cernet.edu.cn/immortalwrt"
-echo ">>> official failed, switching to mirror"
-BASE_URL="$MIRROR"
-echo "Using BASE_URL = $BASE_URL"
-echo "========================================"
-echo "Updating repositories.conf"
-echo "========================================"
-sed -i "s#${OFFICIAL}#${BASE_URL}#g" repositories.conf
-cat repositories.conf
 
 if [ -z "$CUSTOM_PACKAGES" ]; then
   echo "⚪️ 未选择 任何第三方软件包"
