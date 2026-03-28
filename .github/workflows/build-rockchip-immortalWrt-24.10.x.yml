@@ -49,6 +49,7 @@ on:
           - pine64_rockpro64
           - radxa_cm3_io
           - radxa_e25
+          - radxa_e52c
           - radxa_rock-3a
           - radxa_rock-3b
           - radxa_rock-3c
