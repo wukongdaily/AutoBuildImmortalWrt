@@ -5,9 +5,10 @@ on:
       luci_version:
         description: "选择luci版本"
         required: false
-        default: "24.10.5"
+        default: "21.02.7"
         type: choice
         options:
+          - 21.02.7
           - 24.10.0
           - 24.10.1
           - 24.10.2
@@ -17,7 +18,7 @@ on:
       openwrt_kernel:
         description: "选择构建的内核 当高版本内核没有时 系统会自动挑选匹配的内核。比如radxa e52c 即便你选择了6.1.y 可能最终构建还是5.10.160"
         required: false
-        default: "6.1.y"
+        default: "5.10.y"
         type: choice
         options:
           - 5.4.y
