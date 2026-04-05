@@ -1,27 +1,24 @@
-name: build-rockchip-immortalWrt-24.10.x
-
+name: build-rockchip-25.12.x
+# 目前此工作流可以集成imm仓库内的软件 第三方软件暂不能集成(待开发)
 on:
   workflow_dispatch:
     inputs:
       luci_version:
         description: "选择luci版本"
         required: false
-        default: "24.10.5"
+        default: "25.12.0-rc1"
         type: choice
         options:
-          - 24.10.0
-          - 24.10.1
-          - 24.10.2
-          - 24.10.3
-          - 24.10.4
-          - 24.10.5
+          - 25.12.0-rc1
       profile:
         type: choice
         description: |
           输入 软路由型号 可选值如下：
         options:
           - linkease_easepi-r1
+          - 9tripod_x3568-v4
           - ariaboard_photonicat
+          - ariaboard_photonicat2
           - armsom_sige3
           - armsom_sige7
           - cyber_cyber3588-aib
@@ -41,26 +38,41 @@ on:
           - friendlyarm_nanopi-r5s
           - friendlyarm_nanopi-r6c
           - friendlyarm_nanopi-r6s
+          - friendlyarm_nanopi-r76s
           - huake_guangmiao-g4c
           - lunzn_fastrhino-r66s
           - lunzn_fastrhino-r68s
           - lyt_t68m
+          - mmbox_anas3035
+          - nlnet_xiguapi-v3
           - pine64_rock64
           - pine64_rockpro64
           - radxa_cm3_io
+          - radxa_e20c
           - radxa_e25
           - radxa_e52c
+          - radxa_rock-2a
+          - radxa_rock-2f
           - radxa_rock-3a
           - radxa_rock-3b
           - radxa_rock-3c
+          - radxa_rock-4c-plus
+          - radxa_rock-4d
+          - radxa_rock-4se
           - radxa_rock-5a
           - radxa_rock-5b
+          - radxa_rock-5b-plus
+          - radxa_rock-5-itx
+          - radxa_rock-5c
+          - radxa_rock-5t
           - radxa_rock-pi-4a
           - radxa_rock-pi-e
           - radxa_rock-pi-s
           - radxa_zero-3e
           - radxa_zero-3w
           - sinovoip_bpi-r2-pro
+          - widora_mangopi-m28c
+          - widora_mangopi-m28k
           - xunlong_orangepi-5
           - xunlong_orangepi-5-plus
           - xunlong_orangepi-r1-plus
@@ -148,7 +160,7 @@ jobs:
           fi
           
 
-      - name: Building Rockchip ImmortalWrt 24.10.x
+      - name: Building Rockchip ImmortalWrt 25.12.x
         run: |
           profile="${{ github.event.inputs.profile }}"
           include_docker="${{ github.event.inputs.include_docker }}"
@@ -161,9 +173,9 @@ jobs:
               -v "${{ github.workspace }}/files:/home/build/immortalwrt/files" \
               -v "${{ github.workspace }}/custom:/home/build/immortalwrt/files/etc/config" \
               -v "${{ github.workspace }}/arch/arch.conf:/home/build/immortalwrt/files/etc/opkg/arch.conf" \
-              -v "${{ github.workspace }}/rockchip/imm.config:/home/build/immortalwrt/.config" \
+              -v "${{ github.workspace }}/rockchip/imm25.config:/home/build/immortalwrt/.config" \
               -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
-              -v "${{ github.workspace }}/rockchip/build24.sh:/home/build/immortalwrt/build.sh" \
+              -v "${{ github.workspace }}/rockchip/build25.sh:/home/build/immortalwrt/build.sh" \
               -e PROFILE=$profile \
               -e INCLUDE_DOCKER=$include_docker \
               -e ROOTFS_PARTSIZE=$rootfs_partsize \

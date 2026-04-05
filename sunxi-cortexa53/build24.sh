@@ -1,5 +1,6 @@
 #!/bin/bash
 source shell/custom-packages.sh
+source shell/switch_repository.sh
 echo "第三方软件包: $CUSTOM_PACKAGES"
 # yml 传入的路由器型号 PROFILE
 echo "Building for profile: $PROFILE"
