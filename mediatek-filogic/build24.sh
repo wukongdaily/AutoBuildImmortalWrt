@@ -92,7 +92,44 @@ if echo "$PACKAGES" | grep -q "luci-app-openclash"; then
 else
     echo "⚪️ 未选择 luci-app-openclash"
 fi
+# 修改默认主机名 (把 MyRouter 改成你喜欢的名字)
+mkdir -p files/etc/config
+echo "config system
+    option hostname 'iStoreOs'
+    
+# 设置默认密码为 password
+mkdir -p /home/build/immortalwrt/files/etc/uci-defaults
+cat << EOF > /home/build/immortalwrt/files/etc/uci-defaults/99-set-password
+#!/bin/sh
+(echo "password"; sleep 1; echo "password") | passwd root
+exit 0
+EOF
+chmod +x /home/build/immortalwrt/files/etc/uci-defaults/99-set-password
 
+# 创建 WiFi 自动配置脚本
+mkdir -p /home/build/immortalwrt/files/etc/uci-defaults
+cat << 'EOF' > /home/build/immortalwrt/files/etc/uci-defaults/98-wireless-setup
+#!/bin/sh
+
+# 配置 radio0 (通常对应 2.4G)
+uci set wireless.radio0.disabled='0'
+uci set wireless.radio0.htmode='HT40'
+uci set wireless.default_radio0.ssid='OpenWrt2.4G'
+uci set wireless.default_radio0.encryption='psk2'
+uci set wireless.default_radio0.key='password'
+
+# 配置 radio1 (通常对应 5G)
+uci set wireless.radio1.disabled='0'
+uci set wireless.radio1.htmode='HE160'
+uci set wireless.default_radio1.ssid='OpenWrt5G'
+uci set wireless.default_radio1.encryption='psk2'
+uci set wireless.default_radio1.key='password'
+
+# 提交配置并应用
+uci commit wireless
+wifi up
+exit 0
+EOF
 
 # 构建镜像
 echo "$(date '+%Y-%m-%d %H:%M:%S') - Building image with the following packages:"
