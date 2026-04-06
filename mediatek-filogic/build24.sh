@@ -92,16 +92,27 @@ if echo "$PACKAGES" | grep -q "luci-app-openclash"; then
 else
     echo "⚪️ 未选择 luci-app-openclash"
 fi
-# 修改默认主机名 (把 MyRouter 改成你喜欢的名字)
-mkdir -p files/etc/config
-echo "config system
-    option hostname 'iStoreOs'
-    
+# 修改默认主机名
+mkdir -p /home/build/immortalwrt/files/etc/config
+cat << EOF > /home/build/immortalwrt/files/etc/config/system
+config system
+    option hostname 'OpenWrt'
+    option zonename 'Asia/Shanghai'
+    option timezone 'CST-8'
+
+config timeserver 'ntp'
+    list server 'ntp.aliyun.com'
+    list server 'time1.cloud.tencent.com'
+    option enabled '1'
+    option enable_server '0'
+EOF
+
 # 设置默认密码为 password
 mkdir -p /home/build/immortalwrt/files/etc/uci-defaults
 cat << EOF > /home/build/immortalwrt/files/etc/uci-defaults/99-set-password
 #!/bin/sh
-(echo "password"; sleep 1; echo "password") | passwd root
+echo "password" | passwd root
+echo "password" | passwd root
 exit 0
 EOF
 chmod +x /home/build/immortalwrt/files/etc/uci-defaults/99-set-password
