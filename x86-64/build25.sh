@@ -1,8 +1,8 @@
 #!/bin/bash
 # Log file for debugging
-# 目前暂不支持第三方软件apk 待后续开发 仓库内可以集成
-source shell/custom-packages.sh
-#echo "第三方软件包: $CUSTOM_PACKAGES"
+# 目前支持少部分第三方软件apk 通过打开shell/apk-custom-packages.sh的注释来集成
+source shell/apk-custom-packages.sh
+echo "第三方apk软件包: $CUSTOM_PACKAGES"
 LOGFILE="/tmp/uci-defaults-log.txt"
 echo "Starting 99-custom.sh at $(date)" >> $LOGFILE
 echo "编译固件大小为: $PROFILE MB"
@@ -21,6 +21,24 @@ EOF
 echo "cat pppoe-settings"
 cat /home/build/immortalwrt/files/etc/config/pppoe-settings
 
+if [ -z "$CUSTOM_PACKAGES" ]; then
+  echo "⚪️ 未选择 任何第三方软件包"
+else
+  # ============= 同步第三方插件库==============
+  # 同步第三方软件仓库run/apk
+  echo "🔄 正在同步第三方软件仓库 Cloning run file repo..."
+  git clone --depth=1 https://github.com/wukongdaily/apk.git /tmp/store-apk-repo
+
+  # 拷贝 run/x86 下所有 run 文件和apk文件 到 extra-packages 目录
+  mkdir -p /home/build/immortalwrt/extra-packages
+  cp -r /tmp/store-apk-repo/run/x86/* /home/build/immortalwrt/extra-packages/
+
+  echo "✅ Run files copied to extra-packages:"
+  ls -lh /home/build/immortalwrt/extra-packages/*.run
+  # 解压并拷贝apk到packages目录
+  sh shell/apk-prepare-packages.sh
+  ls -lah /home/build/immortalwrt/packages/
+fi
 
 
 # 输出调试信息
@@ -35,7 +53,7 @@ PACKAGES="$PACKAGES luci-i18n-firewall-zh-cn"
 PACKAGES="$PACKAGES luci-theme-argon"
 PACKAGES="$PACKAGES luci-app-argon-config"
 PACKAGES="$PACKAGES luci-i18n-argon-config-zh-cn"
-#24.10
+#25.12
 PACKAGES="$PACKAGES luci-i18n-package-manager-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-ttyd-zh-cn"
 PACKAGES="$PACKAGES xray-core hysteria luci-i18n-passwall-zh-cn"
@@ -45,9 +63,9 @@ PACKAGES="$PACKAGES openssh-sftp-server"
 
 # 文件管理器
 PACKAGES="$PACKAGES luci-i18n-filemanager-zh-cn"
-# ======== shell/custom-packages.sh =======
+# ======== shell/apk-custom-packages.sh =======
 # 合并imm仓库以外的第三方插件 暂时注释
-#PACKAGES="$PACKAGES $CUSTOM_PACKAGES"
+PACKAGES="$PACKAGES $CUSTOM_PACKAGES"
 
 
 # 判断是否需要编译 Docker 插件
