@@ -5,10 +5,11 @@ on:
       luci_version:
         description: "选择luci版本"
         required: false
-        default: "25.12.0-rc1"
+        default: "25.12.0-rc2"
         type: choice
         options:
           - 25.12.0-rc1
+          - 25.12.0-rc2
       custom_router_ip:
         description: "请设置路由器的管理地址(仅对多网口路由器有效) 格式:192.168.x.1 或 10.x.x.1"
         required: true
