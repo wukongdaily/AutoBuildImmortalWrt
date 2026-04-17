@@ -164,12 +164,12 @@ jobs:
               -v "${{ github.workspace }}/rockchip/imm.config:/home/build/immortalwrt/.config" \
               -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
               -v "${{ github.workspace }}/rockchip/build24.sh:/home/build/immortalwrt/build.sh" \
-              -e PROFILE=$profile \
-              -e INCLUDE_DOCKER=$include_docker \
-              -e ROOTFS_PARTSIZE=$rootfs_partsize \
-              -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
-              -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
-              -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
+              -e PROFILE="$profile" \
+              -e INCLUDE_DOCKER="$include_docker" \
+              -e ROOTFS_PARTSIZE="$rootfs_partsize" \
+              -e ENABLE_PPPOE="${{ inputs.enable_pppoe }}" \
+              -e PPPOE_ACCOUNT="${{ inputs.pppoe_account }}" \
+              -e PPPOE_PASSWORD="${{ inputs.pppoe_password }}" \
           immortalwrt/imagebuilder:rockchip-armv8-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
         
     
