@@ -13,7 +13,7 @@
 > 5、在UI上 新增luci版本的可选项，默认最新版24.10.5 https://github.com/wukongdaily/AutoBuildImmortalWrt/discussions/426<br>
 > 6、支持设置管理地址的ip 比如192.168.100.1 这里强调 这项功能仅针对多网口机型 单网口的逻辑还是自动获取ip模式（dhcp）无固定ip<br>
 > 7、对于[插件追新的用户 建议前往run项目 下载run后 ](https://github.com/wukongdaily/RunFilesBuilder/discussions/41)用命令sh xx.run 覆盖安装 <br>
-> 8、25.12 版本 待开发 未完成
+> 8、25.12.x 版本 目前80%都支持（包括x86-64-ISO、x86-64、rockchip、全志sunxi、无线路由器）
 
 ## [基本用法步骤](https://github.com/wukongdaily/AutoBuildImmortalWrt/wiki) 👈🏻
 1、fork本项目<br>
