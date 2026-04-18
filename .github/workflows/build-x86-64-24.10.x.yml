@@ -109,6 +109,10 @@ jobs:
             -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
           immortalwrt/imagebuilder:x86-64-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
           
+      - name: Set build date
+        run: |
+          echo "BUILD_DATE=$(date +'%Y-%m-%d %H:%M')" >> $GITHUB_ENV
+          echo "BUILD_DATE_SHORT=$(date +'%Y%m%d')" >> $GITHUB_ENV
 
       - name: Create info
         run: |
@@ -121,6 +125,7 @@ jobs:
           - 🏠 **后台地址**: ${{ github.event.inputs.custom_router_ip }}
           - 👤 **用户名**: root
           - 🔑 **密码**: 无
+          - ⏱ **构建时间**: ${BUILD_DATE}
           EOF
 
           if [ "${{ github.event.inputs.include_docker }}" == "yes" ]; then
