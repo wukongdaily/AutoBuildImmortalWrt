@@ -60,7 +60,7 @@ esac
 
 # 3. 配置网络
 if [ "$count" -eq 1 ]; then
-    # 单网口设备，DHCP模式
+    # 单网口设备，static模式
     uci set network.lan.proto='static'
     uci set network.lan.ipaddr='192.168.5.2'
 	uci set network.lan.netmask='255.255.255.0'
