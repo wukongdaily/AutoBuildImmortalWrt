@@ -53,6 +53,19 @@ on:
         description: "宽带密码 (若启用PPPoE)"
         required: false
 
+name: Build ImmortalWrt x86-64
+
+on:
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # 加上这一行
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04 # 建议把这里也改成 24.04，默认环境更新
+    ...
+
 jobs:
   build:
     runs-on: ubuntu-22.04
