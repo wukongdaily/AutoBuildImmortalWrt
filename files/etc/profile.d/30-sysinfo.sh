@@ -12,7 +12,6 @@ get_uptime() {
     if [ -r /proc/uptime ]; then
         uptime_seconds=$(awk '{print int($1)}' /proc/uptime)
     else
-        # 降级方案：解析 uptime 命令输出（极少需要）
         raw=$(uptime 2>/dev/null)
         days=0; hours=0; mins=0
         case "$raw" in
@@ -39,17 +38,28 @@ get_uptime() {
 
 uptime_str=$(get_uptime)
 
-# ===================== IP 地址 =====================
-# 获取默认网络接口（优先 eth0，否则取默认路由接口）
-if ip link show eth0 >/dev/null 2>&1; then
-    lan_if="eth0"
-else
-    def_if=$(ip route show default 2>/dev/null | grep -m1 'dev' | awk '{print $5}')
-    lan_if="${def_if:-eth0}"
-fi
+# ===================== 通用 IP 地址获取（不依赖接口名） =====================
+# 获取 IPv4：优先选择私有地址（192.168.x.x, 10.x.x.x, 172.16-31.x.x）
+# 如果没有私有地址，则取第一个非回环、非链路本地的 IPv4
+get_lan_ipv4() {
+    # 私有地址正则（A类:10.0.0.0/8, B类:172.16.0.0/12, C类:192.168.0.0/16）
+    ipv4_private=$(ip -4 addr show 2>/dev/null | grep -oE 'inet (10\.[0-9]+\.[0-9]+\.[0-9]+|172\.(1[6-9]|2[0-9]|3[0-1])\.[0-9]+\.[0-9]+|192\.168\.[0-9]+\.[0-9]+)' | awk '{print $2}' | head -n1)
+    if [ -n "$ipv4_private" ]; then
+        echo "$ipv4_private"
+        return
+    fi
+    # 没有私有地址则取第一个非回环、非169.254.*.*的地址
+    ip -4 addr show 2>/dev/null | grep -v 'inet 127\.0\.0\.' | grep -v 'inet 169\.254\.' | grep -m1 inet | awk '{print $2}' | cut -d/ -f1
+}
 
-lan_ip4=$(ip -4 addr show "$lan_if" 2>/dev/null | grep -m1 inet | awk '{print $2}' | cut -d/ -f1)
-lan_ip6=$(ip -6 addr show "$lan_if" 2>/dev/null | grep -v "inet6 ::1/128" | grep -m1 inet6 | awk '{print $2}' | cut -d/ -f1)
+# 获取 IPv6：取第一个 scope global 的地址（排除链路本地和回环）
+get_lan_ipv6() {
+    ip -6 addr show scope global 2>/dev/null | awk '/inet6/ && !/::1/ {print $2}' | cut -d/ -f1 | head -n1
+}
+
+lan_ip4=$(get_lan_ipv4)
+lan_ip6=$(get_lan_ipv6)
+
 lan_ip4=${lan_ip4:-"无"}
 lan_ip6=${lan_ip6:-"无"}
 
