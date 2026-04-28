@@ -92,7 +92,7 @@ else
     echo "⚪️ 未选择 luci-app-openclash"
 fi
 #daed
-git clone https://github.com/AWAE-Team/openwrt-daed.git package/daed
+git clone https://github.com/daeuniverse/daed.git
 #passwall
 git clone https://github.com/Openwrt-Passwall/openwrt-passwall-packages package/passwall-packages
 git clone https://github.com/Openwrt-Passwall/openwrt-passwall package/passwall-luci
