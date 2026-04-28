@@ -14,6 +14,7 @@ on:
           - 24.10.3
           - 24.10.4
           - 24.10.5
+          - 24.10.6
       openwrt_kernel:
         description: "选择构建的内核(斐讯N1)"
         required: false
