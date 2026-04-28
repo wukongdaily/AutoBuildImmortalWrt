@@ -93,6 +93,8 @@ else
 fi
 #daed
 git clone https://github.com/daeuniverse/daed.git
+echo "CONFIG_PACKAGE_luci-app-daed=y" >> .config
+echo "CONFIG_PACKAGE_dae=y" >> .config
 #passwall
 git clone https://github.com/Openwrt-Passwall/openwrt-passwall-packages package/passwall-packages
 git clone https://github.com/Openwrt-Passwall/openwrt-passwall package/passwall-luci
