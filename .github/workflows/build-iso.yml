@@ -11,7 +11,7 @@ on:
       luci_version:
         description: "选择luci版本"
         required: false
-        default: "24.10.5"
+        default: "24.10.6"
         type: choice
         options:
           - 24.10.0
@@ -20,6 +20,7 @@ on:
           - 24.10.3
           - 24.10.4
           - 24.10.5
+          - 24.10.6
       profile:
         description: '请输入要编译固件大小 单位(MB)'
         required: true
