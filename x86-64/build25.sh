@@ -60,6 +60,11 @@ PACKAGES="$PACKAGES xray-core hysteria luci-i18n-passwall-zh-cn"
 PACKAGES="$PACKAGES luci-app-openclash"
 PACKAGES="$PACKAGES luci-i18n-homeproxy-zh-cn"
 PACKAGES="$PACKAGES openssh-sftp-server"
+#myself
+PACKAGES="$PACKAGES uci-app-daed"
+PACKAGES="$PACKAGES luci-i18n-daed-zh-cn"
+PACKAGES="$PACKAGES luci-app-passwall"
+PACKAGES="$PACKAGES luci-i18n-passwall-zh-cn"
 
 # 文件管理器
 PACKAGES="$PACKAGES luci-i18n-filemanager-zh-cn"
@@ -88,7 +93,11 @@ if echo "$PACKAGES" | grep -q "luci-app-openclash"; then
 else
     echo "⚪️ 未选择 luci-app-openclash"
 fi
-
+#daed
+git clone https://github.com/daeuniverse/daed.git
+#passwall
+git clone https://github.com/Openwrt-Passwall/openwrt-passwall-packages package/passwall-packages
+git clone https://github.com/Openwrt-Passwall/openwrt-passwall package/passwall-luci
 # 构建镜像
 echo "$(date '+%Y-%m-%d %H:%M:%S') - Building image with the following packages:"
 echo "$PACKAGES"
