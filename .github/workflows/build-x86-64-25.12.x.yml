@@ -1,6 +1,6 @@
 name: build-x86-64-immortalwrt-25.12.x
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+#env:
+#  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 on:
   workflow_dispatch:
     inputs:
@@ -50,9 +50,9 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
       - name: Setup Node.js
-        uses: actions/setup-node@v4.2.2
+        uses: actions/setup-node@v4.2.0
         with:
           node-version: '24'
       - name: Set executable permissions
@@ -117,7 +117,7 @@ jobs:
           fi
 
       - name: Upload ImmortWrt as release assets
-        uses: softprops/action-gh-release@v2.2.1
+        uses: softprops/action-gh-release@v2.4.0
         with:
           tag_name: Autobuild-x86-64
           body_path: ${{ github.workspace }}/router-info.md
