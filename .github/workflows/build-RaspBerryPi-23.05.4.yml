@@ -88,9 +88,9 @@ jobs:
               -v "${{ github.workspace }}/arch/$ARCH:/home/build/immortalwrt/files/etc/opkg/arch.conf" \
               -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
               -v "${{ github.workspace }}/raspberrypi/23.05.4/build.sh:/home/build/openwrt/build.sh" \
-              -e PROFILE=$profile \
-              -e INCLUDE_DOCKER=$include_docker \
-              -e ROOTSIZE=$size \
+              -e PROFILE="$profile" \
+              -e INCLUDE_DOCKER="$include_docker" \
+              -e ROOTSIZE="$size" \
               immortalwrt/imagebuilder:$tag /bin/bash /home/build/openwrt/build.sh
           done
           ls ${{ github.workspace }}/bin/targets/bcm27xx/${{ env.cpu }}
