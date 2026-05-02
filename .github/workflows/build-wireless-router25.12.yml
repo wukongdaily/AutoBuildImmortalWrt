@@ -25,6 +25,7 @@ on:
         description: "请选择mtk路由器型号"
         required: true
         options:
+          - glinet_gl-mt3600be
           - glinet_gl-mt2500
           - glinet_gl-mt3000
           - glinet_gl-mt6000
