@@ -53,7 +53,6 @@ PACKAGES="$PACKAGES luci-i18n-firewall-zh-cn"
 PACKAGES="$PACKAGES luci-theme-argon"
 # PACKAGES="$PACKAGES luci-app-argon-config"
 # PACKAGES="$PACKAGES luci-i18n-argon-config-zh-cn"
-PACKAGES="$PACKAGES -luci-theme-bootstrap"
 
 #25.12
 PACKAGES="$PACKAGES luci-i18n-package-manager-zh-cn"
@@ -66,7 +65,7 @@ PACKAGES="$PACKAGES snmpd"
 
 # 文件管理器
 # PACKAGES="$PACKAGES luci-i18n-filemanager-zh-cn"
-PACKAGES="$PACKAGES -luci-app-fstab -luci-i18n-fstab-zh-cn"
+PACKAGES="$PACKAGES -luci-app-fstab -luci-i18n-fstab-zh-cn -block-mount"
 # ======== shell/apk-custom-packages.sh =======
 # 合并imm仓库以外的第三方插件 暂时注释
 PACKAGES="$PACKAGES $CUSTOM_PACKAGES"
