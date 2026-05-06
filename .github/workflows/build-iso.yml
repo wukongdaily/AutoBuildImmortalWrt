@@ -53,6 +53,9 @@ on:
         description: "宽带密码 (若启用PPPoE)"
         required: false
 
+permissions:
+  contents: write
+
 jobs:
   build_immortalwrt:
     runs-on: ubuntu-22.04
