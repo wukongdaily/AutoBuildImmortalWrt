@@ -203,6 +203,4 @@ if opkg list-installed | grep -q '^luci-app-advancedplus '; then
     sed -i '/\/usr\/bin\/zsh/d' /etc/init.d/advancedplus
 fi
 
-rm -f /etc/profile.d/apk-cheatsheet.sh
-
 exit 0
