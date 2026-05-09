@@ -35,7 +35,6 @@ else
   cp -r /tmp/store-apk-repo/run/arm64/* /home/build/immortalwrt/extra-packages/
 
   echo "✅ Run files copied to extra-packages:"
-  ls -lh /home/build/immortalwrt/extra-packages/*.run
   # 解压并拷贝apk到packages目录
   sh shell/apk-prepare-packages.sh
   ls -lah /home/build/immortalwrt/packages/
@@ -89,6 +88,7 @@ if echo "$PACKAGES" | grep -q "luci-app-openclash"; then
     wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat -O files/etc/openclash/GeoSite.dat
     wget -q https://281.281265.xyz/clash/heicat.yaml -O files/etc/openclash/config/heicat.yaml
     # 下载最新 OpenClash Client
+    # Download latest openclash Client
     URL=$(curl -s https://api.github.com/repos/vernesong/OpenClash/releases/latest \
       | grep "browser_download_url.*apk" \
       | head -n1 \
