@@ -35,7 +35,6 @@ else
   cp -r /tmp/store-apk-repo/run/arm64/* /home/build/immortalwrt/extra-packages/
 
   echo "✅ Run files copied to extra-packages:"
-  ls -lh /home/build/immortalwrt/extra-packages/*.run
   # 解压并拷贝apk到packages目录
   sh shell/apk-prepare-packages.sh
   ls -lah /home/build/immortalwrt/packages/
