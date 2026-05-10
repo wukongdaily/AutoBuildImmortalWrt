@@ -5,7 +5,7 @@ on:
       luci_version:
         description: "选择luci版本"
         required: false
-        default: "24.10.5"
+        default: "24.10.6"
         type: choice
         options:
           - 24.10.0
@@ -14,6 +14,7 @@ on:
           - 24.10.3
           - 24.10.4
           - 24.10.5
+          - 24.10.6
       openwrt_kernel:
         description: "选择构建的内核(斐讯N1)"
         required: false
@@ -180,6 +181,9 @@ on:
         required: true
         default: 'wukongdaily'
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -259,7 +263,6 @@ jobs:
 
       - name: Package armsr-armv8 as ImmortalWrt for N1
         uses: wukongdaily/flippy-openwrt-actions@master
-        if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
         env:
           OPENWRT_ARMVIRT: ${{ steps.find_rootfs.outputs.file }}
           PACKAGE_SOC: s905d
