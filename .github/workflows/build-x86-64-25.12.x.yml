@@ -13,11 +13,11 @@ on:
       custom_router_ip:
         description: "请设置路由器的管理地址(仅对多网口路由器有效) 格式:192.168.x.1 或 10.x.x.1"
         required: true
-        default: "192.168.100.1"
+        default: "192.168.100.10"
       profile:
         description: '请输入要编译固件大小 单位(MB)'
         required: true
-        default: '1024'
+        default: '2048'
       include_docker:
         description: |
           是否编译 Docker 插件
