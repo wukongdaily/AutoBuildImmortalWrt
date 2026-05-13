@@ -10,12 +10,12 @@
 # jcg_q30-ubootmod
 # qihoo_360t7-ubootmod
 # xiaomi_mi-router-wr30u-112m-nmbm
-# xiaomi_redmi-router-ax6000 该机型在24.10.6 分化为2个机型
-# —————————————————————————————24.10.6—————————————————————————————————
+# xiaomi_redmi-router-ax6000 该机型在24.10.5 分化为2个机型
+# —————————————————————————————24.10.5—————————————————————————————————
 # xiaomi_redmi-router-ax6000-stock ————原厂默认 bootloader（stock）版本
 # xiaomi_redmi-router-ax6000-ubootmod—————改装过 bootloader 的版本（ubootmod）
 
-name: Build Wireless Router ImmortalWrt 24.10.x
+name: Build Wireless Router ImmortalWrt 25.12.x
 
 on:
   workflow_dispatch:
@@ -25,6 +25,7 @@ on:
         description: "请选择mtk路由器型号"
         required: true
         options:
+          - glinet_gl-mt3600be
           - glinet_gl-mt2500
           - glinet_gl-mt3000
           - glinet_gl-mt6000
@@ -489,11 +490,6 @@ on:
         description: "请设置路由器的管理地址 格式:192.168.x.1 或 10.x.x.1"
         required: true
         default: "192.168.100.1"
-      enable_store:
-        description: "集成 store 商店"
-        required: false
-        type: boolean
-        default: false
       include_docker:
         description: |
           是否编译 Docker 插件
@@ -532,7 +528,7 @@ jobs:
 
       - name: Set executable permissions
         run: |
-          chmod +x ${{ github.workspace }}/mediatek-filogic/build24.sh
+          chmod +x ${{ github.workspace }}/mediatek-filogic/build25.sh
       
       - name: Save Custom Router IP into OpenWrt files
         run: |
@@ -551,18 +547,9 @@ jobs:
             fi
           fi
       
-      - name: Enable Store integration
-        run: |
-          if [ "${{ github.event.inputs.enable_store }}" == "true" ]; then
-            echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-store"' >> shell/custom-packages.sh
-            echo "✅ 已追加 luci-app-store"
-          else
-            echo "❎ 未启用 luci-app-store"
-          fi
-
-
-      - name: Build Wireless ImmortalWrt
-        run: |
+    
+      - name: Build Wireless ImmortalWrt 25.12.x
+        run: | 
           profile="${{ github.event.inputs.profile }}"
           echo "Building for profile: $profile"
           include_docker="${{ github.event.inputs.include_docker }}"
@@ -573,7 +560,7 @@ jobs:
           ipq807x_models=$(cat model/ipq807x.txt | tr '\n' '|')
           ipq807x_models=${ipq807x_models%|}
           if [[ "$profile" =~ ^($ipq807x_models)$ ]]; then
-              case_tag="qualcommax-ipq807x-openwrt-24.10.6"
+              case_tag="qualcommax-ipq807x-openwrt-25.12.0-rc2"
               case_platform="qualcommax/ipq807x"
           fi
 
@@ -581,7 +568,7 @@ jobs:
           mt7621_models=$(cat model/mt7621.txt | tr '\n' '|')
           mt7621_models=${mt7621_models%|}
           if [[ "$profile" =~ ^($mt7621_models)$ ]]; then
-              case_tag="ramips-mt7621-openwrt-24.10.6"
+              case_tag="ramips-mt7621-openwrt-25.12.0-rc2"
               case_platform="ramips/mt7621"
           fi
 
@@ -589,7 +576,7 @@ jobs:
           bcm53xx_models=$(cat model/bcm53xx.txt | tr '\n' '|')
           bcm53xx_models=${bcm53xx_models%|}
           if [[ "$profile" =~ ^($bcm53xx_models)$ ]]; then
-              case_tag="bcm53xx-generic-openwrt-24.10.6"
+              case_tag="bcm53xx-generic-openwrt-25.12.0-rc2"
               case_platform="bcm53xx/generic"
           fi
 
@@ -597,7 +584,7 @@ jobs:
           case "$profile" in
               glinet_gl-b2200)
                   # 虽然它是高通ipq40xx平台 但由于都是gl机型 故放在一起 找起来方便
-                  tag=ipq40xx-generic-openwrt-24.10.6
+                  tag=ipq40xx-generic-openwrt-25.12.0-rc2
                   echo "platform=ipq40xx/generic" >> $GITHUB_ENV
                   ;;
               glinet_gl-axt1800|glinet_gl-ax1800)
@@ -606,10 +593,10 @@ jobs:
                   echo "platform=qualcommax/ipq60xx" >> $GITHUB_ENV
                   ;;
               xiaomi_redmi-router-ax6s)
-                  tag=mediatek-mt7622-openwrt-24.10.6
+                  tag=mediatek-mt7622-openwrt-25.12.0-rc2
                   echo "platform=mediatek/mt7622" >> $GITHUB_ENV
                   ;;
-              # 下列机型目前没有24.10 因此采用23.05.4分支来构建
+              # 下列机型目前没有25.12 因此采用23.05.4分支来构建
               cmcc_rax3000m-emmc-ubootmod | \
               cmcc_rax3000m-nand-ubootmod | \
               cmcc_a10 | \
@@ -623,7 +610,7 @@ jobs:
               qihoo_360t7-ubootmod)
                   tag=mediatek-filogic-openwrt-23.05.4
                   ls ${{ github.workspace }}/mediatek-filogic/
-                  cp ${{ github.workspace }}/mediatek-filogic/build23.sh ${{ github.workspace }}/mediatek-filogic/build24.sh
+                  cp ${{ github.workspace }}/mediatek-filogic/build23.sh ${{ github.workspace }}/mediatek-filogic/build25.sh
                   ;;
               *)
                   # 如果前面匹配了 ipq807x、mt7621、bcm53xx 机型文件，则使用对应 tag
@@ -632,7 +619,7 @@ jobs:
                       echo "platform=$case_platform" >> $GITHUB_ENV
                   else
                       # 默认分支
-                      tag=mediatek-filogic-openwrt-24.10.6
+                      tag=mediatek-filogic-openwrt-25.12.0-rc2
                   fi
                   ;;
             esac
@@ -642,9 +629,8 @@ jobs:
               -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
               -v "${{ github.workspace }}/glinet:/home/build/immortalwrt/files/etc/uci-defaults" \
               -v "${{ github.workspace }}/custom:/home/build/immortalwrt/files/etc/config" \
-              -v "${{ github.workspace }}/arch/arch.conf:/home/build/immortalwrt/files/etc/opkg/arch.conf" \
               -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
-              -v "${{ github.workspace }}/mediatek-filogic/build24.sh:/home/build/immortalwrt/build.sh" \
+              -v "${{ github.workspace }}/mediatek-filogic/build25.sh:/home/build/immortalwrt/build.sh" \
               -e PROFILE=$profile \
               -e INCLUDE_DOCKER=$include_docker \
               -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
