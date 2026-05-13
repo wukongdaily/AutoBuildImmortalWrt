@@ -51,6 +51,9 @@ on:
         required: true
         default: '1024'
 
+permissions:
+  contents: write
+
 
 jobs:
   build:
