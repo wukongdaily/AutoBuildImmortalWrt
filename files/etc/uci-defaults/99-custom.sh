@@ -79,19 +79,25 @@ elif [ "$count" -gt 1 ]; then
     uci set network.wan6.device="$wan_ifname"
     uci set network.wan6.proto='dhcpv6'
 
-    # 查找 br-lan 设备 section
-    section=$(uci show network | awk -F '[.=]' '/\.@?device\[\d+\]\.name=.br-lan.$/ {print $2; exit}')
-    if [ -z "$section" ]; then
-        echo "error：cannot find device 'br-lan'." >>$LOGFILE
-    else
-        # 删除原有ports
-        uci -q delete "network.$section.ports"
-        # 添加LAN接口端口
-        for port in $lan_ifnames; do
-            uci add_list "network.$section.ports"="$port"
-        done
-        echo "Updated br-lan ports: $lan_ifnames" >>$LOGFILE
-    fi
+# 1. 强制删除所有旧的 br-lan 设备（彻底清空）
+uci -q delete network.@device[0]
+uci -q delete network.br_lan
+
+# 2. 重新创建 1 个全新、干净的 br-lan（只创建一次）
+uci set network.br_lan=device
+uci set network.br_lan.name='br-lan'
+uci set network.br_lan.type='bridge'
+
+# 3. 清空端口（保险操作）
+uci -q del_list network.br_lan.ports
+
+# 4. 添加正确的 LAN 口（eth1 eth2 eth3）
+for port in $lan_ifnames; do
+    uci add_list network.br_lan.ports="$port"
+    echo "Added LAN port: $port" >> "$LOGFILE"
+done
+
+echo "Updated br-lan ports: $lan_ifnames" >>$LOGFILE
 
     # LAN口设置静态IP
     uci set network.lan.proto='static'
