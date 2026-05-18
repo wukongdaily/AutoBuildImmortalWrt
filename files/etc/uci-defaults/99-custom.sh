@@ -127,6 +127,45 @@ elif [ "$count" -gt 1 ]; then
     uci commit network
 fi
 
+# 设置所有网口可访问网页终端
+uci delete ttyd.@ttyd[0].interface
+
+# 设置所有网口可连接 SSH
+uci set dropbear.@dropbear[0].Interface=''
+uci commit
+
+# 设置编译作者信息
+FILE_PATH="/etc/openwrt_release"
+NEW_DESCRIPTION="Packaged by wukongdaily"
+sed -i "s/DISTRIB_DESCRIPTION='[^']*'/DISTRIB_DESCRIPTION='$NEW_DESCRIPTION'/" "$FILE_PATH"
+
+# 若luci-app-advancedplus (进阶设置)已安装 则去除zsh的调用 防止命令行报 /usb/bin/zsh: not found的提示
+if [ -f /usr/lib/lua/luci/controller/advancedplus.lua ]; then
+    sed -i '/\/usr\/bin\/zsh/d' /etc/profile
+    sed -i '/\/bin\/zsh/d' /etc/init.d/advancedplus
+    sed -i '/\/usr\/bin\/zsh/d' /etc/init.d/advancedplus
+    echo "fix ttyd show msg: /usb/bin/zsh: not found" >>$LOGFILE
+fi
+
+# 只有安装了 luci-app-quickfile 才执行
+if [ -f /usr/bin/quickfile ]; then
+    uci set nginx.global.uci_enable='true'
+    uci del nginx._lan 2>/dev/null
+    uci del nginx._redirect2ssl 2>/dev/null
+
+    uci add nginx server
+    uci rename nginx.@server[-1]='_lan'
+
+    uci set nginx._lan.server_name='_lan'
+    uci add_list nginx._lan.listen='80 default_server'
+    uci add_list nginx._lan.listen='[::]:80 default_server'
+    uci add_list nginx._lan.include='conf.d/*.locations'
+    uci set nginx._lan.access_log='off; # logd openwrt'
+
+    uci commit nginx
+    echo "fix quickfile nginx config" >>$LOGFILE
+fi
+
 # 若安装了dockerd 则设置docker的防火墙规则
 # 扩大docker涵盖的子网范围 '172.16.0.0/12'
 # 方便各类docker容器的端口顺利通过防火墙 
@@ -149,8 +188,9 @@ if command -v dockerd >/dev/null 2>&1; then
     done
     # 提交删除
     uci commit firewall
-    # 追加新的 zone + forwarding 配置
-    cat <<EOF >>"$FW_FILE"
+
+# 追加新的 zone + forwarding 配置
+cat <<EOF >>"$FW_FILE"
 
 config zone 'docker'
   option input 'ACCEPT'
@@ -174,25 +214,6 @@ EOF
 
 else
     echo "未检测到 Docker，跳过防火墙配置。"
-fi
-
-# 设置所有网口可访问网页终端
-uci delete ttyd.@ttyd[0].interface
-
-# 设置所有网口可连接 SSH
-uci set dropbear.@dropbear[0].Interface=''
-uci commit
-
-# 设置编译作者信息
-FILE_PATH="/etc/openwrt_release"
-NEW_DESCRIPTION="Packaged by wukongdaily"
-sed -i "s/DISTRIB_DESCRIPTION='[^']*'/DISTRIB_DESCRIPTION='$NEW_DESCRIPTION'/" "$FILE_PATH"
-
-# 若luci-app-advancedplus (进阶设置)已安装 则去除zsh的调用 防止命令行报 /usb/bin/zsh: not found的提示
-if opkg list-installed | grep -q '^luci-app-advancedplus '; then
-    sed -i '/\/usr\/bin\/zsh/d' /etc/profile
-    sed -i '/\/bin\/zsh/d' /etc/init.d/advancedplus
-    sed -i '/\/usr\/bin\/zsh/d' /etc/init.d/advancedplus
 fi
 
 exit 0
