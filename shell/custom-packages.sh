@@ -68,6 +68,11 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES webdav2 luci-app-unishare"
 
 #===========================以下imm仓库内的软件==============================↓
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES nut-driver-usbhid-ups"
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES kmod-usb3"
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES kmod-usb-net-cdc-ether"
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES kmod-usb-net-ipheth"
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES usbutils"
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES kmod-mii"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES kmod-usb2"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES kmod-usb-net"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES kmod-usb-net-rndis"
