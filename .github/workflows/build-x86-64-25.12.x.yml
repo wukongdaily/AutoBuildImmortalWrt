@@ -1,19 +1,19 @@
 name: Build ImmortalWrt 25.12 x86_64
 
-on:
+于:
   workflow_dispatch:
     inputs:
       ssh:
         description: 'Enable SSH connection to Actions'
         required: false
-        default: 'false'
+        默认: 'false'
 
 env:
   REPO_URL: https://github.com/immortalwrt/immortalwrt
   REPO_BRANCH: openwrt-25.12
   TZ: Asia/Shanghai
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: .config
+  CONFIG_FILE: wb77cn.config
   DIY_P1_SH: diy-part1.sh
   DIY_P2_SH: diy-part2.sh
 
