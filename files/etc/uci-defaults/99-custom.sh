@@ -20,7 +20,7 @@ if [ ! -f "$SETTINGS_FILE" ]; then
     echo "PPPoE settings file not found. Skipping." >>$LOGFILE
 else
     # 读取pppoe信息($enable_pppoe、$pppoe_account、$pppoe_password)
-    . "$SETTINGS_FILE"
+    。 "$SETTINGS_FILE"
 fi
 
 # 1. 先获取所有物理接口列表
@@ -105,27 +105,9 @@ elif [ "$count" -gt 1 ]; then
         uci set network.lan.ipaddr=$CUSTOM_IP
         echo "custom router ip is $CUSTOM_IP" >> $LOGFILE
     else
-        uci set network.lan.ipaddr='192.168.100.1'
-        echo "default router ip is 192.168.100.1" >> $LOGFILE
+        uci set network.lan.ipaddr='192.168.2.200'
+        echo "default router ip is 192.168.2.200" >> $LOGFILE
     fi
-
-    # PPPoE设置
-    echo "enable_pppoe value: $enable_pppoe" >>$LOGFILE
-    if [ "$enable_pppoe" = "yes" ]; then
-        echo "PPPoE enabled, configuring..." >>$LOGFILE
-        uci set network.wan.proto='pppoe'
-        uci set network.wan.username="$pppoe_account"
-        uci set network.wan.password="$pppoe_password"
-        uci set network.wan.peerdns='1'
-        uci set network.wan.auto='1'
-        uci set network.wan6.proto='none'
-        echo "PPPoE config done." >>$LOGFILE
-    else
-        echo "PPPoE not enabled." >>$LOGFILE
-    fi
-
-    uci commit network
-fi
 
 # 设置所有网口可访问网页终端
 uci delete ttyd.@ttyd[0].interface
@@ -136,7 +118,7 @@ uci commit
 
 # 设置编译作者信息
 FILE_PATH="/etc/openwrt_release"
-NEW_DESCRIPTION="Packaged by wukongdaily"
+NEW_DESCRIPTION="Packaged by wb77cn"
 sed -i "s/DISTRIB_DESCRIPTION='[^']*'/DISTRIB_DESCRIPTION='$NEW_DESCRIPTION'/" "$FILE_PATH"
 
 # 若luci-app-advancedplus (进阶设置)已安装 则去除zsh的调用 防止命令行报 /usb/bin/zsh: not found的提示
