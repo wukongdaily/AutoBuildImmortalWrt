@@ -120,11 +120,6 @@ jobs:
           # 根分区大小（对应 ImageBuilder 的 ROOTFS_PARTSIZE 参数）
           echo "CONFIG_TARGET_ROOTFS_PARTSIZE=${{ github.event.inputs.profile }}" \
             >> ${{ env.WORKDIR }}/.config
-          # Docker 插件（条件注入）
-          if [[ "${{ github.event.inputs.include_docker }}" == "yes" ]]; then
-            echo "CONFIG_PACKAGE_luci-i18n-dockerman-zh-cn=y" \
-              >> ${{ env.WORKDIR }}/.config
-          fi
           cd ${{ env.WORKDIR }} && make defconfig
 
       # ── 7. 关键：向内核 Kconfig 注入 MLX5 硬件分流所需选项 ──
