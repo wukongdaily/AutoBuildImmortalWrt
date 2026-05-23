@@ -197,5 +197,6 @@ fi
 
 # x86 软路由无 LED 硬件，去除 LuCI 系统菜单中的"LED 配置"页面
 rm -f /www/luci-static/resources/view/system/leds.js
+sed -i '/"admin\/system\/leds"/,/^[[:space:]]*},$/d' /usr/share/luci/menu.d/luci-mod-system.json
 
 exit 0
