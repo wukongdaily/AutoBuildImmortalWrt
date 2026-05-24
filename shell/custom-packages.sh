@@ -58,7 +58,7 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-advancedplus luci-i18n-advancedplus-z
 # 任务设置
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-taskplan luci-i18n-taskplan-zh-cn"
 # Easytier
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES easytier luci-app-easytier luci-i18n-easytier-zh-cn"
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES easytier luci-app-easytier"
 # 统一文件共享
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES webdav2 luci-app-unishare"
 # IPSec VPN 服务器
@@ -210,7 +210,7 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-upnp-zh-cn"
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-xlnetacc-zh-cn"
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-zerotier-zh-cn"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-base-zh-cn"
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-nginx-zh-cn"
+#CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-nginx-zh-cn"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES -luci-i18n-filemanager-zh-cn -luci-app-uhttpd"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES kmod-usb-hid kmod-usb-audio ffmpeg mpd-full mpd-avahi-service upmpdcli"
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES "
