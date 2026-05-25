@@ -5,7 +5,7 @@ on:
       luci_version:
         description: "选择luci版本"
         required: false
-        default: "24.10.5"
+        default: "24.10.6"
         type: choice
         options:
           - 24.10.0
@@ -14,6 +14,7 @@ on:
           - 24.10.3
           - 24.10.4
           - 24.10.5
+          - 24.10.6
       openwrt_kernel:
         description: "选择构建的内核(斐讯N1)"
         required: false
@@ -45,6 +46,20 @@ on:
           - 6.1.142
           - 6.1.144
           - 6.1.146
+          - 6.1.147
+          - 6.1.148
+          - 6.1.149
+          - 6.1.150
+          - 6.1.151
+          - 6.1.152
+          - 6.1.153
+          - 6.1.154
+          - 6.1.155
+          - 6.1.156
+          - 6.1.157
+          - 6.1.158
+          - 6.1.159
+          - 6.1.160
           - 6.6.67
           - 6.6.68
           - 6.6.69
@@ -87,6 +102,8 @@ on:
           - 6.6.114
           - 6.6.115
           - 6.6.116
+          - 6.6.119
+          - 6.6.120
           - 6.12.16
           - 6.12.17
           - 6.12.18
@@ -124,7 +141,9 @@ on:
           - 6.12.54
           - 6.12.55
           - 6.12.56
-          - 6.12.57		
+          - 6.12.57
+          - 6.12.62
+          - 6.12.65
           
       include_docker:
         description: |
@@ -161,6 +180,9 @@ on:
         description: "设置打包作者的名称"
         required: true
         default: 'wukongdaily'
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -241,7 +263,6 @@ jobs:
 
       - name: Package armsr-armv8 as ImmortalWrt for N1
         uses: wukongdaily/flippy-openwrt-actions@master
-        if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
         env:
           OPENWRT_ARMVIRT: ${{ steps.find_rootfs.outputs.file }}
           PACKAGE_SOC: s905d
