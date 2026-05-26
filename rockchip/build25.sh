@@ -28,7 +28,7 @@ else
   # ============= 同步第三方插件库==============
   # 同步第三方软件仓库run/apk
   echo "🔄 正在同步第三方软件仓库 Cloning run file repo..."
-  git clone --depth=1 -b dev https://github.com/LimitlessTao/immortalwrtstoreapk.git /tmp/store-run-repo
+  git clone --depth=1 -b dev https://github.com/LimitlessTao/immortalwrtstoreapk.git /tmp/store-apk-repo
 
   # 拷贝 run/arm64 下所有 run 文件和apk文件 到 extra-packages 目录
   mkdir -p /home/build/immortalwrt/extra-packages
