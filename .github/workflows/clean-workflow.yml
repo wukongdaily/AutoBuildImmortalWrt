@@ -1,0 +1,52 @@
+name: Cleanup Old Workflow Runs
+
+on:
+  workflow_dispatch:
+    inputs:
+      keep_days:
+        description: "保留最近多少天（默认 1）"
+        required: false
+        default: "1"
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+
+    steps:
+      - name: 安装 jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: 删除指定天数前的已完成运行
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          KEEP_DAYS: ${{ github.event.inputs.keep_days }}
+        run: |
+          : "${KEEP_DAYS:=1}"
+          THRESHOLD="$(date -u -d "${KEEP_DAYS} days ago" '+%Y-%m-%dT%H:%M:%SZ')"
+          echo "阈值时间(UTC)：$THRESHOLD"
+
+          RUN_IDS=$(gh api -X GET "repos/${GITHUB_REPOSITORY}/actions/runs" \
+                    --paginate -F per_page=100 \
+                    --jq '.workflow_runs[]
+                          | select(.status=="completed" and .created_at < "'"$THRESHOLD"'")
+                          | .id')
+
+          if [ -z "$RUN_IDS" ]; then
+            echo "✅ 没有可删除的运行"
+            exit 0
+          fi
+
+          echo "待删除运行数量：$(wc -w <<< "$RUN_IDS")"
+          for ID in $RUN_IDS; do
+            echo "🗑 正在删除运行 ID: $ID"
+            gh api -X DELETE "repos/${GITHUB_REPOSITORY}/actions/runs/${ID}" || {
+              echo "⚠️ 删除失败：$ID（将继续处理其他项）"
+            }
+            sleep 0.2
+          done
+
+          echo "🎉 清理完成"

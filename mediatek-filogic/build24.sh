@@ -1,5 +1,6 @@
 #!/bin/bash
 source shell/custom-packages.sh
+source shell/switch_repository.sh
 # 该文件实际为imagebuilder容器内的build.sh
 
 #echo "✅ 你选择了第三方软件包：$CUSTOM_PACKAGES"
@@ -25,6 +26,7 @@ arch aarch64_cortex-a53 15' repositories.conf
 
 # yml 传入的路由器型号 PROFILE
 echo "Building for profile: $PROFILE"
+
 echo "Include Docker: $INCLUDE_DOCKER"
 echo "Create pppoe-settings"
 mkdir -p  /home/build/immortalwrt/files/etc/config
@@ -45,7 +47,7 @@ echo "$(date '+%Y-%m-%d %H:%M:%S') - Starting build process..."
 
 # 定义所需安装的包列表 下列插件你都可以自行删减
 PACKAGES=""
-PACKAGES="$PACKAGES curl"
+PACKAGES="$PACKAGES curl luci luci-i18n-base-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-firewall-zh-cn"
 PACKAGES="$PACKAGES luci-theme-argon"
 PACKAGES="$PACKAGES luci-app-argon-config"
@@ -57,16 +59,18 @@ PACKAGES="$PACKAGES luci-i18n-ttyd-zh-cn"
 PACKAGES="$PACKAGES openssh-sftp-server"
 # 文件管理器
 PACKAGES="$PACKAGES luci-i18n-filemanager-zh-cn"
-# 静态文件服务器dufs(推荐)
-PACKAGES="$PACKAGES luci-i18n-dufs-zh-cn"
-# 分区扩容 by sirpdboy 
-PACKAGES="$PACKAGES luci-app-partexp"
-PACKAGES="$PACKAGES luci-i18n-partexp-zh-cn"
+
 
 # 第三方软件包 合并
 # ======== shell/custom-packages.sh =======
-PACKAGES="$PACKAGES $CUSTOM_PACKAGES"
-
+if [ "$PROFILE" = "glinet_gl-axt1800" ] || [ "$PROFILE" = "glinet_gl-ax1800" ]; then
+    # 这2款 暂时不支持第三方插件的集成 snapshot版本太高 opkg换成apk包管理器 6.12内核 
+    echo "Model:$PROFILE not support third-parted packages"
+    PACKAGES="$PACKAGES -luci-i18n-diskman-zh-cn luci-i18n-homeproxy-zh-cn"
+else
+    echo "Other Model:$PROFILE"
+    PACKAGES="$PACKAGES $CUSTOM_PACKAGES"
+fi
 
 # 判断是否需要编译 Docker 插件
 if [ "$INCLUDE_DOCKER" = "yes" ]; then
@@ -85,6 +89,13 @@ if echo "$PACKAGES" | grep -q "luci-app-openclash"; then
     # Download GeoIP and GeoSite
     wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat -O files/etc/openclash/GeoIP.dat
     wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat -O files/etc/openclash/GeoSite.dat
+    # Download latest openclash Client
+    URL=$(curl -s https://api.github.com/repos/vernesong/OpenClash/releases/latest \
+      | grep "browser_download_url.*ipk" \
+      | head -n1 \
+      | cut -d '"' -f 4)
+    echo "OpenClash latest ipk: $URL"
+    wget "$URL" -P /home/build/immortalwrt/packages/
 else
     echo "⚪️ 未选择 luci-app-openclash"
 fi
