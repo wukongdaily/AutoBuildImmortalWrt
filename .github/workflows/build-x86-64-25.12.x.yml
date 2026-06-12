@@ -16,26 +16,25 @@ on:
         required: true
         default: "192.168.100.1"
       profile:
-        description: '请输入要编译固件大小 单位(MB)'
+        description: "请输入要编译固件大小 单位(MB)"
         required: true
-        default: '1024'
+        default: "1024"
       include_docker:
-        description: |
-          是否编译 Docker 插件
+        description: "是否编译 Docker 插件"
         required: true
-        default: 'yes'
+        default: "yes"
         type: choice
         options:
-          - 'yes'
-          - 'no'
+          - "yes"
+          - "no"
       enable_pppoe:
         description: "是否配置PPPoE拨号信息?"
         required: true
-        default: 'no'
+        default: "no"
         type: choice
         options:
-        - 'yes'
-        - 'no'
+          - "yes"
+          - "no"
       pppoe_account:
         description: "宽带账号 (若启用PPPoE)"
         required: false
@@ -60,10 +59,9 @@ jobs:
       - name: Save Custom Router IP into OpenWrt files
         run: |
           mkdir -p "${{ github.workspace }}/custom"
-          echo "${{ github.event.inputs.custom_router_ip }}" > "${{ github.workspace }}/custom/custom_router_ip.txt"
-          echo "您设置的路由器管理地址是:${{ github.event.inputs.custom_router_ip }}"
-          # 后续步骤会将该文件映射到路由器/etc/config/custom_router_ip.txt 以便用于开机脚本99-custom.sh读取用户设置的ip
-      
+          echo "${{ inputs.custom_router_ip }}" > "${{ github.workspace }}/custom/custom_router_ip.txt"
+          echo "您设置的路由器管理地址是:${{ inputs.custom_router_ip }}"
+          
       - name: Validate PPPoE Inputs
         run: |
           if [[ "${{ inputs.enable_pppoe }}" == "yes" ]]; then
@@ -75,9 +73,9 @@ jobs:
 
       - name: Build ImmortalWrt-x86-64-efi 25.12.x
         run: |
-          profile="${{ github.event.inputs.profile }}"
-          include_docker="${{ github.event.inputs.include_docker }}"
-          luci_version="${{ github.event.inputs.luci_version }}"
+          profile="${{ inputs.profile }}"
+          include_docker="${{ inputs.include_docker }}"
+          luci_version="${{ inputs.luci_version }}"
           echo "Building for profile: $profile"
           docker run --rm -i \
             --user root \
@@ -92,23 +90,22 @@ jobs:
             -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
             -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
             -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
-          immortalwrt/imagebuilder:x86-64-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
-          
+            immortalwrt/imagebuilder:x86-64-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
 
       - name: Create info
         run: |
           cat > ${{ github.workspace }}/router-info.md <<EOF
           ## 📡 路由器后台信息
           <a href="https://wkdaily.cpolar.cn/archives/1">
-           <img src="https://img.shields.io/badge/若下载慢可套用国内加速站下载-FC7C0D?logo=github&logoColor=fff&labelColor=000&style=for-the-badge"/>
+            <img src="https://img.shields.io/badge/若下载慢可套用国内加速站下载-FC7C0D?logo=github&logoColor=fff&labelColor=000&style=for-the-badge"/>
           </a>
           
-          - 🏠 **后台地址**: ${{ github.event.inputs.custom_router_ip }}
+          - 🏠 **后台地址**: ${{ inputs.custom_router_ip }}
           - 👤 **用户名**: root
           - 🔑 **密码**: 无
           EOF
 
-          if [ "${{ github.event.inputs.include_docker }}" == "yes" ]; then
+          if [ "${{ inputs.include_docker }}" == "yes" ]; then
             extra_content="#### 默认带docker"
             echo -e "\n$extra_content" >> ${{ github.workspace }}/router-info.md
           else
