@@ -89,16 +89,6 @@ on:
         required: false
         type: boolean
         default: false
-      enable_nekobox:
-        description: "【代理】Nekobox 代理工具"
-        required: false
-        type: boolean
-        default: false
-      enable_homeproxy:
-        description: "【代理】HomeProxy 代理工具"
-        required: false
-        type: boolean
-        default: false
       # ============= DNS/去广告 =============
       enable_mosdns:
         description: "【DNS】MosDNS 高性能DNS分流"
@@ -132,11 +122,6 @@ on:
         required: false
         type: boolean
         default: true
-      enable_kucat:
-        description: "【主题】酷猫主题 Kucat Theme"
-        required: false
-        type: boolean
-        default: false
       # ============= 实用工具 =============
       enable_lucky:
         description: "【工具】Lucky大吉 (端口转发/反向代理/NAT)"
@@ -160,11 +145,6 @@ on:
         default: false
       enable_bandix:
         description: "【工具】Bandix 流量监控"
-        required: false
-        type: boolean
-        default: false
-      enable_rtp2httpd:
-        description: "【工具】IPTV rtp2httpd 流媒体转发"
         required: false
         type: boolean
         default: false
@@ -205,27 +185,27 @@ jobs:
             case "${{ inputs.preset }}" in
               minimal)
                 PASSWALL2=false; OPENCLASH=false; SSR_PLUS=false; NIKKI=false; CLASHOO=false
-                NEKOBOX=false; HOMEPROXY=false; MOSDNS=false; ADGUARDHOME=false
+                MOSDNS=false; ADGUARDHOME=false
                 TURBOACC=false; TAILSCALE=false; EASYTIER=false
-                AURORA=true; KUCAT=false
+                AURORA=true
                 LUCKY=false; QUICKFILE=true; UNINSTALL=true; PARTEXP=false
-                BANDIX=false; RTP2HTTPD=false
+                BANDIX=false
                 ;;
               standard)
                 PASSWALL2=true; OPENCLASH=false; SSR_PLUS=false; NIKKI=false; CLASHOO=false
-                NEKOBOX=false; HOMEPROXY=false; MOSDNS=true; ADGUARDHOME=false
+                MOSDNS=true; ADGUARDHOME=false
                 TURBOACC=true; TAILSCALE=false; EASYTIER=false
-                AURORA=true; KUCAT=false
+                AURORA=true
                 LUCKY=false; QUICKFILE=true; UNINSTALL=true; PARTEXP=true
-                BANDIX=false; RTP2HTTPD=false
+                BANDIX=false
                 ;;
               full)
                 PASSWALL2=true; OPENCLASH=true; SSR_PLUS=true; NIKKI=true; CLASHOO=true
-                NEKOBOX=true; HOMEPROXY=true; MOSDNS=true; ADGUARDHOME=true
+                MOSDNS=true; ADGUARDHOME=true
                 TURBOACC=true; TAILSCALE=true; EASYTIER=true
-                AURORA=true; KUCAT=true
+                AURORA=true
                 LUCKY=true; QUICKFILE=true; UNINSTALL=true; PARTEXP=true
-                BANDIX=true; RTP2HTTPD=true
+                BANDIX=true
                 ;;
             esac
           else
@@ -234,21 +214,17 @@ jobs:
             SSR_PLUS="${{ inputs.enable_ssr_plus }}"
             NIKKI="${{ inputs.enable_nikki }}"
             CLASHOO="${{ inputs.enable_clashoo }}"
-            NEKOBOX="${{ inputs.enable_nekobox }}"
-            HOMEPROXY="${{ inputs.enable_homeproxy }}"
             MOSDNS="${{ inputs.enable_mosdns }}"
             ADGUARDHOME="${{ inputs.enable_adguardhome }}"
             TURBOACC="${{ inputs.enable_turboacc }}"
             TAILSCALE="${{ inputs.enable_tailscale }}"
             EASYTIER="${{ inputs.enable_easytier }}"
             AURORA="${{ inputs.enable_aurora }}"
-            KUCAT="${{ inputs.enable_kucat }}"
             LUCKY="${{ inputs.enable_lucky }}"
             QUICKFILE="${{ inputs.enable_quickfile }}"
             UNINSTALL="${{ inputs.enable_uninstall }}"
             PARTEXP="${{ inputs.enable_partexp }}"
             BANDIX="${{ inputs.enable_bandix }}"
-            RTP2HTTPD="${{ inputs.enable_rtp2httpd }}"
           fi
 
           echo "========================================="
@@ -259,21 +235,17 @@ jobs:
           echo "SSR-Plus:     $SSR_PLUS"
           echo "Nikki:        $NIKKI"
           echo "Clashoo:      $CLASHOO"
-          echo "Nekobox:      $NEKOBOX"
-          echo "HomeProxy:    $HOMEPROXY"
           echo "MosDNS:       $MOSDNS"
           echo "AdGuardHome:  $ADGUARDHOME"
           echo "TurboACC:     $TURBOACC"
           echo "Tailscale:    $TAILSCALE"
           echo "Easytier:     $EASYTIER"
           echo "极光主题:      $AURORA"
-          echo "酷猫主题:      $KUCAT"
           echo "Lucky大吉:    $LUCKY"
           echo "QuickFile:    $QUICKFILE"
           echo "高级卸载:      $UNINSTALL"
           echo "分区扩容:      $PARTEXP"
           echo "Bandix监控:   $BANDIX"
-          echo "IPTV转发:     $RTP2HTTPD"
           echo "========================================="
 
           # ============= 动态生成 shell/custom-packages.sh =============
@@ -300,12 +272,6 @@ jobs:
           if [ "$CLASHOO" = "true" ]; then
             echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES clashoo luci-app-clashoo luci-i18n-clashoo-zh-cn"' >> shell/custom-packages.sh
           fi
-          if [ "$NEKOBOX" = "true" ]; then
-            echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-nekobox"' >> shell/custom-packages.sh
-          fi
-          if [ "$HOMEPROXY" = "true" ]; then
-            echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-homeproxy-zh-cn"' >> shell/custom-packages.sh
-          fi
           # DNS/去广告
           if [ "$MOSDNS" = "true" ]; then
             echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-mosdns luci-i18n-mosdns-zh-cn"' >> shell/custom-packages.sh
@@ -327,9 +293,6 @@ jobs:
           if [ "$AURORA" = "true" ]; then
             echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-theme-aurora luci-app-aurora-config luci-i18n-aurora-config-zh-cn"' >> shell/custom-packages.sh
           fi
-          if [ "$KUCAT" = "true" ]; then
-            echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-theme-kucat"' >> shell/custom-packages.sh
-          fi
           # 实用工具
           if [ "$LUCKY" = "true" ]; then
             echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-lucky lucky"' >> shell/custom-packages.sh
@@ -345,9 +308,6 @@ jobs:
           fi
           if [ "$BANDIX" = "true" ]; then
             echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-bandix luci-i18n-bandix-zh-cn"' >> shell/custom-packages.sh
-          fi
-          if [ "$RTP2HTTPD" = "true" ]; then
-            echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-rtp2httpd luci-i18n-rtp2httpd-zh-cn"' >> shell/custom-packages.sh
           fi
           # iStore 商店
           if [ "${{ github.event.inputs.enable_store }}" == "true" ]; then
