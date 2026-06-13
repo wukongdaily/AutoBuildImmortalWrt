@@ -25,8 +25,7 @@ on:
         type: boolean
         default: true
       include_docker:
-        description: |
-          是否编译 Docker 插件
+        description: "是否编译 Docker 插件"
         required: true
         default: 'yes'
         type: choice
@@ -41,15 +40,14 @@ on:
         options:
         - 'yes'
         - 'no'
-      pppoe_account:
-        description: "宽带账号 (若启用PPPoE)"
-        required: false
-      pppoe_password:
-        description: "宽带密码 (若启用PPPoE)"
+      pppoe_info:
+        description: "PPPoE账号:密码 (格式: 账号冒号密码 例: user@123456:pass123)"
         required: false
       # ============= 插件预设 =============
+      # 重要: 选择预设方案时,预设会覆盖下方所有复选框,无需手动勾选
+      # 只有选择"自定义"时,下方复选框才生效
       preset:
-        description: "插件预设方案 (自定义可逐个勾选下方插件)"
+        description: "插件预设方案 (选自定义时下方复选框才生效,选其他预设则自动编译对应插件)"
         required: true
         default: "自定义"
         type: choice
@@ -59,8 +57,13 @@ on:
           - 标准版
           - 全家桶
       # ============= 代理工具 =============
+      enable_passwall:
+        description: "【代理】PassWall (经典版 含xray/singbox/ss/ssr/trojan)"
+        required: false
+        type: boolean
+        default: false
       enable_passwall2:
-        description: "【代理】Passwall2 (含xray/sing-box/hysteria内核)"
+        description: "【代理】PassWall2 (新版 含xray/sing-box/hysteria)"
         required: false
         type: boolean
         default: false
@@ -84,7 +87,6 @@ on:
         required: false
         type: boolean
         default: false
-
       # ============= DNS/去广告 =============
       enable_mosdns:
         description: "【DNS】MosDNS 高性能DNS分流"
@@ -118,7 +120,6 @@ on:
         required: false
         type: boolean
         default: true
-
       # ============= 实用工具 =============
       enable_lucky:
         description: "【工具】Lucky大吉 (端口转发/反向代理/NAT)"
@@ -146,7 +147,6 @@ on:
         type: boolean
         default: false
 
-
 permissions:
   contents: write
 
@@ -166,47 +166,38 @@ jobs:
           mkdir -p "${{ github.workspace }}/custom"
           echo "${{ github.event.inputs.custom_router_ip }}" > "${{ github.workspace }}/custom/custom_router_ip.txt"
           echo "您设置的路由器管理地址是:${{ github.event.inputs.custom_router_ip }}"
-      
-      - name: Validate PPPoE Inputs
-        run: |
-          if [[ "${{ inputs.enable_pppoe }}" == "yes" ]]; then
-            if [[ -z "${{ inputs.pppoe_account }}" || -z "${{ inputs.pppoe_password }}" ]]; then
-              echo "Error: PPPoE account and password must be provided when PPPoE is enabled!"
-              exit 1
-            fi
-          fi
 
       - name: Configure plugin selections
         run: |
           # ============= 解析预设方案 vs 自定义选择 =============
+          # 选择非"自定义"预设时,预设覆盖所有复选框
+          # 只有选择"自定义"时,复选框的勾选状态才生效
           if [ "${{ inputs.preset }}" != "自定义" ]; then
             case "${{ inputs.preset }}" in
               精简版)
-                PASSWALL2=false; OPENCLASH=false; SSR_PLUS=false; NIKKI=false; CLASHOO=false
-                MOSDNS=false; ADGUARDHOME=false
+                PASSWALL=false; PASSWALL2=false; OPENCLASH=false; SSR_PLUS=false
+                NIKKI=false; CLASHOO=false; MOSDNS=false; ADGUARDHOME=false
                 TURBOACC=false; TAILSCALE=false; EASYTIER=false
-                AURORA=true
-                LUCKY=false; QUICKFILE=true; UNINSTALL=true; PARTEXP=false
-                BANDIX=false
+                AURORA=true; LUCKY=false; QUICKFILE=true; UNINSTALL=true
+                PARTEXP=false; BANDIX=false
                 ;;
               标准版)
-                PASSWALL2=true; OPENCLASH=false; SSR_PLUS=false; NIKKI=false; CLASHOO=false
-                MOSDNS=true; ADGUARDHOME=false
+                PASSWALL=true; PASSWALL2=false; OPENCLASH=false; SSR_PLUS=false
+                NIKKI=false; CLASHOO=false; MOSDNS=true; ADGUARDHOME=false
                 TURBOACC=true; TAILSCALE=false; EASYTIER=false
-                AURORA=true
-                LUCKY=false; QUICKFILE=true; UNINSTALL=true; PARTEXP=true
-                BANDIX=false
+                AURORA=true; LUCKY=false; QUICKFILE=true; UNINSTALL=true
+                PARTEXP=true; BANDIX=false
                 ;;
               全家桶)
-                PASSWALL2=true; OPENCLASH=true; SSR_PLUS=true; NIKKI=true; CLASHOO=true
-                MOSDNS=true; ADGUARDHOME=true
+                PASSWALL=true; PASSWALL2=true; OPENCLASH=true; SSR_PLUS=true
+                NIKKI=true; CLASHOO=true; MOSDNS=true; ADGUARDHOME=true
                 TURBOACC=true; TAILSCALE=true; EASYTIER=true
-                AURORA=true
-                LUCKY=true; QUICKFILE=true; UNINSTALL=true; PARTEXP=true
-                BANDIX=true
+                AURORA=true; LUCKY=true; QUICKFILE=true; UNINSTALL=true
+                PARTEXP=true; BANDIX=true
                 ;;
             esac
           else
+            PASSWALL="${{ inputs.enable_passwall }}"
             PASSWALL2="${{ inputs.enable_passwall2 }}"
             OPENCLASH="${{ inputs.enable_openclash }}"
             SSR_PLUS="${{ inputs.enable_ssr_plus }}"
@@ -226,35 +217,36 @@ jobs:
           fi
 
           echo "========================================="
-          echo "插件选择结果 (预设: ${{ inputs.preset }})"
+          echo "  插件选择结果 (方案: ${{ inputs.preset }})"
           echo "========================================="
-          echo "Passwall2:    $PASSWALL2"
-          echo "OpenClash:    $OPENCLASH"
-          echo "SSR-Plus:     $SSR_PLUS"
-          echo "Nikki:        $NIKKI"
-          echo "Clashoo:      $CLASHOO"
-          echo "MosDNS:       $MOSDNS"
-          echo "AdGuardHome:  $ADGUARDHOME"
-          echo "TurboACC:     $TURBOACC"
-          echo "Tailscale:    $TAILSCALE"
-          echo "Easytier:     $EASYTIER"
-          echo "极光主题:      $AURORA"
-          echo "Lucky大吉:    $LUCKY"
-          echo "QuickFile:    $QUICKFILE"
-          echo "高级卸载:      $UNINSTALL"
-          echo "分区扩容:      $PARTEXP"
-          echo "Bandix监控:   $BANDIX"
+          echo "PassWall:      $PASSWALL"
+          echo "PassWall2:     $PASSWALL2"
+          echo "OpenClash:     $OPENCLASH"
+          echo "SSR-Plus:      $SSR_PLUS"
+          echo "Nikki:         $NIKKI"
+          echo "Clashoo:       $CLASHOO"
+          echo "MosDNS:        $MOSDNS"
+          echo "AdGuardHome:   $ADGUARDHOME"
+          echo "TurboACC:      $TURBOACC"
+          echo "Tailscale:     $TAILSCALE"
+          echo "Easytier:      $EASYTIER"
+          echo "极光主题:       $AURORA"
+          echo "Lucky大吉:     $LUCKY"
+          echo "QuickFile:     $QUICKFILE"
+          echo "高级卸载:       $UNINSTALL"
+          echo "分区扩容:       $PARTEXP"
+          echo "Bandix监控:    $BANDIX"
           echo "========================================="
 
           # ============= 动态生成 shell/apk-custom-packages.sh =============
           cat > shell/apk-custom-packages.sh << 'SHEOF'
           #!/bin/bash
           # ============= 由 GitHub Actions 工作流自动生成 (25.12.x apk版) =============
-          # 此文件根据用户在工作流 UI 上的选择动态生成
-          # 请勿手动编辑此文件，修改请通过工作流参数控制
           SHEOF
 
-          # 代理工具
+          if [ "$PASSWALL" = "true" ]; then
+            echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-passwall luci-i18n-passwall-zh-cn"' >> shell/apk-custom-packages.sh
+          fi
           if [ "$PASSWALL2" = "true" ]; then
             echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES xray-core sing-box hysteria kmod-nft-socket kmod-nft-tproxy luci-app-passwall2 luci-i18n-passwall2-zh-cn"' >> shell/apk-custom-packages.sh
           fi
@@ -270,14 +262,12 @@ jobs:
           if [ "$CLASHOO" = "true" ]; then
             echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES clashoo luci-app-clashoo luci-i18n-clashoo-zh-cn"' >> shell/apk-custom-packages.sh
           fi
-          # DNS/去广告
           if [ "$MOSDNS" = "true" ]; then
             echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-mosdns luci-i18n-mosdns-zh-cn"' >> shell/apk-custom-packages.sh
           fi
           if [ "$ADGUARDHOME" = "true" ]; then
             echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-adguardhome"' >> shell/apk-custom-packages.sh
           fi
-          # 网络/加速/组网
           if [ "$TURBOACC" = "true" ]; then
             echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-turboacc"' >> shell/apk-custom-packages.sh
           fi
@@ -287,11 +277,9 @@ jobs:
           if [ "$EASYTIER" = "true" ]; then
             echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES easytier luci-app-easytier"' >> shell/apk-custom-packages.sh
           fi
-          # 主题
           if [ "$AURORA" = "true" ]; then
             echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-theme-aurora luci-app-aurora-config luci-i18n-aurora-config-zh-cn"' >> shell/apk-custom-packages.sh
           fi
-          # 实用工具
           if [ "$LUCKY" = "true" ]; then
             echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-lucky lucky luci-i18n-lucky-zh-cn"' >> shell/apk-custom-packages.sh
           fi
@@ -307,12 +295,8 @@ jobs:
           if [ "$BANDIX" = "true" ]; then
             echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES bandix luci-app-bandix luci-i18n-bandix-zh-cn"' >> shell/apk-custom-packages.sh
           fi
-          # iStore 商店
           if [ "${{ github.event.inputs.enable_store }}" == "true" ]; then
             echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-store"' >> shell/apk-custom-packages.sh
-            echo "✅ 已追加 luci-app-store"
-          else
-            echo "❎ 未启用 luci-app-store"
           fi
 
           echo "✅ 自定义插件配置已生成 (25.12.x apk版)"
@@ -323,6 +307,20 @@ jobs:
           profile="${{ github.event.inputs.profile }}"
           include_docker="${{ github.event.inputs.include_docker }}"
           luci_version="${{ github.event.inputs.luci_version }}"
+
+          # 解析PPPoE账号密码 (格式: 账号:密码)
+          pppoe_info="${{ github.event.inputs.pppoe_info }}"
+          if [ -n "$pppoe_info" ] && [[ "$pppoe_info" == *:* ]]; then
+            PPPOE_ACCOUNT="${pppoe_info%%:*}"
+            PPPOE_PASSWORD="${pppoe_info#*:}"
+            ENABLE_PPPOE="yes"
+            echo "PPPoE已配置: 账号=$PPPOE_ACCOUNT"
+          else
+            ENABLE_PPPOE="no"
+            PPPOE_ACCOUNT=""
+            PPPOE_PASSWORD=""
+          fi
+
           echo "Building for profile: $profile"
           docker run --rm -i \
             --user root \
@@ -334,9 +332,9 @@ jobs:
             -v "${{ github.workspace }}/x86-64/build25.sh:/home/build/immortalwrt/build.sh" \
             -e PROFILE=$profile \
             -e INCLUDE_DOCKER=$include_docker \
-            -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
-            -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
-            -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
+            -e ENABLE_PPPOE=$ENABLE_PPPOE \
+            -e PPPOE_ACCOUNT=$PPPOE_ACCOUNT \
+            -e PPPOE_PASSWORD=$PPPOE_PASSWORD \
           immortalwrt/imagebuilder:x86-64-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
 
       - name: Create info
