@@ -19,6 +19,11 @@ on:
         description: '请输入要编译固件大小 单位(MB)'
         required: true
         default: '1024'
+      enable_store:
+        description: "集成 store 商店 (apk版)"
+        required: false
+        type: boolean
+        default: true
       include_docker:
         description: |
           是否编译 Docker 插件
@@ -42,6 +47,67 @@ on:
       pppoe_password:
         description: "宽带密码 (若启用PPPoE)"
         required: false
+      # ============= 插件选择 =============
+      preset:
+        description: "插件预设方案 (选择自定义时可通过下方复选框逐个选择)"
+        required: true
+        default: "custom"
+        type: choice
+        options:
+          - custom
+          - minimal
+          - standard
+          - full
+      enable_passwall2:
+        description: "【代理】Passwall2 (含xray/sing-box/hysteria内核)"
+        required: false
+        type: boolean
+        default: false
+      enable_openclash:
+        description: "【代理】OpenClash (含clash_meta内核，体积较大)"
+        required: false
+        type: boolean
+        default: false
+      enable_ssr_plus:
+        description: "【代理】SSR-Plus (含mihomo内核)"
+        required: false
+        type: boolean
+        default: false
+      enable_mosdns:
+        description: "【DNS】MosDNS 高性能DNS分流"
+        required: false
+        type: boolean
+        default: false
+      enable_turboacc:
+        description: "【加速】TurboACC 网络加速"
+        required: false
+        type: boolean
+        default: false
+      enable_aurora:
+        description: "【主题】极光主题 Aurora Theme"
+        required: false
+        type: boolean
+        default: true
+      enable_clashoo:
+        description: "【代理】Clashoo 代理插件"
+        required: false
+        type: boolean
+        default: false
+      enable_lucky:
+        description: "【工具】Lucky大吉 (端口转发/反向代理)"
+        required: false
+        type: boolean
+        default: false
+      enable_quickfile:
+        description: "【工具】QuickFile 文件管理器"
+        required: false
+        type: boolean
+        default: true
+      enable_adguardhome:
+        description: "【去广告】AdGuardHome 本地DNS去广告"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -72,6 +138,107 @@ jobs:
               exit 1
             fi
           fi
+
+      - name: Configure plugin selections
+        run: |
+          # ============= 解析预设方案 vs 自定义选择 =============
+          if [ "${{ inputs.preset }}" != "custom" ]; then
+            case "${{ inputs.preset }}" in
+              minimal)
+                PASSWALL2=false; OPENCLASH=false; SSR_PLUS=false; MOSDNS=false
+                TURBOACC=false; AURORA=false; CLASHOO=false; LUCKY=false
+                QUICKFILE=false; ADGUARDHOME=false
+                ;;
+              standard)
+                PASSWALL2=true; OPENCLASH=false; SSR_PLUS=false; MOSDNS=true
+                TURBOACC=true; AURORA=true; CLASHOO=false; LUCKY=false
+                QUICKFILE=true; ADGUARDHOME=false
+                ;;
+              full)
+                PASSWALL2=true; OPENCLASH=true; SSR_PLUS=true; MOSDNS=true
+                TURBOACC=true; AURORA=true; CLASHOO=true; LUCKY=true
+                QUICKFILE=true; ADGUARDHOME=true
+                ;;
+            esac
+          else
+            # 自定义模式：读取各个复选框的值
+            PASSWALL2="${{ inputs.enable_passwall2 }}"
+            OPENCLASH="${{ inputs.enable_openclash }}"
+            SSR_PLUS="${{ inputs.enable_ssr_plus }}"
+            MOSDNS="${{ inputs.enable_mosdns }}"
+            TURBOACC="${{ inputs.enable_turboacc }}"
+            AURORA="${{ inputs.enable_aurora }}"
+            CLASHOO="${{ inputs.enable_clashoo }}"
+            LUCKY="${{ inputs.enable_lucky }}"
+            QUICKFILE="${{ inputs.enable_quickfile }}"
+            ADGUARDHOME="${{ inputs.enable_adguardhome }}"
+          fi
+
+          echo "========================================="
+          echo "插件选择结果 (预设: ${{ inputs.preset }})"
+          echo "========================================="
+          echo "Passwall2:     $PASSWALL2"
+          echo "OpenClash:     $OPENCLASH"
+          echo "SSR-Plus:      $SSR_PLUS"
+          echo "MosDNS:        $MOSDNS"
+          echo "TurboACC:      $TURBOACC"
+          echo "极光主题:       $AURORA"
+          echo "Clashoo:       $CLASHOO"
+          echo "Lucky大吉:     $LUCKY"
+          echo "QuickFile:     $QUICKFILE"
+          echo "AdGuardHome:   $ADGUARDHOME"
+          echo "========================================="
+
+          # ============= 动态生成 shell/apk-custom-packages.sh =============
+          cat > shell/apk-custom-packages.sh << 'SHEOF'
+          #!/bin/bash
+          # ============= 由 GitHub Actions 工作流自动生成 (apk版) =============
+          # 此文件根据用户在工作流 UI 上的选择动态生成
+          # 请勿手动编辑此文件，修改请通过工作流参数控制
+          SHEOF
+
+          if [ "$QUICKFILE" = "true" ]; then
+            echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES bash quickfile luci-app-quickfile luci-i18n-quickfile-zh-cn"' >> shell/apk-custom-packages.sh
+          fi
+          if [ "$AURORA" = "true" ]; then
+            echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-theme-aurora luci-app-aurora-config luci-i18n-aurora-config-zh-cn"' >> shell/apk-custom-packages.sh
+          fi
+          if [ "$ADGUARDHOME" = "true" ]; then
+            echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-adguardhome"' >> shell/apk-custom-packages.sh
+          fi
+          if [ "$PASSWALL2" = "true" ]; then
+            echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES xray-core sing-box hysteria kmod-nft-socket kmod-nft-tproxy luci-app-passwall2 luci-i18n-passwall2-zh-cn"' >> shell/apk-custom-packages.sh
+          fi
+          if [ "$OPENCLASH" = "true" ]; then
+            echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-openclash"' >> shell/apk-custom-packages.sh
+          fi
+          if [ "$SSR_PLUS" = "true" ]; then
+            echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES xray-core naiveproxy luci-app-ssr-plus luci-i18n-ssr-plus-zh-cn"' >> shell/apk-custom-packages.sh
+          fi
+          if [ "$CLASHOO" = "true" ]; then
+            echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES clashoo luci-app-clashoo luci-i18n-clashoo-zh-cn"' >> shell/apk-custom-packages.sh
+          fi
+          if [ "$MOSDNS" = "true" ]; then
+            echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-mosdns luci-i18n-mosdns-zh-cn"' >> shell/apk-custom-packages.sh
+          fi
+          if [ "$TURBOACC" = "true" ]; then
+            echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-turboacc"' >> shell/apk-custom-packages.sh
+          fi
+          if [ "$LUCKY" = "true" ]; then
+            echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-lucky lucky luci-i18n-lucky-zh-cn"' >> shell/apk-custom-packages.sh
+          fi
+
+          # 集成 store 商店
+          if [ "${{ github.event.inputs.enable_store }}" == "true" ]; then
+            echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-store"' >> shell/apk-custom-packages.sh
+            echo "✅ 已追加 luci-app-store"
+          else
+            echo "❎ 未启用 luci-app-store"
+          fi
+
+          echo "✅ 自定义插件配置已生成 (apk版)"
+          echo "--- shell/apk-custom-packages.sh 内容如下 ---"
+          cat shell/apk-custom-packages.sh
 
       - name: Build ImmortalWrt-x86-64-efi 25.12.x
         run: |

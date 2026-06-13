@@ -1,6 +1,6 @@
 #!/bin/bash
 # Log file for debugging
-# 目前支持少部分第三方软件apk 通过打开shell/apk-custom-packages.sh的注释来集成
+# 目前支持少部分第三方软件apk 通过工作流UI选择来集成
 source shell/apk-custom-packages.sh
 echo "第三方apk软件包: $CUSTOM_PACKAGES"
 LOGFILE="/tmp/uci-defaults-log.txt"
@@ -60,7 +60,7 @@ PACKAGES="$PACKAGES openssh-sftp-server"
 # 文件管理器
 PACKAGES="$PACKAGES luci-i18n-filemanager-zh-cn"
 # ======== shell/apk-custom-packages.sh =======
-# 合并imm仓库以外的第三方插件 暂时注释
+# 合并imm仓库以外的第三方插件（由工作流动态生成）
 PACKAGES="$PACKAGES $CUSTOM_PACKAGES"
 
 

@@ -62,7 +62,7 @@ PACKAGES="$PACKAGES openssh-sftp-server"
 # 文件管理器
 PACKAGES="$PACKAGES luci-i18n-filemanager-zh-cn"
 # ======== shell/custom-packages.sh =======
-# 合并imm仓库以外的第三方插件
+# 合并imm仓库以外的第三方插件（由工作流动态生成）
 PACKAGES="$PACKAGES $CUSTOM_PACKAGES"
 
 
