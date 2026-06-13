@@ -49,15 +49,15 @@ on:
         required: false
       # ============= 插件预设 =============
       preset:
-        description: "插件预设方案 (自定义模式可逐个勾选下方插件)"
+        description: "插件预设方案 (自定义可逐个勾选下方插件)"
         required: true
-        default: "custom"
+        default: "自定义"
         type: choice
         options:
-          - custom
-          - minimal
-          - standard
-          - full
+          - 自定义
+          - 精简版
+          - 标准版
+          - 全家桶
       # ============= 代理工具 =============
       enable_passwall2:
         description: "【代理】Passwall2 (含xray/sing-box/hysteria内核)"
@@ -179,9 +179,9 @@ jobs:
       - name: Configure plugin selections
         run: |
           # ============= 解析预设方案 vs 自定义选择 =============
-          if [ "${{ inputs.preset }}" != "custom" ]; then
+          if [ "${{ inputs.preset }}" != "自定义" ]; then
             case "${{ inputs.preset }}" in
-              minimal)
+              精简版)
                 PASSWALL2=false; OPENCLASH=false; SSR_PLUS=false; NIKKI=false; CLASHOO=false
                 MOSDNS=false; ADGUARDHOME=false
                 TURBOACC=false; TAILSCALE=false; EASYTIER=false
@@ -189,7 +189,7 @@ jobs:
                 LUCKY=false; QUICKFILE=true; UNINSTALL=true; PARTEXP=false
                 BANDIX=false
                 ;;
-              standard)
+              标准版)
                 PASSWALL2=true; OPENCLASH=false; SSR_PLUS=false; NIKKI=false; CLASHOO=false
                 MOSDNS=true; ADGUARDHOME=false
                 TURBOACC=true; TAILSCALE=false; EASYTIER=false
@@ -197,7 +197,7 @@ jobs:
                 LUCKY=false; QUICKFILE=true; UNINSTALL=true; PARTEXP=true
                 BANDIX=false
                 ;;
-              full)
+              全家桶)
                 PASSWALL2=true; OPENCLASH=true; SSR_PLUS=true; NIKKI=true; CLASHOO=true
                 MOSDNS=true; ADGUARDHOME=true
                 TURBOACC=true; TAILSCALE=true; EASYTIER=true
