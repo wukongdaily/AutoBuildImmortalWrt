@@ -87,7 +87,7 @@ on:
         required: false
         type: boolean
         default: false
-      # ============= DNS/去广告 =============
+      # ============= DNS/去广告 (仅自定义模式生效) =============
       enable_mosdns:
         description: "【DNS】MosDNS 高性能DNS分流"
         required: false
@@ -98,7 +98,7 @@ on:
         required: false
         type: boolean
         default: false
-      # ============= 网络/加速/组网 =============
+      # ============= 网络/加速/组网 (仅自定义模式生效) =============
       enable_turboacc:
         description: "【加速】TurboACC 网络加速 (含BBR/shortcut)"
         required: false
@@ -114,13 +114,13 @@ on:
         required: false
         type: boolean
         default: false
-      # ============= 主题 =============
+      # ============= 主题 (仅自定义模式生效) =============
       enable_aurora:
         description: "【主题】极光主题 Aurora Theme"
         required: false
         type: boolean
         default: true
-      # ============= 实用工具 =============
+      # ============= 实用工具 (仅自定义模式生效) =============
       enable_lucky:
         description: "【工具】Lucky大吉 (端口转发/反向代理/NAT)"
         required: false

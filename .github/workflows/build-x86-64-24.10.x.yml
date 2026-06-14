@@ -52,7 +52,7 @@ on:
       # 重要: 选择预设方案时,预设会覆盖下方所有复选框,无需手动勾选
       # 只有选择"自定义"时,下方复选框才生效
       preset:
-        description: "插件预设方案 (选自定义时下方复选框才生效,选其他预设则自动编译对应插件)"
+        description: "插件预设方案 (⚠️选全家桶/标准版/精简版时自动编译,忽略下方所有复选框! 仅选自定义时才读取下方复选框状态)"
         required: true
         default: "自定义"
         type: choice
@@ -61,7 +61,7 @@ on:
           - 精简版
           - 标准版
           - 全家桶
-      # ============= 代理工具 =============
+      # ============= 代理工具 (仅自定义模式生效) =============
       enable_passwall:
         description: "【代理】PassWall (经典版 含xray/singbox/ss/ssr/trojan)"
         required: false
@@ -92,7 +92,7 @@ on:
         required: false
         type: boolean
         default: false
-      # ============= DNS/去广告 =============
+      # ============= DNS/去广告 (仅自定义模式生效) =============
       enable_mosdns:
         description: "【DNS】MosDNS 高性能DNS分流"
         required: false
@@ -103,7 +103,7 @@ on:
         required: false
         type: boolean
         default: false
-      # ============= 网络/加速/组网 =============
+      # ============= 网络/加速/组网 (仅自定义模式生效) =============
       enable_turboacc:
         description: "【加速】TurboACC 网络加速 (含BBR/shortcut)"
         required: false
@@ -119,7 +119,7 @@ on:
         required: false
         type: boolean
         default: false
-      # ============= 主题 =============
+      # ============= 主题 (仅自定义模式生效) =============
       enable_aurora:
         description: "【主题】极光主题 Aurora Theme"
         required: false
