@@ -61,9 +61,32 @@ PACKAGES="$PACKAGES openssh-sftp-server"
 
 # 文件管理器
 PACKAGES="$PACKAGES luci-i18n-filemanager-zh-cn"
+
+# SNMPD (用于爱快等设备添加第三层管理)
+PACKAGES="$PACKAGES snmpd luci-app-snmpd"
+
 # ======== shell/custom-packages.sh =======
 # 合并imm仓库以外的第三方插件（由工作流动态生成）
 PACKAGES="$PACKAGES $CUSTOM_PACKAGES"
+
+# 修复passwall依赖: 当选择passwall时自动添加缺失的依赖
+if echo "$PACKAGES" | grep -q "luci-app-passwall"; then
+    echo "✅ 检测到 passwall，添加缺失依赖..."
+    PACKAGES="$PACKAGES luci-app-vssr luci-app-ssr-plus-mbedtls"
+    # 确保有 xray-core 和 sing-box
+    if ! echo "$PACKAGES" | grep -q "xray-core"; then
+        PACKAGES="$PACKAGES xray-core"
+    fi
+    if ! echo "$PACKAGES" | grep -q "sing-box"; then
+        PACKAGES="$PACKAGES sing-box"
+    fi
+fi
+
+# 修复passwall2依赖
+if echo "$PACKAGES" | grep -q "luci-app-passwall2"; then
+    echo "✅ 检测到 passwall2，添加缺失依赖..."
+    PACKAGES="$PACKAGES kmod-nft-tproxy kmod-nft-socket"
+fi
 
 
 # 判断是否需要编译 Docker 插件

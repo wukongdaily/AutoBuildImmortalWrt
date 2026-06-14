@@ -134,9 +134,36 @@ uci delete ttyd.@ttyd[0].interface
 uci set dropbear.@dropbear[0].Interface=''
 uci commit
 
+# ============= IPV6 配置 =============
+# WAN口获取IPV6地址，但默认不向LAN口下发IPV6
+# 这样WAN口可以正常获取IPV6用于爱快等场景，但不会影响内网设备
+echo "Configuring IPv6: WAN get IPv6, LAN no advertise..." >>$LOGFILE
+
+# 确保WAN6接口存在并配置为dhcpv6获取地址
+if uci get network.wan6 >/dev/null 2>&1; then
+    uci set network.wan6.proto='dhcpv6'
+    uci set network.wan6.reqaddress='try'
+    uci set network.wan6.reqprefix='auto'
+    echo "wan6 configured as dhcpv6" >>$LOGFILE
+else
+    echo "wan6 not found, skip IPv6 config" >>$LOGFILE
+fi
+
+# 关闭LAN口的IPV6通告(ra)和DHCPv6服务
+if uci get dhcp.lan >/dev/null 2>&1; then
+    uci set dhcp.lan.ra='disabled'
+    uci set dhcp.lan.dhcpv6='disabled'
+    uci set dhcp.lan.ndp='disabled'
+    echo "LAN IPv6 advertisement disabled" >>$LOGFILE
+fi
+
+uci commit network
+uci commit dhcp
+echo "IPv6 config done." >>$LOGFILE
+
 # 设置编译作者信息
 FILE_PATH="/etc/openwrt_release"
-NEW_DESCRIPTION="Packaged by wukongdaily"
+NEW_DESCRIPTION="Packaged by zack-112"
 sed -i "s/DISTRIB_DESCRIPTION='[^']*'/DISTRIB_DESCRIPTION='$NEW_DESCRIPTION'/" "$FILE_PATH"
 
 # 若luci-app-advancedplus (进阶设置)已安装 则去除zsh的调用 防止命令行报 /usb/bin/zsh: not found的提示
