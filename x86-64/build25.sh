@@ -70,7 +70,6 @@ PACKAGES="$PACKAGES $CUSTOM_PACKAGES"
 # 修复passwall依赖: 当选择passwall时自动添加缺失的依赖
 if echo "$PACKAGES" | grep -q "luci-app-passwall"; then
     echo "✅ 检测到 passwall，添加缺失依赖..."
-    PACKAGES="$PACKAGES luci-app-vssr"
     if ! echo "$PACKAGES" | grep -q "xray-core"; then
         PACKAGES="$PACKAGES xray-core"
     fi
@@ -127,6 +126,16 @@ if echo "$PACKAGES" | grep -q "luci-app-ssr-plus"; then
 else
     echo "⚪️ 未选择 luci-app-ssr-plus"
 fi
+
+# ============= 过滤25.12 apk仓库中不存在的包 =============
+# 以下包在24.10 ipk仓库存在，但25.12 apk仓库尚未适配
+PACKAGES_25_12_UNAVAILABLE="luci-app-mosdns luci-i18n-mosdns-zh-cn luci-app-store luci-app-uninstall luci-app-vssr"
+for pkg in $PACKAGES_25_12_UNAVAILABLE; do
+    if echo "$PACKAGES" | grep -q "$pkg"; then
+        echo "⚠️  25.12暂不支持: $pkg，已自动移除"
+        PACKAGES=$(echo "$PACKAGES" | sed "s/$pkg//g")
+    fi
+done
 
 # 构建镜像
 echo "$(date '+%Y-%m-%d %H:%M:%S') - Building image with the following packages:"

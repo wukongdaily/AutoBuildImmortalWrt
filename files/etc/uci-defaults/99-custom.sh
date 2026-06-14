@@ -60,13 +60,30 @@ esac
 
 # 3. 配置网络
 if [ "$count" -eq 1 ]; then
-    # 单网口设备，DHCP模式
-    uci set network.lan.proto='dhcp'
-    uci delete network.lan.ipaddr
-    uci delete network.lan.netmask
-    uci delete network.lan.gateway
-    uci delete network.lan.dns
-    uci commit network
+    # 单网口设备: WAN+LAN混合模式
+    # 同一物理口既做WAN(获取IPv6/上网)又做LAN(访问Web后台)
+    echo "Configuring single-port WAN+LAN hybrid mode..." >>$LOGFILE
+
+    # WAN口: DHCP(从上游获取IPV4/IPV6)
+    uci set network.wan=interface
+    uci set network.wan.device="$wan_ifname"
+    uci set network.wan.proto='dhcp'
+
+    # LAN口: 静态IP(用于访问Web后台, 与WAN不同网段)
+    uci set network.lan.proto='static'
+    uci set network.lan.ipaddr='192.168.1.1'
+    uci set network.lan.netmask='255.255.255.0'
+    # 删除DHCP残留配置
+    uci delete network.lan.gateway 2>/dev/null
+    uci delete network.lan.dns 2>/dev/null
+
+    # 防火墙: LAN设备加入LAN zone + 允许LAN->WAN转发
+    LAN_ZONE_NUM=$(uci show firewall 2>/dev/null | grep -c "zone$")
+    if [ "$LAN_ZONE_NUM" -gt 0 ]; then
+        uci add_list firewall.@zone[0].network='lan' 2>/dev/null
+    fi
+
+    echo "Single-port hybrid: WAN=$wan_ifname (DHCP), LAN=192.168.1.1" >>$LOGFILE
 elif [ "$count" -gt 1 ]; then
     # 多网口设备配置
     # 配置WAN
