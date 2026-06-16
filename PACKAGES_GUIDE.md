@@ -102,7 +102,7 @@
 
 | 包名 | 用途 |
 |---|---|
-| `luci-app-adguardhome` | **AdGuard Home** —— 局域网 DNS 级广告过滤。两个文件都已列出该行；apk 版是后加的，**首次 25.x 构建建议留意日志确认 wukongdaily/apk 仓库内确有此包** |
+| `luci-app-adguardhome` | **AdGuard Home** —— 局域网 DNS 级广告过滤。两个文件都已列出该行（apk 在 commit 1f738c9 后启用，已通过 25.12.0 构建验证 wukongdaily/apk 仓库内确有此包） |
 | `luci-app-mosdns luci-i18n-mosdns-zh-cn` | **MosDNS** —— 高性能可编程 DNS 转发（仅 opkg） |
 
 ### 1.6 监控 / 流量
