@@ -17,6 +17,40 @@
 
 这部分是 ImmortalWrt 官方仓库**没有**的，构建时会从 `wukongdaily/store`（opkg）或 `wukongdaily/apk`（apk）这两个第三方仓库拉取 `.run` 自解压包，再展开成 `.ipk` / `.apk`。
 
+### 0. 跨版本可用性总览（两个文件的差异）
+
+下面按"两边都有"/"仅 opkg"/"仅 apk"三类一次列清。后面各类目里的"备注列"都依据这个表，不再分散标注。
+
+**两边都有**（约 180 个，最常用插件全部在此——`luci-theme-aurora`、`luci-app-openclash`、`luci-app-passwall2`、`luci-app-quickfile`、`luci-app-rtp2httpd`、`luci-app-tailscale-community`、`luci-app-bandix`、`luci-app-partexp`、`luci-app-lucky`、`luci-app-ssr-plus`、`luci-i18n-daed-zh-cn`、`luci-i18n-homeproxy-zh-cn`、`luci-i18n-nikki-zh-cn`、`luci-app-clashoo`、`luci-i18n-dae-zh-cn`、`luci-app-adguardhome` 等）。
+
+**仅 `shell/custom-packages.sh`（opkg, 23.05/24.10）有，apk 没有**——共 24 个，主要是 sirpdboy 等作者基于 opkg 维护的插件：
+
+| 包名 | 用途 |
+|---|---|
+| `luci-i18n-quickstart-zh-cn` | 首页 + 网络设置向导 |
+| `luci-app-uninstall` | 高级卸载（VedioTalk） |
+| `luci-theme-kucat` | 酷猫主题（sirpdboy） |
+| `luci-app-advancedplus luci-i18n-advancedplus-zh-cn` | 进阶设置（sirpdboy） |
+| `luci-app-mosdns luci-i18n-mosdns-zh-cn` | MosDNS 高性能 DNS |
+| `luci-app-turboacc` | Turbo ACC 网络加速 |
+| `luci-app-appfilter` | 应用过滤（openappfilter.com） |
+| `luci-app-gecoosac gecoosac` | 集客 AC 控制器 |
+| `luci-app-taskplan luci-i18n-taskplan-zh-cn` | 图形化任务计划 |
+| `easytier luci-app-easytier` | EasyTier 去中心化组网 |
+| `webdav2 luci-app-unishare` | 统一文件共享 |
+| `luci-app-watchdog luci-i18n-watchdog-zh-cn` | 看门狗（sirpdboy） |
+| `luci-app-nekobox` | NekoBox 代理面板 |
+| `momo luci-app-momo luci-i18n-momo-zh-cn` | Momo 极简 Mihomo |
+| `luci-i18n-dufs-zh-cn` | dufs 静态文件服务器 |
+
+**仅 `shell/apk-custom-packages.sh`（apk, 25.12）多出**——共 1 个，且只是某个跨版本包的中文化：
+
+| 包名 | 备注 |
+|---|---|
+| `luci-i18n-lucky-zh-cn` | apk 版的 Lucky 大吉随中文包打包；opkg 版的 Lucky 不带这个独立 i18n |
+
+> 后面各小节如果**没特别标注**，默认都是"两边都有"。只有"仅 opkg 版"的插件才会显式注明。
+
 ### 1.1 工具类
 
 | 包名 | 用途 | 备注 |
@@ -29,10 +63,10 @@
 
 ### 1.2 主题类
 
-| 包名 | 用途 | 备注 |
-|---|---|---|
-| `luci-theme-aurora luci-app-aurora-config luci-i18n-aurora-config-zh-cn` | **极光主题** (by eamonxg) —— 蓝紫色系，色彩鲜艳 | 仅 opkg 版 |
-| `luci-theme-kucat` | **酷猫主题** (by sirpdboy) —— 蓝色系，强调可定制 | 仅 opkg 版 |
+| 包名 | 用途 |
+|---|---|
+| `luci-theme-aurora luci-app-aurora-config luci-i18n-aurora-config-zh-cn` | **极光主题** (by eamonxg) —— 蓝紫色系，色彩鲜艳 |
+| `luci-theme-kucat` | **酷猫主题** (by sirpdboy) —— 蓝色系，强调可定制（仅 opkg） |
 
 ### 1.3 代理类（科学上网）
 
@@ -68,8 +102,8 @@
 
 | 包名 | 用途 |
 |---|---|
-| `luci-app-adguardhome` | **AdGuard Home** —— 局域网 DNS 级广告过滤（仅 opkg 版） |
-| `luci-app-mosdns luci-i18n-mosdns-zh-cn` | **MosDNS** —— 高性能可编程 DNS 转发（仅 opkg 版） |
+| `luci-app-adguardhome` | **AdGuard Home** —— 局域网 DNS 级广告过滤。两个文件都已列出该行；apk 版是后加的，**首次 25.x 构建建议留意日志确认 wukongdaily/apk 仓库内确有此包** |
+| `luci-app-mosdns luci-i18n-mosdns-zh-cn` | **MosDNS** —— 高性能可编程 DNS 转发（仅 opkg） |
 
 ### 1.6 监控 / 流量
 
