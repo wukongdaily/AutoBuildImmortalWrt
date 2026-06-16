@@ -9,6 +9,23 @@
 > **为了不给 ImmortalWrt 上游维护者增加额外负担和麻烦，所有相关问题请勿在 ImmortalWrt 群内反馈**。  <br>
 > **建议各位在本项目 [Discussions](https://github.com/wukongdaily/ImmortalWrt-ImageBuilder/discussions) 中提问或讨论**
 
+---
+
+## 🔐 首次刷机必读（安全相关）
+
+ImmortalWrt 出厂 **root 用户无密码**。刷入固件后**第一件事**：
+
+1. 浏览器打开 LuCI → **系统 → 管理权** → 设置 **root 密码**并保存
+2. 在完成第 1 步之前，**不要把路由器 WAN 口接入有公网 IP 的环境**（如直接 PPPoE 拨号到运营商、IPv6 公网直连、云服务器软路由等）
+
+**默认安全策略**（已在 `files/etc/uci-defaults/99-custom.sh` 中配置）：
+
+- WAN 入站：`REJECT`（沿用 OpenWrt 默认，公网无法访问后台）
+- 网页终端 ttyd：仅监听 LAN 区域
+- SSH (dropbear)：仅监听 LAN 区域，禁止空密码登录
+
+**单网口设备首次访问后台的方法**：把路由器接到上级路由器的 LAN 口 → 上级路由器后台 DHCP 客户端列表查它分到的 IP → 浏览器访问那个 IP。这是 OpenWrt 的标准做法。
+
 
 ---
 

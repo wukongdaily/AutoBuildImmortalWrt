@@ -1,8 +1,7 @@
 #!/bin/sh
 # 该脚本为immortalwrt首次启动时 运行的脚本 即 /etc/uci-defaults/99-custom.sh 也就是说该文件在路由器内 重启后消失 只运行一次
-# 设置默认防火墙规则，方便虚拟机首次访问 WebUI
+# 安全加固：不再主动放行 WAN 入站，沿用 OpenWrt 默认 WAN REJECT
 LOGFILE="/etc/config/uci-defaults-log.txt"
-uci set firewall.@zone[1].input='ACCEPT'
 
 # 设置主机名映射，解决安卓原生 TV 无法联网的问题
 uci add dhcp domain
@@ -93,12 +92,16 @@ else
     echo "未检测到 Docker，跳过防火墙配置。"
 fi
 
-# 设置所有网口可访问网页终端
-uci delete ttyd.@ttyd[0].interface
+# 安全加固：网页终端只在 lan 区域可达
+uci set ttyd.@ttyd[0].interface='lan'
 
-# 设置所有网口可连接 SSH
-uci set dropbear.@dropbear[0].Interface=''
-uci commit
+# 安全加固：SSH 只在 lan 区域可达，且不允许空密码登录
+uci set dropbear.@dropbear[0].Interface='lan'
+uci set dropbear.@dropbear[0].RootLogin='1'
+uci -q delete dropbear.@dropbear[0].EnableEmptyPassword
+
+uci commit ttyd
+uci commit dropbear
 
 # 设置编译作者信息
 FILE_PATH="/etc/openwrt_release"

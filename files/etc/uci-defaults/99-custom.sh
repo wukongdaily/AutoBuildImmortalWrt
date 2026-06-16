@@ -3,11 +3,9 @@
 # Log file for debugging
 LOGFILE="/etc/config/uci-defaults-log.txt"
 echo "Starting 99-custom.sh at $(date)" >>$LOGFILE
-# 设置默认防火墙规则，方便单网口虚拟机首次访问 WebUI 
-# 因为本项目中 单网口模式是dhcp模式 直接就能上网并且访问web界面 避免新手每次都要修改/etc/config/network中的静态ip
-# 当你刷机运行后 都调整好了 你完全可以在web页面自行关闭 wan口防火墙的入站数据
-# 具体操作方法：网络——防火墙 在wan的入站数据 下拉选项里选择 拒绝 保存并应用即可。
-uci set firewall.@zone[1].input='ACCEPT'
+# 安全加固：不再主动放行 WAN 入站，沿用 OpenWrt 默认 WAN REJECT
+# 单网口设备首次接入时，请到【上级路由器】DHCP 客户端列表查看本机 IP，
+# 然后从 LAN 侧（即上级网段）访问 WebUI——这是 OpenWrt 的标准做法。
 
 # 设置主机名映射，解决安卓原生 TV 无法联网的问题
 uci add dhcp domain
@@ -127,12 +125,17 @@ elif [ "$count" -gt 1 ]; then
     uci commit network
 fi
 
-# 设置所有网口可访问网页终端
-uci delete ttyd.@ttyd[0].interface
+# 安全加固：网页终端只在 lan 区域可达（避免 WAN 侧通过 ttyd 直接拿 shell）
+uci set ttyd.@ttyd[0].interface='lan'
 
-# 设置所有网口可连接 SSH
-uci set dropbear.@dropbear[0].Interface=''
-uci commit
+# 安全加固：SSH 只在 lan 区域可达，且不允许空密码登录
+# 注：root 密码为空时，dropbear 默认不允许密码登录；这里显式关闭空密码以防误配
+uci set dropbear.@dropbear[0].Interface='lan'
+uci set dropbear.@dropbear[0].RootLogin='1'
+uci -q delete dropbear.@dropbear[0].EnableEmptyPassword
+
+uci commit ttyd
+uci commit dropbear
 
 # 设置编译作者信息
 FILE_PATH="/etc/openwrt_release"
