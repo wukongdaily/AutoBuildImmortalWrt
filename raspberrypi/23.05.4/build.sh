@@ -1,4 +1,6 @@
 #!/bin/bash
+# 任意命令失败 / 管道中段失败立即退出，避免出现"wget 失败但脚本继续走、最终把空二进制打进固件"的情况
+set -eo pipefail
 source shell/custom-packages.sh
 source shell/switch_repository.sh
 echo "第三方软件包: $CUSTOM_PACKAGES"
@@ -6,7 +8,7 @@ echo "第三方软件包: $CUSTOM_PACKAGES"
 echo "Building for profile: $PROFILE"
 echo "Include Docker: $INCLUDE_DOCKER"
 # yml 传入的固件大小 ROOTFS_PARTSIZE
-echo "Building for ROOTFS_PARTSIZE: $ROOTSIZE"
+echo "Building for ROOTFS_PARTSIZE: $ROOTFS_PARTSIZE"
 if [ -z "$CUSTOM_PACKAGES" ]; then
   echo "⚪️ 未选择 任何第三方软件包"
 else
@@ -105,7 +107,7 @@ fi
 echo "$(date '+%Y-%m-%d %H:%M:%S') - Building image with the following packages:"
 echo "$PACKAGES"
 
-make image PROFILE=$PROFILE PACKAGES="$PACKAGES" FILES="/home/build/immortalwrt/files" ROOTFS_PARTSIZE=$ROOTSIZE
+make image PROFILE=$PROFILE PACKAGES="$PACKAGES" FILES="/home/build/immortalwrt/files" ROOTFS_PARTSIZE=$ROOTFS_PARTSIZE
 
 if [ $? -ne 0 ]; then
     echo "$(date '+%Y-%m-%d %H:%M:%S') - Error: Build failed!"

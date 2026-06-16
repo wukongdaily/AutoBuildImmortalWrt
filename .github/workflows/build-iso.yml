@@ -21,7 +21,7 @@ on:
           - 24.10.4
           - 24.10.5
           - 24.10.6
-      profile:
+      rootfs_partsize:
         description: '请输入要编译固件大小 单位(MB)'
         required: true
         default: '1024'
@@ -87,27 +87,23 @@ jobs:
 
       - name: ✅ 正在构建ImmortalWrt固件
         run: |
-          profiles="${{ github.event.inputs.profile }}"
+          rootfs_partsize="${{ github.event.inputs.rootfs_partsize }}"
           include_docker="${{ github.event.inputs.include_docker }}"
           luci_version="${{ github.event.inputs.luci_version }}"
-          IFS=',' read -r -a profile_array <<< "$profiles"
-          
-          for profile in "${profile_array[@]}"; do
-            echo "Building for profile: $profile"
-            docker run --rm -i \
-              --user root \
-              -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
-              -v "${{ github.workspace }}/files:/home/build/immortalwrt/files" \
-              -v "${{ github.workspace }}/x86-64/imm.config:/home/build/immortalwrt/.config" \
-              -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
-              -v "${{ github.workspace }}/x86-64/build24.sh:/home/build/immortalwrt/build.sh" \
-              -e PROFILE=$profile \
-              -e INCLUDE_DOCKER=$include_docker \
-              -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
-              -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
-              -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
-              immortalwrt/imagebuilder:x86-64-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
-          done
+          echo "Building for rootfs_partsize: $rootfs_partsize MB"
+          docker run --rm -i \
+            --user root \
+            -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
+            -v "${{ github.workspace }}/files:/home/build/immortalwrt/files" \
+            -v "${{ github.workspace }}/x86-64/imm.config:/home/build/immortalwrt/.config" \
+            -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
+            -v "${{ github.workspace }}/x86-64/build24.sh:/home/build/immortalwrt/build.sh" \
+            -e ROOTFS_PARTSIZE=$rootfs_partsize \
+            -e INCLUDE_DOCKER=$include_docker \
+            -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
+            -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
+            -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
+            immortalwrt/imagebuilder:x86-64-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
 
       - name: ✅ 复制固件到根目录
         run: |

@@ -15,7 +15,7 @@ on:
         description: "请设置路由器的管理地址(仅对多网口路由器有效) 格式:192.168.x.1 或 10.x.x.1"
         required: true
         default: "192.168.100.1"
-      profile:
+      rootfs_partsize:
         description: '请输入要编译固件大小 单位(MB)'
         required: true
         default: '1024'
@@ -75,10 +75,10 @@ jobs:
 
       - name: Build ImmortalWrt-x86-64-efi 25.12.x
         run: |
-          profile="${{ github.event.inputs.profile }}"
+          rootfs_partsize="${{ github.event.inputs.rootfs_partsize }}"
           include_docker="${{ github.event.inputs.include_docker }}"
           luci_version="${{ github.event.inputs.luci_version }}"
-          echo "Building for profile: $profile"
+          echo "Building for rootfs_partsize: $rootfs_partsize MB"
           docker run --rm -i \
             --user root \
             -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
@@ -87,7 +87,7 @@ jobs:
             -v "${{ github.workspace }}/x86-64/imm25.config:/home/build/immortalwrt/.config" \
             -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
             -v "${{ github.workspace }}/x86-64/build25.sh:/home/build/immortalwrt/build.sh" \
-            -e PROFILE=$profile \
+            -e ROOTFS_PARTSIZE=$rootfs_partsize \
             -e INCLUDE_DOCKER=$include_docker \
             -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
             -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \

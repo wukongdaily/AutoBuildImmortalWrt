@@ -7,7 +7,7 @@ on:
         description: "请设置路由器的管理地址(仅对多网口路由器有效) 格式:192.168.x.1 或 10.x.x.1"
         required: true
         default: "192.168.100.1"
-      profile:
+      rootfs_partsize:
         description: '请输入要编译固件大小 单位(MB)'
         required: true
         default: '1024'
@@ -82,29 +82,23 @@ jobs:
 
       - name: Build ImmortalWrt-x86-64-efi
         run: |
-          profiles="${{ github.event.inputs.profile }}"
+          rootfs_partsize="${{ github.event.inputs.rootfs_partsize }}"
           include_docker="${{ github.event.inputs.include_docker }}"
-          
-          IFS=',' read -r -a profile_array <<< "$profiles"
-          
-          for profile in "${profile_array[@]}"; do
-            echo "Building for profile: $profile"
-            
-            docker run --rm -i \
-              --user root \
-              -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
-              -v "${{ github.workspace }}/files:/home/build/immortalwrt/files" \
-              -v "${{ github.workspace }}/custom:/home/build/immortalwrt/files/etc/config" \
-              -v "${{ github.workspace }}/x86-64/imm.config:/home/build/immortalwrt/.config" \
-              -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
-              -v "${{ github.workspace }}/x86-64/build23.sh:/home/build/immortalwrt/build.sh" \
-              -e PROFILE=$profile \
-              -e INCLUDE_DOCKER=$include_docker \
-              -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
-              -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
-              -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
-              immortalwrt/imagebuilder:x86-64-openwrt-23.05.4 /bin/bash /home/build/immortalwrt/build.sh
-          done
+
+          docker run --rm -i \
+            --user root \
+            -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
+            -v "${{ github.workspace }}/files:/home/build/immortalwrt/files" \
+            -v "${{ github.workspace }}/custom:/home/build/immortalwrt/files/etc/config" \
+            -v "${{ github.workspace }}/x86-64/imm.config:/home/build/immortalwrt/.config" \
+            -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
+            -v "${{ github.workspace }}/x86-64/build23.sh:/home/build/immortalwrt/build.sh" \
+            -e ROOTFS_PARTSIZE=$rootfs_partsize \
+            -e INCLUDE_DOCKER=$include_docker \
+            -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
+            -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
+            -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
+            immortalwrt/imagebuilder:x86-64-openwrt-23.05.4 /bin/bash /home/build/immortalwrt/build.sh
 
       - name: Create info
         run: |

@@ -1,4 +1,6 @@
 #!/bin/bash
+# 任意命令失败 / 管道中段失败立即退出，避免出现"wget 失败但脚本继续走、最终把空二进制打进固件"的情况
+set -eo pipefail
 source shell/custom-packages.sh
 source shell/switch_repository.sh
 # 该文件实际为imagebuilder容器内的build.sh

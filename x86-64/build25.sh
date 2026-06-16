@@ -1,11 +1,13 @@
 #!/bin/bash
+# 任意命令失败 / 管道中段失败立即退出，避免出现"wget 失败但脚本继续走、最终把空二进制打进固件"的情况
+set -eo pipefail
 # Log file for debugging
 # 目前支持少部分第三方软件apk 通过打开shell/apk-custom-packages.sh的注释来集成
 source shell/apk-custom-packages.sh
 echo "第三方apk软件包: $CUSTOM_PACKAGES"
 LOGFILE="/tmp/uci-defaults-log.txt"
 echo "Starting 99-custom.sh at $(date)" >> $LOGFILE
-echo "编译固件大小为: $PROFILE MB"
+echo "编译固件大小为: $ROOTFS_PARTSIZE MB"
 echo "Include Docker: $INCLUDE_DOCKER"
 
 echo "Create pppoe-settings"
@@ -110,7 +112,7 @@ fi
 echo "$(date '+%Y-%m-%d %H:%M:%S') - Building image with the following packages:"
 echo "$PACKAGES"
 
-make image PROFILE="generic" PACKAGES="$PACKAGES" FILES="/home/build/immortalwrt/files" ROOTFS_PARTSIZE=$PROFILE
+make image PROFILE="generic" PACKAGES="$PACKAGES" FILES="/home/build/immortalwrt/files" ROOTFS_PARTSIZE=$ROOTFS_PARTSIZE
 
 if [ $? -ne 0 ]; then
     echo "$(date '+%Y-%m-%d %H:%M:%S') - Error: Build failed!"

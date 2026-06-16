@@ -97,7 +97,7 @@ jobs:
               -v "${{ github.workspace }}/sunxi-cortexa53/build24.sh:/home/build/immortalwrt/build.sh" \
               -e PROFILE=$profile \
               -e INCLUDE_DOCKER=$include_docker \
-              -e ROOTSIZE=$size \
+              -e ROOTFS_PARTSIZE=$size \
               immortalwrt/imagebuilder:sunxi-cortexa53-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
           done
 
