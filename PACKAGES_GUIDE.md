@@ -102,8 +102,45 @@
 
 | 包名 | 用途 |
 |---|---|
-| `luci-app-adguardhome` | **AdGuard Home** —— 局域网 DNS 级广告过滤。两个文件都已列出该行（apk 在 commit 1f738c9 后启用，已通过 25.12.0 构建验证 wukongdaily/apk 仓库内确有此包） |
+| `luci-app-adguardhome` | **AdGuard Home** —— 局域网 DNS 级广告过滤。⚠️ 24.10 与 25.12 实际安装到的是**不同 fork**，行为差异巨大，详见下面的说明 |
 | `luci-app-mosdns luci-i18n-mosdns-zh-cn` | **MosDNS** —— 高性能可编程 DNS 转发（仅 opkg） |
+
+#### ⚠️ luci-app-adguardhome 在 24.10 与 25.12 上的差异
+
+虽然两个文件都列出了 `luci-app-adguardhome` 这一行，但**实际打包进固件的不是同一个软件**。差异完全来自第三方 run 仓库 + 上游 LuCI 仓库的演进：
+
+| 项目 | 24.10.x（opkg 路径） | 25.12.0（apk 路径） |
+|---|---|---|
+| LuCI 插件来源 | ImmortalWrt 24.10 官方 opkg 仓库 | ImmortalWrt 25.12 官方 apk 仓库 |
+| 插件背后 fork | 老版本（sirpdboy 系 luci-app-adguardhome） | 新版本（sbwml 系，已被上游 ImmortalWrt 收编） |
+| AGH 主二进制是否预置 | ✅ **预置 v0.107.72**——`wukongdaily/store` 仓库随构建放进来 | ❌ **不预置**——`wukongdaily/apk` 仓库不带 AGH 二进制 |
+| 启动方式 | 旧 init.d 脚本 | 现代 procd |
+| 配置面板 | LuCI 里能调大量参数（DNS 上游、规则、过滤、备份） | LuCI 只留几个开关，多数配置转移到 AGH 自带的 web UI |
+| 中文翻译 | 旧版译文 | 新版译文，措辞与结构完全不同 |
+
+**首次刷 25.12 后启用 AGH 的步骤**：
+
+1. 进 LuCI → 服务 → AdGuardHome
+2. 看页面顶部找"更新核心 / 更新二进制"按钮，点一下让插件去 GitHub 下载主程序
+3. 或在路由器 SSH 上跑 `apk update && apk add adguardhome`（25.12 官方仓库通常直接有这个独立 apk，比插件下载更快）
+4. 启动 AGH 后从 LuCI 里点"启动"按钮
+
+**验证两个版本到底装的是什么**（路由器 SSH 上跑）：
+
+```bash
+# 看 LuCI 前端版本
+opkg info luci-app-adguardhome      # 24.10 上跑
+apk info  luci-app-adguardhome      # 25.12 上跑
+
+# 看 AGH 主程序是否存在
+which AdGuardHome
+ls -lh /usr/bin/AdGuardHome 2>/dev/null
+
+# 看启动脚本
+head -5 /etc/init.d/AdGuardHome     # procd vs init.d 一眼能区分
+```
+
+> 这不是你这个项目的 bug，是 LuCI 25 升级时 ImmortalWrt 上游把 `luci-app-adguardhome` 换成了别人的 fork。同类问题在 `luci-app-openclash`、`luci-app-passwall` 等社区插件上也可能出现——当看到"插件配置面板换了一套"时，先怀疑 fork 是否换了人维护。
 
 ### 1.6 监控 / 流量
 
