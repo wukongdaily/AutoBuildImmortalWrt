@@ -1,5 +1,6 @@
 #!/bin/bash
 source shell/custom-packages.sh
+source shell/switch_repository.sh
 # 该文件实际为imagebuilder容器内的build.sh
 
 if [ -n "$CUSTOM_PACKAGES" ]; then
@@ -69,7 +70,6 @@ PACKAGES="$PACKAGES openssh-sftp-server"
 # 增加几个必备组件 方便用户安装iStore
 PACKAGES="$PACKAGES fdisk"
 PACKAGES="$PACKAGES script-utils"
-PACKAGES="$PACKAGES luci-i18n-samba4-zh-cn"
 # 第三方软件包 合并
 # ======== shell/custom-packages.sh =======
 PACKAGES="$PACKAGES $CUSTOM_PACKAGES"

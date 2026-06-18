@@ -1,4 +1,4 @@
-name: build-sunxi-cortexa53-23.05.4-ImmpotalWrt
+name: Build 23.05.4 sunxi-cortexa53
 
 on:
   workflow_dispatch:
@@ -37,13 +37,16 @@ on:
         default: '1024'
 
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Set executable permissions
         run: |
@@ -92,7 +95,7 @@ jobs:
           fi
           
       - name: Upload ImmortWrt as release assets
-        uses: softprops/action-gh-release@v2.2.1
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: Autobuild-sunxi-cortexa53
           name: ImmortalWrt-sunxi-cortexa53
