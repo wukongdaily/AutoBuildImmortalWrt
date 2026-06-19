@@ -15,7 +15,8 @@
 # xiaomi_redmi-router-ax6000-stock ————原厂默认 bootloader（stock）版本
 # xiaomi_redmi-router-ax6000-ubootmod—————改装过 bootloader 的版本（ubootmod）
 
-name: Build Wireless Router ImmortalWrt 25.12.x
+
+name: Build 25.12.x Wireless Router
 
 on:
   workflow_dispatch:
@@ -490,6 +491,11 @@ on:
         description: "请设置路由器的管理地址 格式:192.168.x.1 或 10.x.x.1"
         required: true
         default: "192.168.100.1"
+      enable_store:
+        description: "集成 store 商店"
+        required: false
+        type: boolean
+        default: false
       include_docker:
         description: |
           是否编译 Docker 插件
@@ -524,7 +530,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Set executable permissions
         run: |
@@ -546,6 +552,14 @@ jobs:
               exit 1
             fi
           fi
+      - name: Enable Store integration
+        run: |
+          if [ "${{ github.event.inputs.enable_store }}" == "true" ]; then
+            echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-store"' >> shell/apk-custom-packages.sh
+            echo "✅ 已追加 luci-app-store"
+          else
+            echo "❎ 未启用 luci-app-store"
+          fi
       
     
       - name: Build Wireless ImmortalWrt 25.12.x
@@ -560,7 +574,7 @@ jobs:
           ipq807x_models=$(cat model/ipq807x.txt | tr '\n' '|')
           ipq807x_models=${ipq807x_models%|}
           if [[ "$profile" =~ ^($ipq807x_models)$ ]]; then
-              case_tag="qualcommax-ipq807x-openwrt-25.12.0-rc2"
+              case_tag="qualcommax-ipq807x-openwrt-25.12.0"
               case_platform="qualcommax/ipq807x"
           fi
 
@@ -568,7 +582,7 @@ jobs:
           mt7621_models=$(cat model/mt7621.txt | tr '\n' '|')
           mt7621_models=${mt7621_models%|}
           if [[ "$profile" =~ ^($mt7621_models)$ ]]; then
-              case_tag="ramips-mt7621-openwrt-25.12.0-rc2"
+              case_tag="ramips-mt7621-openwrt-25.12.0"
               case_platform="ramips/mt7621"
           fi
 
@@ -576,7 +590,7 @@ jobs:
           bcm53xx_models=$(cat model/bcm53xx.txt | tr '\n' '|')
           bcm53xx_models=${bcm53xx_models%|}
           if [[ "$profile" =~ ^($bcm53xx_models)$ ]]; then
-              case_tag="bcm53xx-generic-openwrt-25.12.0-rc2"
+              case_tag="bcm53xx-generic-openwrt-25.12.0"
               case_platform="bcm53xx/generic"
           fi
 
@@ -584,7 +598,7 @@ jobs:
           case "$profile" in
               glinet_gl-b2200)
                   # 虽然它是高通ipq40xx平台 但由于都是gl机型 故放在一起 找起来方便
-                  tag=ipq40xx-generic-openwrt-25.12.0-rc2
+                  tag=ipq40xx-generic-openwrt-25.12.0
                   echo "platform=ipq40xx/generic" >> $GITHUB_ENV
                   ;;
               glinet_gl-axt1800|glinet_gl-ax1800)
@@ -593,7 +607,7 @@ jobs:
                   echo "platform=qualcommax/ipq60xx" >> $GITHUB_ENV
                   ;;
               xiaomi_redmi-router-ax6s)
-                  tag=mediatek-mt7622-openwrt-25.12.0-rc2
+                  tag=mediatek-mt7622-openwrt-25.12.0
                   echo "platform=mediatek/mt7622" >> $GITHUB_ENV
                   ;;
               # 下列机型目前没有25.12 因此采用23.05.4分支来构建
@@ -619,7 +633,7 @@ jobs:
                       echo "platform=$case_platform" >> $GITHUB_ENV
                   else
                       # 默认分支
-                      tag=mediatek-filogic-openwrt-25.12.0-rc2
+                      tag=mediatek-filogic-openwrt-25.12.0
                   fi
                   ;;
             esac
@@ -653,7 +667,7 @@ jobs:
           
           
       - name: Upload ImmortalWrt as release assets
-        uses: softprops/action-gh-release@v2.2.1
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.event.inputs.profile }}
           name: ImmortalWrt-Wireless

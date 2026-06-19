@@ -1,4 +1,4 @@
-name: build-rockchip-25.12.x
+name: Build 25.12.x Rockchip
 # 目前此工作流可以集成imm仓库内的软件 第三方软件暂不能集成(待开发)
 on:
   workflow_dispatch:
@@ -6,11 +6,12 @@ on:
       luci_version:
         description: "选择luci版本"
         required: false
-        default: "25.12.0-rc2"
+        default: "25.12.0"
         type: choice
         options:
           - 25.12.0-rc1
           - 25.12.0-rc2
+          - 25.12.0
       profile:
         type: choice
         description: |
@@ -88,6 +89,11 @@ on:
         description: '设置软件包大小 单位(MB)'
         required: true
         default: '1024'
+      enable_store:
+        description: "集成 store 商店"
+        required: false
+        type: boolean
+        default: false
       include_docker:
         description: |
           是否编译 Docker 插件
@@ -121,7 +127,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Set executable permissions
         run: chmod +x ${{ github.workspace }}/rockchip/build24.sh
@@ -141,7 +147,15 @@ jobs:
               exit 1
             fi
           fi
-      
+
+      - name: Enable Store integration
+        run: |
+          if [ "${{ github.event.inputs.enable_store }}" == "true" ]; then
+            echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-store"' >> shell/apk-custom-packages.sh
+            echo "✅ 已追加 luci-app-store"
+          else
+            echo "❎ 未启用 luci-app-store"
+          fi
       - name: Check Docker
         run: |
           if [[ "${{ inputs.include_docker }}" == "yes" ]]; then
@@ -194,7 +208,7 @@ jobs:
           fi
 
       - name: Upload ImmortWrt as release assets
-        uses: softprops/action-gh-release@v2.2.1
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: Autobuild
           name: ImmortWrt-Rockchip
