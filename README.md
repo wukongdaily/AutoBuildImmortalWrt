@@ -67,16 +67,6 @@ https://wkdaily.cpolar.cn/15
 ### 新增Bandix流量监控 来自 https://github.com/timsaya/luci-app-bandix
 ### 新增rtp2httpd 来自https://github.com/stackia/rtp2httpd
 
-## ❤️赞助作者 ⬇️⬇️
-
-<a href="https://wkdaily.cpolar.top/01" target="_blank">
-  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
-       alt="Buy Me A Coffee"
-       style="width:15%; height:auto;">
-</a>
-
-
-
 <details>
 <summary><h2>🍭相关引用</h2></summary>
 
