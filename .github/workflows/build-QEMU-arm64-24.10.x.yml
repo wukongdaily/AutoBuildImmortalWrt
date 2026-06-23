@@ -1,4 +1,4 @@
-name: build-QEMU-armsr-armv8-24.10.x
+name: Build 24.10.x QEMU-armsr-armv8
 # 你可以理解为这是一种ARM64平台下通用型OpenWrt ,产出格式为qcow2,适合所有ARM64平台的虚拟机
 # 比如斐讯N1刷了armbian系统,armbian系统里安装了PVE虚拟机 可用
 # 比如新款Apple Silicon芯片的苹果电脑里的虚拟机UTM 可用
@@ -61,7 +61,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Set executable permissions
         run: chmod +x ${{ github.workspace }}/armsr-armv8/build.sh
@@ -116,7 +116,7 @@ jobs:
           cp ${{ github.workspace }}/bin/targets/armsr/armv8/*.vmdk ${{ github.workspace }}
 
       - name: Upload ImmortWrt as release assets
-        uses: softprops/action-gh-release@v2.2.1
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: QEMU
           name: ImmortWrt-QEMU-armsr-armv8-24.10.x
