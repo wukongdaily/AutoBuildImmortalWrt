@@ -103,16 +103,37 @@ https://www.youtube.com/watch?v=7i6BQeitUtE
 
 ## ❤️如何构建docker版ImmortalWrt（建议收藏）⬇️
 https://wkdaily.cpolar.cn/15
-# 🌟鸣谢
-### https://github.com/immortalwrt
-### https://github.com/ophub/flippy-openwrt-actions
-### https://github.com/ophub/amlogic-s9xxx-openwrt
-### https://github.com/sirpdboy
-### https://github.com/wukongdaily/ib-overlay
-### 高级卸载插件出处 by VedioTalk https://xz.vumstar.com
-### 新增极光主题 来自 https://github.com/eamonxg/luci-theme-aurora
-### 新增Bandix流量监控 来自 https://github.com/timsaya/luci-app-bandix
-### 新增rtp2httpd 来自https://github.com/stackia/rtp2httpd
+# 🎉鸣谢
+
+感谢以下项目与作者对本项目的贡献与灵感 ❤️
+
+<div align="left">
+
+<a href="https://github.com/immortalwrt"><img src="https://avatars.githubusercontent.com/immortalwrt?v=4&s=80" width="80" height="80" alt="immortalwrt" /></a>
+<a href="https://github.com/Openwrt-Passwall"><img src="https://avatars.githubusercontent.com/Openwrt-Passwall?v=4&s=80" width="80" height="80" alt="Openwrt-Passwall" /></a>
+<a href="https://github.com/sirpdboy"><img src="https://avatars.githubusercontent.com/sirpdboy?v=4&s=80" width="80" height="80" alt="sirpdboy" /></a>
+<a href="https://github.com/ophub"><img src="https://avatars.githubusercontent.com/ophub?v=4&s=80" width="80" height="80" alt="ophub" /></a>
+<a href="https://github.com/linkease"><img src="https://avatars.githubusercontent.com/linkease?v=4&s=80" width="80" height="80" alt="linkease" /></a>
+
+<a href="https://github.com/coolsnowwolf"><img src="https://avatars.githubusercontent.com/coolsnowwolf?v=4&s=80" width="80" height="80" alt="coolsnowwolf" /></a>
+<a href="https://github.com/stackia"><img src="https://avatars.githubusercontent.com/stackia?v=4&s=80" width="80" height="80" alt="stackia" /></a>
+<a href="https://github.com/kiddin9"><img src="https://avatars.githubusercontent.com/kiddin9?v=4&s=80" width="80" height="80" alt="kiddin9" /></a>
+<a href="https://github.com/sbwml"><img src="https://avatars.githubusercontent.com/sbwml?v=4&s=80" width="80" height="80" alt="sbwml" /></a>
+<a href="https://github.com/kenzok8"><img src="https://avatars.githubusercontent.com/kenzok8?v=4&s=80" width="80" height="80" alt="kenzok8" /></a>
+
+<a href="https://github.com/timsaya"><img src="https://avatars.githubusercontent.com/timsaya?v=4&s=80" width="80" height="80" alt="timsaya" /></a>
+<a href="https://github.com/AdguardTeam"><img src="https://avatars.githubusercontent.com/AdguardTeam?v=4&s=80" width="80" height="80" alt="AdguardTeam" /></a>
+<a href="https://github.com/Thaolga"><img src="https://avatars.githubusercontent.com/Thaolga?v=4&s=80" width="80" height="80" alt="Thaolga" /></a>
+<a href="https://github.com/eamonxg"><img src="https://avatars.githubusercontent.com/eamonxg?v=4&s=80" width="80" height="80" alt="eamonxg" /></a>
+<a href="https://github.com/nikkinikki-org"><img src="https://avatars.githubusercontent.com/nikkinikki-org?v=4&s=80" width="80" height="80" alt="nikkinikki-org" /></a>
+
+<a href="https://github.com/gdy666"><img src="https://avatars.githubusercontent.com/gdy666?v=4&s=80" width="80" height="80" alt="gdy666" /></a>
+<a href="https://github.com/lwb1978"><img src="https://avatars.githubusercontent.com/lwb1978?v=4&s=80" width="80" height="80" alt="lwb1978" /></a>
+<a href="https://github.com/Tokisaki-Galaxy"><img src="https://avatars.githubusercontent.com/Tokisaki-Galaxy?v=4&s=80" width="80" height="80" alt="Tokisaki-Galaxy" /></a>
+<a href="https://github.com/QiuSimons"><img src="https://avatars.githubusercontent.com/QiuSimons?v=4&s=80" width="80" height="80" alt="QiuSimons" /></a>
+<a href="https://xz.vumstar.com/"><img src="https://xz.vumstar.com/static/img/logo.png" width="80" height="80" alt="wukongdaily" /></a>
+
+</div>
 
 ## ❤️赞助作者 ⬇️⬇️
 
@@ -121,15 +142,3 @@ https://wkdaily.cpolar.cn/15
        alt="Buy Me A Coffee"
        style="width:15%; height:auto;">
 </a>
-
-
-
-<details>
-<summary><h2>🍭相关引用</h2></summary>
-
-#### 🍭引用和项目参考的仓库
-- https://github.com/wukongdaily/RunFilesBuilder
-- https://github.com/wukongdaily/store
-- https://github.com/sirpdboy/luci-theme-kucat
-- https://github.com/AdguardTeam/AdGuardHome
-- https://github.com/kiddin9/kwrt-packages
