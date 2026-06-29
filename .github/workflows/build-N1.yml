@@ -1,4 +1,4 @@
-name: build-N1
+name: Build 24.10.x N1
 on:
   workflow_dispatch:
     inputs:

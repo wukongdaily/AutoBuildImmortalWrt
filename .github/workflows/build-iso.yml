@@ -3,7 +3,7 @@
 # 安装时 若是多张硬盘 你可以选择 需要安装的硬盘 此类方法安装的openwrt 安装后是有剩余空间的 更多信息请参考 wukongdaily/img-installer 项目
 # 几乎所有linux 都有各自的安装器 唯独openwrt和armbian 没有, 希望此工作流 弥补这个遗憾 让你更优雅的 安装openwrt 
 
-name: build ISO
+name: Build 24.10.x ISO x86-64
 
 on:
   workflow_dispatch:
@@ -114,7 +114,7 @@ jobs:
           cp ${{ github.workspace }}/bin/targets/x86/64/*squashfs-combined-efi.img.gz ${{ github.workspace }}
 
       - name: ✅ 上传固件到 artifact (for ISO generation)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: firmware-img
           path: |
@@ -126,7 +126,7 @@ jobs:
 
     steps:
       - name: Download firmware artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: firmware-img
 
