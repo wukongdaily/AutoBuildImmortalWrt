@@ -1,4 +1,4 @@
-name: build-sunxi-cortexa53-25.12.x
+name: Build 25.12.x sunxi-cortexa53
 
 on:
   workflow_dispatch:
@@ -28,6 +28,11 @@ on:
           - 25.12.0-rc1
           - 25.12.0-rc2
           - 25.12.0
+      enable_store:
+        description: "集成 store 商店"
+        required: false
+        type: boolean
+        default: false
       include_docker:
         description: |
           是否编译 Docker 插件
@@ -52,12 +57,20 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Set executable permissions
         run: |
           chmod +x ${{ github.workspace }}/sunxi-cortexa53/build25.sh
     
+      - name: Enable Store integration
+        run: |
+          if [ "${{ github.event.inputs.enable_store }}" == "true" ]; then
+            echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-store"' >> shell/apk-custom-packages.sh
+            echo "✅ 已追加 luci-app-store"
+          else
+            echo "❎ 未启用 luci-app-store"
+          fi
       - name: Build sunxi-cortexa53 ImmpotalWrt 25.12.x
         run: |
           profiles="${{ github.event.inputs.profile }}"
@@ -93,7 +106,7 @@ jobs:
           fi
 
       - name: Upload ImmortWrt as release assets
-        uses: softprops/action-gh-release@v2.2.1
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: Autobuild-sunxi-cortexa53
           name: ImmortalWrt-sunxi-cortexa53
