@@ -1,9 +1,20 @@
 # [新手指导](https://github.com/wukongdaily/AutoBuildImmortalWrt/wiki) 👈🏻
 # ImmortalWrt-ImageBuilder
 
+**⚠️ 重要声明**
+
+> **本项目为个人独立维护的第三方项目(脚本)，与 ImmortalWrt 官方没有关联。** <br>
+> **项目中使用了 ImmortalWrt 官方 ImageBuilder 工具打包生成固件。<br>
+> 但用户自行定制产生的任何 bug，均不代表 ImmortalWrt 官方固件的 bug**<br>
+> **为了不给 ImmortalWrt 上游维护者增加额外负担和麻烦，所有相关问题请勿在 ImmortalWrt 群内反馈**。  <br>
+> **建议各位在本项目 [Discussions](https://github.com/wukongdaily/ImmortalWrt-ImageBuilder/discussions) 中提问或讨论**
+
+
+---
+
 [![GitHub](https://img.shields.io/github/license/wukongdaily/AutoBuildImmortalWrt.svg?label=LICENSE&logo=github&logoColor=%20)](https://github.com/wukongdaily/AutoBuildImmortalWrt/blob/master/LICENSE)
 ![GitHub Stars](https://img.shields.io/github/stars/wukongdaily/AutoBuildImmortalWrt.svg?style=flat&logo=appveyor&label=Stars&logo=github)
-![GitHub Forks](https://img.shields.io/github/forks/wukongdaily/AutoBuildImmortalWrt.svg?style=flat&logo=appveyor&label=Forks&logo=github) [![Github](https://img.shields.io/badge/RELEASE:ImmortalWrtImageBuilder-123456?logo=github&logoColor=fff&labelColor=green&style=flat)](https://github.com/wukongdaily/AutoBuildImmortalWrt/releases) [![Bilibili](https://img.shields.io/badge/Bilibili-123456?logo=bilibili&logoColor=fff&labelColor=fb7299)](https://github.com/wukongdaily/AutoBuildImmortalWrt/wiki) <br>
+![GitHub Forks](https://img.shields.io/github/forks/wukongdaily/AutoBuildImmortalWrt.svg?style=flat&logo=appveyor&label=Forks&logo=github)
 
 ## 🤔 这是什么？
 基于 CI 的 ImageBuilder 工作流，用于自动化构建 ImmortalWrt 固件。
@@ -92,16 +103,37 @@ https://www.youtube.com/watch?v=7i6BQeitUtE
 
 ## ❤️如何构建docker版ImmortalWrt（建议收藏）⬇️
 https://wkdaily.cpolar.cn/15
-# 🌟鸣谢
-### https://github.com/immortalwrt
-### https://github.com/ophub/flippy-openwrt-actions
-### https://github.com/ophub/amlogic-s9xxx-openwrt
-### https://github.com/sirpdboy
-### https://github.com/wukongdaily/ib-overlay
-### 高级卸载插件出处 by VedioTalk https://xz.vumstar.com
-### 新增极光主题 来自 https://github.com/eamonxg/luci-theme-aurora
-### 新增Bandix流量监控 来自 https://github.com/timsaya/luci-app-bandix
-### 新增rtp2httpd 来自https://github.com/stackia/rtp2httpd
+# 🎉鸣谢
+
+感谢以下项目与作者对本项目的贡献与灵感 ❤️
+
+<div align="left">
+
+<a href="https://github.com/immortalwrt"><img src="https://avatars.githubusercontent.com/immortalwrt?v=4&s=80" width="80" height="80" alt="immortalwrt" /></a>
+<a href="https://github.com/Openwrt-Passwall"><img src="https://avatars.githubusercontent.com/Openwrt-Passwall?v=4&s=80" width="80" height="80" alt="Openwrt-Passwall" /></a>
+<a href="https://github.com/sirpdboy"><img src="https://avatars.githubusercontent.com/sirpdboy?v=4&s=80" width="80" height="80" alt="sirpdboy" /></a>
+<a href="https://github.com/ophub"><img src="https://avatars.githubusercontent.com/ophub?v=4&s=80" width="80" height="80" alt="ophub" /></a>
+<a href="https://github.com/linkease"><img src="https://avatars.githubusercontent.com/linkease?v=4&s=80" width="80" height="80" alt="linkease" /></a>
+
+<a href="https://github.com/coolsnowwolf"><img src="https://avatars.githubusercontent.com/coolsnowwolf?v=4&s=80" width="80" height="80" alt="coolsnowwolf" /></a>
+<a href="https://github.com/stackia"><img src="https://avatars.githubusercontent.com/stackia?v=4&s=80" width="80" height="80" alt="stackia" /></a>
+<a href="https://github.com/kiddin9"><img src="https://avatars.githubusercontent.com/kiddin9?v=4&s=80" width="80" height="80" alt="kiddin9" /></a>
+<a href="https://github.com/sbwml"><img src="https://avatars.githubusercontent.com/sbwml?v=4&s=80" width="80" height="80" alt="sbwml" /></a>
+<a href="https://github.com/kenzok8"><img src="https://avatars.githubusercontent.com/kenzok8?v=4&s=80" width="80" height="80" alt="kenzok8" /></a>
+
+<a href="https://github.com/timsaya"><img src="https://avatars.githubusercontent.com/timsaya?v=4&s=80" width="80" height="80" alt="timsaya" /></a>
+<a href="https://github.com/AdguardTeam"><img src="https://avatars.githubusercontent.com/AdguardTeam?v=4&s=80" width="80" height="80" alt="AdguardTeam" /></a>
+<a href="https://github.com/Thaolga"><img src="https://avatars.githubusercontent.com/Thaolga?v=4&s=80" width="80" height="80" alt="Thaolga" /></a>
+<a href="https://github.com/eamonxg"><img src="https://avatars.githubusercontent.com/eamonxg?v=4&s=80" width="80" height="80" alt="eamonxg" /></a>
+<a href="https://github.com/nikkinikki-org"><img src="https://avatars.githubusercontent.com/nikkinikki-org?v=4&s=80" width="80" height="80" alt="nikkinikki-org" /></a>
+
+<a href="https://github.com/gdy666"><img src="https://avatars.githubusercontent.com/gdy666?v=4&s=80" width="80" height="80" alt="gdy666" /></a>
+<a href="https://github.com/lwb1978"><img src="https://avatars.githubusercontent.com/lwb1978?v=4&s=80" width="80" height="80" alt="lwb1978" /></a>
+<a href="https://github.com/Tokisaki-Galaxy"><img src="https://avatars.githubusercontent.com/Tokisaki-Galaxy?v=4&s=80" width="80" height="80" alt="Tokisaki-Galaxy" /></a>
+<a href="https://github.com/QiuSimons"><img src="https://avatars.githubusercontent.com/QiuSimons?v=4&s=80" width="80" height="80" alt="QiuSimons" /></a>
+<a href="https://xz.vumstar.com/"><img src="https://xz.vumstar.com/static/img/logo.png" width="80" height="80" alt="wukongdaily" /></a>
+
+</div>
 
 ## ❤️赞助作者 ⬇️⬇️
 
@@ -110,15 +142,3 @@ https://wkdaily.cpolar.cn/15
        alt="Buy Me A Coffee"
        style="width:15%; height:auto;">
 </a>
-
-
-
-<details>
-<summary><h2>🍭相关引用</h2></summary>
-
-#### 🍭引用和项目参考的仓库
-- https://github.com/wukongdaily/RunFilesBuilder
-- https://github.com/wukongdaily/store
-- https://github.com/sirpdboy/luci-theme-kucat
-- https://github.com/AdguardTeam/AdGuardHome
-- https://github.com/kiddin9/kwrt-packages
