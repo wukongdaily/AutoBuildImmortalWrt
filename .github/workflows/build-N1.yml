@@ -1,4 +1,4 @@
-name: build-N1
+name: Build 24.10.x N1
 on:
   workflow_dispatch:
     inputs:
@@ -189,7 +189,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Set executable permissions
         run: chmod +x ${{ github.workspace }}/n1/build.sh
@@ -289,7 +289,7 @@ jobs:
 
 
       - name: Upload firmware to GitHub Releases
-        uses: softprops/action-gh-release@v2.2.1
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: phicomm-n1
           name: ImmortalWrt for Phicomm N1

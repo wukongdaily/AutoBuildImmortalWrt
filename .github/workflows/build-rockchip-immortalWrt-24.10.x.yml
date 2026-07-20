@@ -1,4 +1,4 @@
-name: build-rockchip-immortalWrt-24.10.x
+name: Build 24.10.x Rockchip
 
 on:
   workflow_dispatch:
@@ -114,7 +114,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Set executable permissions
         run: chmod +x ${{ github.workspace }}/rockchip/build24.sh
@@ -196,7 +196,7 @@ jobs:
           fi
 
       - name: Upload ImmortWrt as release assets
-        uses: softprops/action-gh-release@v2.2.1
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: Autobuild
           name: ImmortWrt-Rockchip
