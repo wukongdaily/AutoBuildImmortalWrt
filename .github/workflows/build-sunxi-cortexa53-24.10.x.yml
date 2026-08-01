@@ -46,10 +46,16 @@ on:
         options:
           - 'yes'
           - 'no'
-      size:
-        description: '请输入要编译固件大小 单位(MB)'
+      rootfs_partsize:
+        description: '选择软件包空间大小'
         required: true
-        default: '1024'
+        type: choice
+        default: '1G'
+        options:
+          - '1G'
+          - '2G'
+          - '3G'
+          - '4G'
 
 permissions:
   contents: write
@@ -80,7 +86,22 @@ jobs:
         run: |
           profiles="${{ github.event.inputs.profile }}"
           include_docker="${{ github.event.inputs.include_docker }}"
-          size="${{ github.event.inputs.size }}"
+          rootfs_partsize="${{ github.event.inputs.rootfs_partsize }}"
+          case "$rootfs_partsize" in
+            1G)
+              ROOTFS_SIZE=1024
+              ;;
+            2G)
+              ROOTFS_SIZE=2048
+              ;;
+            3G)
+              ROOTFS_SIZE=3072
+              ;;
+            4G)
+              ROOTFS_SIZE=4096
+              ;;
+          esac
+          echo "ROOTFS_SIZE=$ROOTFS_SIZE" >> $GITHUB_ENV
           luci_version="${{ github.event.inputs.luci_version }}"
           
           IFS=',' read -r -a profile_array <<< "$profiles"
@@ -97,7 +118,7 @@ jobs:
               -v "${{ github.workspace }}/sunxi-cortexa53/build24.sh:/home/build/immortalwrt/build.sh" \
               -e PROFILE=$profile \
               -e INCLUDE_DOCKER=$include_docker \
-              -e ROOTSIZE=$size \
+              -e ROOTSIZE=$ROOTFS_SIZE \
               immortalwrt/imagebuilder:sunxi-cortexa53-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
           done
 
