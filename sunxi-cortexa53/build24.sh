@@ -50,7 +50,6 @@ PACKAGES="$PACKAGES luci-i18n-package-manager-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-ttyd-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-openlist-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-vlmcsd-zh-cn"
-PACKAGES="$PACKAGES luci-i18n-homeproxy-zh-cn"
 PACKAGES="$PACKAGES ip-full"
 PACKAGES="$PACKAGES openssh-sftp-server"
 # ======== shell/custom-packages.sh =======
