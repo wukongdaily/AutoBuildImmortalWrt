@@ -123,6 +123,7 @@ jobs:
               -e PROFILE=$profile \
               -e INCLUDE_DOCKER=$include_docker \
               -e ROOTSIZE=$ROOTFS_SIZE \
+              -e IMAGE_TYPE=ext4 \
               immortalwrt/imagebuilder:sunxi-cortexa53-openwrt-${luci_version} /bin/bash /home/build/immortalwrt/build.sh
           done
 
@@ -143,7 +144,7 @@ jobs:
           name: ImmortalWrt-sunxi-cortexa53
           body_path: ${{ github.workspace }}/sunxi-cortexa53/info.md
           files: |
-            ${{ github.workspace }}/bin/targets/sunxi/cortexa53/*squashfs-sdcard.img.gz
+            ${{ github.workspace }}/bin/targets/sunxi/cortexa53/*ext4-sdcard.img.gz
           token: ${{ secrets.GITHUB_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
