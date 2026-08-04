@@ -56,7 +56,8 @@ on:
           - '2G'
           - '3G'
           - '4G'
-
+          - '28G'
+          
 permissions:
   contents: write
 
@@ -99,6 +100,9 @@ jobs:
               ;;
             4G)
               ROOTFS_SIZE=4096
+              ;;
+            28G)
+              ROOTFS_SIZE=28672
               ;;
           esac
           echo "ROOTFS_SIZE=$ROOTFS_SIZE" >> $GITHUB_ENV
