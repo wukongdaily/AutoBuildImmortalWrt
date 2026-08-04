@@ -8,8 +8,6 @@ on:
         default: "25.12.1"
         type: choice
         options:
-          - 25.12.0-rc1
-          - 25.12.0-rc2
           - 25.12.0
           - 25.12.1
       custom_router_ip:
@@ -17,9 +15,15 @@ on:
         required: true
         default: "192.168.100.1"
       profile:
-        description: '请输入要编译固件大小 单位(MB)'
+        description: '选择软件包空间大小'
         required: true
-        default: '1024'
+        type: choice
+        default: '1G'
+        options:
+          - '1G'
+          - '2G'
+          - '3G'
+          - '4G'
       enable_store:
         description: "集成 store 商店"
         required: false
@@ -91,9 +95,24 @@ jobs:
       - name: Build ImmortalWrt-x86-64-efi 25.12.x
         run: |
           profile="${{ github.event.inputs.profile }}"
+          case "$profile" in
+            1G)
+              ROOTFS_SIZE=1024
+              ;;
+            2G)
+              ROOTFS_SIZE=2048
+              ;;
+            3G)
+              ROOTFS_SIZE=3072
+              ;;
+            4G)
+              ROOTFS_SIZE=4096
+              ;;
+          esac
+          echo "ROOTFS_SIZE=$ROOTFS_SIZE" >> $GITHUB_ENV
           include_docker="${{ github.event.inputs.include_docker }}"
           luci_version="${{ github.event.inputs.luci_version }}"
-          echo "Building for profile: $profile"
+          echo "Building for rootfs_size: $profile"
           docker run --rm -i \
             --user root \
             -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
@@ -102,7 +121,7 @@ jobs:
             -v "${{ github.workspace }}/x86-64/imm25.config:/home/build/immortalwrt/.config" \
             -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
             -v "${{ github.workspace }}/x86-64/build25.sh:/home/build/immortalwrt/build.sh" \
-            -e PROFILE=$profile \
+            -e PROFILE=$ROOTFS_SIZE \
             -e INCLUDE_DOCKER=$include_docker \
             -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
             -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
