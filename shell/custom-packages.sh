@@ -33,7 +33,7 @@
 # 新版ssrp 支持mihomo
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES kmod-nft-tproxy kmod-nft-socket xray-core naiveproxy luci-app-ssr-plus luci-i18n-ssr-plus-zh-cn"
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES kmod-nft-tproxy kmod-nft-socket iptables-mod-tproxy xray-core naiveproxy shadowsocks-rust-sslocal luci-app-ssr-plus luci-i18n-ssr-plus-zh-cn"
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES kmod-nft-tproxy kmod-nft-socket iptables-mod-tproxy xray-core naiveproxy shadowsocks-rust-ss-local shadowsocksr-libev-alt luci-app-ssr-plus luci-i18n-ssr-plus-zh-cn htop nano"
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES kmod-nft-tproxy kmod-nft-socket iptables-mod-tproxy xray-core naiveproxy shadowsocks-rust-ss-local shadowsocksr-libev-alt dns2tcp luci-app-ssr-plus luci-i18n-ssr-plus-zh-cn htop nano"
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-nikki-zh-cn"
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-nekobox"
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES momo luci-app-momo luci-i18n-momo-zh-cn"
