@@ -32,7 +32,8 @@
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-homeproxy-zh-cn"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES htop nano"
 # 新版ssrp 支持mihomo
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES kmod-nft-tproxy kmod-nft-socket xray-core naiveproxy luci-app-ssr-plus luci-i18n-ssr-plus-zh-cn"
+#CUSTOM_PACKAGES="$CUSTOM_PACKAGES kmod-nft-tproxy kmod-nft-socket xray-core naiveproxy luci-app-ssr-plus luci-i18n-ssr-plus-zh-cn"
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES kmod-nft-tproxy kmod-nft-socket kmod-nft-compat shadowsocks-rust luci-app-ssr-plus luci-i18n-ssr-plus-zh-cn"
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES kmod-nft-tproxy kmod-nft-socket iptables-mod-tproxy shadowsocks-rust-sslocal shadowsocksr-libev-ssr-local shadowsocksr-libev-ssr-redir simple-obfs-client lua-neturl luci-app-ssr-plus luci-i18n-ssr-plus-zh-cn"
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES kmod-nft-tproxy kmod-nft-socket luci-app-ssr-plus luci-i18n-ssr-plus-zh-cn shadowsocks-rust-sslocal shadowsocksr-libev-ssr-check shadowsocksr-libev-ssr-local shadowsocksr-libev-ssr-redir simple-obfs-client lua-neturl iptables-mod-tproxy"
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES kmod-nft-tproxy kmod-nft-socket iptables-mod-tproxy shadowsocks-rust-sslocal shadowsocksr-libev-ssr-local shadowsocksr-libev-ssr-check simple-obfs-client lua-neturl luci-app-ssr-plus luci-i18n-ssr-plus-zh-cn htop nano"
