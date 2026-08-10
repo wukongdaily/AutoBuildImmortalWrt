@@ -30,7 +30,7 @@
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES kmod-nft-socket kmod-nft-tproxy shadowsocks-rust-sslocal luci-app-passwall2 luci-i18n-passwall2-zh-cn -sing-box -xray-core"
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-openclash luci-compat kmod-tun kmod-inet-diag kmod-nft-tproxy bash curl ip-full unzip"
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-homeproxy-zh-cn"
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES htop nano"
+#CUSTOM_PACKAGES="$CUSTOM_PACKAGES htop nano"
 # 新版ssrp 支持mihomo
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES kmod-nft-tproxy kmod-nft-socket xray-core naiveproxy luci-app-ssr-plus luci-i18n-ssr-plus-zh-cn"
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES kmod-nft-tproxy kmod-nft-socket iptables-mod-tproxy shadowsocks-rust-sslocal shadowsocksr-libev-ssr-local shadowsocksr-libev-ssr-redir simple-obfs-client lua-neturl luci-app-ssr-plus luci-i18n-ssr-plus-zh-cn"
