@@ -77,7 +77,6 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES webdav2 luci-app-unishare"
 # =========custom append=========
 # passwall2补充依赖
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES \
-  tuic-client \
   shadowsocksr-libev-ssr-local \
   shadowsocksr-libev-ssr-redir \
   shadowsocksr-libev-ssr-server \
