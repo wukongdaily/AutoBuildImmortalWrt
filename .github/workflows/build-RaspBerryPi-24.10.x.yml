@@ -1,4 +1,4 @@
-name: build-RaspBerryPi-24.10.x
+name: Build 24.10.x RaspBerryPi
 
 on:
   workflow_dispatch:

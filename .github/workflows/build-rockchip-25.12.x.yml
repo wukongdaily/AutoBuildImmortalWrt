@@ -1,4 +1,4 @@
-name: build-rockchip-25.12.x
+name: Build 25.12.x Rockchip
 # 目前此工作流可以集成imm仓库内的软件 第三方软件暂不能集成(待开发)
 on:
   workflow_dispatch:
@@ -6,12 +6,11 @@ on:
       luci_version:
         description: "选择luci版本"
         required: false
-        default: "25.12.0"
+        default: "25.12.1"
         type: choice
         options:
-          - 25.12.0-rc1
-          - 25.12.0-rc2
           - 25.12.0
+          - 25.12.1
       profile:
         type: choice
         description: |
@@ -86,9 +85,20 @@ on:
         required: true
         default: "192.168.100.1"
       rootfs_partsize:
-        description: '设置软件包大小 单位(MB)'
+        description: '选择软件包空间大小'
         required: true
-        default: '1024'
+        type: choice
+        default: '1G'
+        options:
+          - '1G'
+          - '2G'
+          - '3G'
+          - '4G'
+      enable_store:
+        description: "集成 store 商店"
+        required: false
+        type: boolean
+        default: false
       include_docker:
         description: |
           是否编译 Docker 插件
@@ -142,7 +152,15 @@ jobs:
               exit 1
             fi
           fi
-      
+
+      - name: Enable Store integration
+        run: |
+          if [ "${{ github.event.inputs.enable_store }}" == "true" ]; then
+            echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-store"' >> shell/apk-custom-packages.sh
+            echo "✅ 已追加 luci-app-store"
+          else
+            echo "❎ 未启用 luci-app-store"
+          fi
       - name: Check Docker
         run: |
           if [[ "${{ inputs.include_docker }}" == "yes" ]]; then
@@ -156,6 +174,21 @@ jobs:
           profile="${{ github.event.inputs.profile }}"
           include_docker="${{ github.event.inputs.include_docker }}"
           rootfs_partsize="${{ github.event.inputs.rootfs_partsize }}"
+          case "$rootfs_partsize" in
+            1G)
+              ROOTFS_SIZE=1024
+              ;;
+            2G)
+              ROOTFS_SIZE=2048
+              ;;
+            3G)
+              ROOTFS_SIZE=3072
+              ;;
+            4G)
+              ROOTFS_SIZE=4096
+              ;;
+          esac
+          echo "ROOTFS_SIZE=$ROOTFS_SIZE" >> $GITHUB_ENV
           luci_version="${{ github.event.inputs.luci_version }}"
           echo "Building for profile: $profile"
           docker run --rm -i \
@@ -169,7 +202,7 @@ jobs:
               -v "${{ github.workspace }}/rockchip/build25.sh:/home/build/immortalwrt/build.sh" \
               -e PROFILE=$profile \
               -e INCLUDE_DOCKER=$include_docker \
-              -e ROOTFS_PARTSIZE=$rootfs_partsize \
+              -e ROOTFS_PARTSIZE=$ROOTFS_SIZE \
               -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
               -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
               -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
