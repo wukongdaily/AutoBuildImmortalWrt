@@ -189,11 +189,16 @@ CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-watchcat-zh-cn"
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-wifischedule-zh-cn"
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-xinetd-zh-cn"
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-i18n-xlnetacc-zh-cn"
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-turboacc luci-i18n-turboacc-zh-cn"
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-cpufreq luci-i18n-cpufreq-zh-cn"
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-qosify luci-i18n-qosify-zh-cn"
+# ============ 补充:性能提升 ============
+# turboacc/cpufreq/qosify:构建源里没有,已移除
+# chrony:时间同步增强,体积小可用
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-chrony luci-i18n-chrony-zh-cn"
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-adguardhome luci-i18n-adguardhome-zh-cn"
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-unblockneteasemusic luci-i18n-unblockneteasemusic-zh-cn"
+
+# ============ 补充:好玩/实用 ============
+# adguardhome:去广告+DNS,主包可用,语言包没有(界面英文,或刷好后 opkg 补)
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-adguardhome"
+# unblockneteasemusic:解锁网易云,主包可用,界面英文,或刷好后 opkg 补中文
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-unblockneteasemusic"
 CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-gost luci-i18n-gost-zh-cn"
+
 
