@@ -15,7 +15,7 @@
 #    e) 防火墙 zone 用写死索引 @zone[1] → 改为按 name 动态查找,避免索引漂移
 # =========================================================
 
-LOGFILE="/etc/config/uci-defaults-log.txt"
+LOGFILE="/tmp/uci-defaults-log.txt
 echo "Starting 99-custom.sh at $(date)" >>$LOGFILE
 
 # ---------- 工具:按 name 查找防火墙 zone 的索引(匿名 section 不能用名字直接访问) ----------
@@ -152,7 +152,7 @@ elif [ "$count" -ge 2 ]; then
         uci set network.wan2.device="$wan2_ifname"
         uci set network.wan2.proto='dhcp'
         uci set network.wan2.metric='20'  # 跃点大,主链路断了才接管
-        uci set network.wan2.peerdns='0'  # DNS 统一由 WAN1 下发,避免两边 DNS 打架
+        uci set network.wan2.peerdns='1'  # DNS 统一由 WAN1 下发,避免两边 DNS 打架
         uci set network.wan2.auto='1'
 
         uci set network.wan26=interface
