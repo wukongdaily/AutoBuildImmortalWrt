@@ -1,4 +1,4 @@
-name: build-rockchip-immortalWrt-24.10.x
+name: Build 24.10.x Rockchip
 
 on:
   workflow_dispatch:
@@ -73,9 +73,15 @@ on:
         required: true
         default: "192.168.100.1"
       rootfs_partsize:
-        description: '设置软件包大小 单位(MB)'
+        description: '选择软件包空间大小'
         required: true
-        default: '1024'
+        type: choice
+        default: '1G'
+        options:
+          - '1G'
+          - '2G'
+          - '3G'
+          - '4G'
       enable_store:
         description: "集成 store 商店"
         required: false
@@ -114,7 +120,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Set executable permissions
         run: chmod +x ${{ github.workspace }}/rockchip/build24.sh
@@ -157,8 +163,22 @@ jobs:
           profile="${{ github.event.inputs.profile }}"
           include_docker="${{ github.event.inputs.include_docker }}"
           rootfs_partsize="${{ github.event.inputs.rootfs_partsize }}"
+          case "$rootfs_partsize" in
+            1G)
+              ROOTFS_SIZE=1024
+              ;;
+            2G)
+              ROOTFS_SIZE=2048
+              ;;
+            3G)
+              ROOTFS_SIZE=3072
+              ;;
+            4G)
+              ROOTFS_SIZE=4096
+              ;;
+          esac
+          echo "ROOTFS_SIZE=$ROOTFS_SIZE" >> $GITHUB_ENV
           luci_version="${{ github.event.inputs.luci_version }}"
-          echo "Building for profile: $profile"
           docker run --rm -i \
               --user root \
               -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
@@ -170,7 +190,7 @@ jobs:
               -v "${{ github.workspace }}/rockchip/build24.sh:/home/build/immortalwrt/build.sh" \
               -e PROFILE=$profile \
               -e INCLUDE_DOCKER=$include_docker \
-              -e ROOTFS_PARTSIZE=$rootfs_partsize \
+              -e ROOTFS_PARTSIZE=$ROOTFS_SIZE \
               -e ENABLE_PPPOE=${{ inputs.enable_pppoe }} \
               -e PPPOE_ACCOUNT=${{ inputs.pppoe_account }} \
               -e PPPOE_PASSWORD=${{ inputs.pppoe_password }} \
@@ -196,7 +216,7 @@ jobs:
           fi
 
       - name: Upload ImmortWrt as release assets
-        uses: softprops/action-gh-release@v2.2.1
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: Autobuild
           name: ImmortWrt-Rockchip
